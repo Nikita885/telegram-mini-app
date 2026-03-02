@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
