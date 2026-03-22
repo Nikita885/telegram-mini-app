@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мой мини-апп</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+    <div id="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <nav class="bottom-navigation">
+
+        <a href="{% url 'home' %}" class="bottom-navigation__item">
+            <i class="ri-home-line bottom-navigation__icon"></i>
+            <span class="bottom-navigation__label">Главная</span>
+        </a>
+
+        <a href="{% url 'search' %}" class="bottom-navigation__item">
+            <i class="ri-search-line bottom-navigation__icon"></i>
+            <span class="bottom-navigation__label">Поиск</span>
+        </a>
+
+        <a href="{% url 'create' %}" class="bottom-navigation__item">
+            <button class="bottom-navigation__action">+</button>
+        </a>
+
+        <a href="{% url 'messages' %}" class="bottom-navigation__item">
+            <i class="ri-message-2-line bottom-navigation__icon"></i>
+            <span class="bottom-navigation__label">Сообщения</span>
+        </a>
+
+        <a href="{% url 'profile' %}" class="bottom-navigation__item">
+            <i class="ri-user-line bottom-navigation__icon"></i>
+            <span class="bottom-navigation__label">Профиль</span>
+        </a>
+
+    </nav>
+
+    <script src="{% static 'js/base.js' %}"></script>
+</body>
+</html>
