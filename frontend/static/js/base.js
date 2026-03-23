@@ -1,11 +1,3 @@
-function detectPlatform() {
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad|ipod/.test(userAgent);
-  
-  if (isIOS) {
-    document.documentElement.classList.add('ios');
-  }
-}
 
 async function loadPage(url) {
   try {
@@ -16,6 +8,10 @@ async function loadPage(url) {
     const newContent = doc.getElementById('main-content');
     if (newContent) {
       document.getElementById('main-content').innerHTML = newContent.innerHTML;
+      // Инициализируем страницу после загрузки (например, для профиля)
+      if (typeof window.initPageAfterLoad === 'function') {
+        window.initPageAfterLoad();
+      }
     }
   } catch (error) {
     console.error('Ошибка загрузки страницы:', error);
@@ -82,7 +78,11 @@ window.addEventListener('popstate', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  detectPlatform();
+  // стартовая проверка и синхронизация пользователя при открытии приложения
+  if (typeof saveTelegramUser === 'function') {
+    saveTelegramUser();
+  }
+
   setActiveButton();
 
   if (window.location.pathname !== '/') {
@@ -93,4 +93,18 @@ document.addEventListener('DOMContentLoaded', () => {
   navItems.forEach(item => {
     item.addEventListener('click', handleNavClick);
   });
+
+  // Инициализируем страницу, если нужно (например, профиль)
+  if (typeof window.initPageAfterLoad === 'function') {
+    window.initPageAfterLoad();
+  }
 });
+
+// Глобальная функция для инициализации после замены контента
+window.initPageAfterLoad = function() {
+  setActiveButton(); // обновить активную иконку
+  // Если текущая страница – профиль, вызываем loadProfile
+  if (window.location.pathname === '/profile/' && typeof window.loadProfile === 'function') {
+    window.loadProfile();
+  }
+};

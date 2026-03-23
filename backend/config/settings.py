@@ -65,7 +65,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'database-tg-app'),
         'USER': os.environ.get('POSTGRES_USER', 'postgres'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'Qiwe1419as'),
-        'HOST': os.environ.get('POSTGRES_HOST', '127.0.0.1'),  # <--- важное
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),  # default to docker service host
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
     }
 }

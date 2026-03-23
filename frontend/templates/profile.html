@@ -1,6 +1,45 @@
-
 {% extends "base.html" %}
 
 {% block content %}
 <h1>Профиль</h1>
+<div id="profile-info">
+    <p><strong>Telegram ID:</strong> <span id="tg-id">—</span></p>
+    <p><strong>Имя:</strong> <span id="tg-first-name">—</span></p>
+    <p><strong>Фамилия:</strong> <span id="tg-last-name">—</span></p>
+    <p><strong>Username:</strong> <span id="tg-username">—</span></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Загрузка профиля пользователя из БД
+    window.loadProfile = async function() {
+        const tg = window.Telegram?.WebApp;
+        const user = tg?.initDataUnsafe?.user;
+        
+        if (!user) {
+            console.warn('No user from Telegram');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/telegram-user/${user.id}/`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const dbUser = await response.json();
+            document.getElementById('tg-id').textContent = dbUser.telegram_id || '—';
+            document.getElementById('tg-first-name').textContent = dbUser.first_name || '—';
+            document.getElementById('tg-last-name').textContent = dbUser.last_name || '—';
+            document.getElementById('tg-username').textContent = dbUser.username || '—';
+        } catch (error) {
+            console.error('Error loading profile:', error);
+        }
+    };
+    
+    window.initPageAfterLoad = window.loadProfile;
+</script>
 {% endblock %}

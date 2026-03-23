@@ -13,7 +13,7 @@ services:
     env_file:
       - ./backend/.env
     command: >
-      sh -c "./scripts/wait-for-it.sh db:5432 &&
+      sh -c "./scripts/wait-for-it.sh db:5432 --strict --timeout=60 &&
             python manage.py migrate &&
             exec python manage.py runserver 0.0.0.0:8000 --noreload"
     volumes:

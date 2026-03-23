@@ -9,3 +9,13 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+    
+class TelegramUser(models.Model):
+    telegram_id = models.BigIntegerField(unique=True, verbose_name="Telegram ID")
+    username = models.CharField(max_length=255, blank=True, null=True, verbose_name="Username")
+    first_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="First name")
+    last_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Last name")
+    language_code = models.CharField(max_length=10, blank=True, null=True, verbose_name="Language code")
+
+    def __str__(self):
+        return f"{self.username or self.first_name or str(self.telegram_id)}"
