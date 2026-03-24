@@ -1,7 +1,6 @@
 from django.urls import path
-from .views import TelegramUserView
+from .views import AuthorizeView
 
 urlpatterns = [
-    path('telegram-user/', TelegramUserView.as_view(), name='telegram-user'),
-    path('telegram-user/<int:telegram_id>/', TelegramUserView.as_view(), name='telegram-user-detail'),
+    path('authorize/', AuthorizeView.as_view(), name='api-authorize'),
 ]

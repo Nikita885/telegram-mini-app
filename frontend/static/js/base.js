@@ -1,21 +1,34 @@
+function detectPlatform() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(userAgent);
+  
+  if (isIOS) {
+    document.documentElement.classList.add('ios');
+  }
+}
 
 async function loadPage(url) {
-  try {
-    const response = await fetch(url);
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const newContent = doc.getElementById('main-content');
-    if (newContent) {
-      document.getElementById('main-content').innerHTML = newContent.innerHTML;
-      // Инициализируем страницу после загрузки (например, для профиля)
-      if (typeof window.initPageAfterLoad === 'function') {
-        window.initPageAfterLoad();
-      }
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Ошибка сервера');
+        
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        const newContent = doc.getElementById('main-content');
+        if (newContent) {
+            document.getElementById('main-content').innerHTML = newContent.innerHTML;
+        }
+
+        // Переинициализируем навигацию после загрузки
+        setActiveButton();
+        
+    } catch (error) {
+        console.error('Ошибка загрузки страницы:', error);
+        // Если ошибка — делаем полный редирект
+        window.location.href = url;
     }
-  } catch (error) {
-    console.error('Ошибка загрузки страницы:', error);
-  }
 }
 
 function updateIcons() {
@@ -63,13 +76,20 @@ function setActiveButton() {
 }
 
 function handleNavClick(event) {
-  event.preventDefault();
-  const href = event.currentTarget.getAttribute('href');
-  if (href) {
-    loadPage(href);
-    history.pushState(null, '', href);
-    setActiveButton();
-  }
+    event.preventDefault();
+    
+    const item = event.currentTarget;
+    const href = item.getAttribute('href');
+    const telegramId = item.getAttribute('data-telegram-id');
+
+    if (href && telegramId) {
+        // Добавляем telegram_id в URL на всякий случай
+        const urlWithId = href.includes(telegramId) ? href : `/home/${telegramId}/`; // fallback
+        
+        loadPage(href);
+        history.pushState({telegram_id: telegramId}, '', href);
+        setActiveButton();
+    }
 }
 
 window.addEventListener('popstate', () => {
@@ -78,11 +98,7 @@ window.addEventListener('popstate', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // стартовая проверка и синхронизация пользователя при открытии приложения
-  if (typeof saveTelegramUser === 'function') {
-    saveTelegramUser();
-  }
-
+  detectPlatform();
   setActiveButton();
 
   if (window.location.pathname !== '/') {
@@ -93,18 +109,4 @@ document.addEventListener('DOMContentLoaded', () => {
   navItems.forEach(item => {
     item.addEventListener('click', handleNavClick);
   });
-
-  // Инициализируем страницу, если нужно (например, профиль)
-  if (typeof window.initPageAfterLoad === 'function') {
-    window.initPageAfterLoad();
-  }
 });
-
-// Глобальная функция для инициализации после замены контента
-window.initPageAfterLoad = function() {
-  setActiveButton(); // обновить активную иконку
-  // Если текущая страница – профиль, вызываем loadProfile
-  if (window.location.pathname === '/profile/' && typeof window.loadProfile === 'function') {
-    window.loadProfile();
-  }
-};
