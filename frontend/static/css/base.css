@@ -29,7 +29,7 @@ html.ios .bottom-navigation {
 
 .bottom-navigation {
   position: fixed;
-  bottom: 0;
+  bottom: 10px;
   left: 0;
   width: 100%;
   height: 70px;
@@ -102,4 +102,8 @@ html.ios .bottom-navigation {
 
 .bottom-navigation__item:active {
   transform: scale(0.95);
+}
+
+body.hide-nav .bottom-navigation {
+    display: none;
 }

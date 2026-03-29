@@ -1,7 +1,45 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<h1>Профиль</h1>
+<div class="profile">
+    <div class="profile-avatar">
+        <button id="avatar-button" class="avatar-container" style="background-color: {{ user.avatar_random_color|default:'#cccccc' }};">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" class="avatar-img">
+            {% else %}
+                <div class="avatar-letter">
+                    {{ user.username|first }}
+                </div>
+            {% endif %}
+        </button>
+        <button id="avatar-overlay-btn" class="avatar-button-overlay">+</button>
+    </div>
+    <div class="profile-name">
+        {{ user.first_name }}
+    </div>
+    {% if user.username %}
+    <div class="profile-username">@{{ user.username }}</div>
+    {% endif %} 
 
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-value">{{ following_count }}</span>
+            <span class="stat-label">Подписок</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ followers_count }}</span>
+            <span class="stat-label">Подписчиков</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ posts_count }}</span>
+            <span class="stat-label">Постов</span>
+        </div>
+    </div>
+
+    {% comment %} <button id="load-avatar-btn" {% if user.avatar %}style="display:none;"{% endif %}>
+        Загрузить аватар из Telegram
+    </button> {% endcomment %}
+    
+</div>
 {% endblock %}
-
