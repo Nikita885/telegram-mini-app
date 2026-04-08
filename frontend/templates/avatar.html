@@ -8,7 +8,7 @@
                 <img src="{{ user.avatar.url }}" class="avatar-img">
             {% else %}
                 <div class="avatar-letter">
-                    {{ user.username|first }}
+                    {{ user.username|first|default:'U' }}
                 </div>
             {% endif %}
         </div>
@@ -26,9 +26,11 @@
             <button id="telegram-btn" class="avatar-action-btn">
                 Telegram
             </button>
+
+            <button id="delete-btn" class="avatar-action-btn delete-btn">
+                Удалить аватар
+            </button>
         </div>
 
     </div>
-    <input type="file" id="avatar-input" accept="image/*" hidden>
-    <div id="avatar-gallery" class="avatar-gallery"></div>
 </div>

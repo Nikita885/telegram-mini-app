@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +12,8 @@ from django.http import JsonResponse
 from PIL import Image
 from io import BytesIO
 from django.views.decorators.cache import never_cache
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from .models import TelegramUser
 from .utils import verify_telegram_init_data
@@ -59,7 +62,6 @@ class AuthorizeView(APIView):
                 user.first_name = user_data.get('first_name')
                 user.last_name = user_data.get('last_name')
                 user.language_code = user_data.get('language_code')
-
                 user.save()
 
             request.session['telegram_id'] = telegram_id
@@ -68,29 +70,9 @@ class AuthorizeView(APIView):
             return Response({'status': 'ok'}, status=200)
 
         except Exception as e:
-            # В production лучше заменить на logging.exception(e)
             print("CRITICAL ERROR:", str(e))
             return Response({'error': 'Server error'}, status=500)
         
-class UpdateAvatarColorView(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        user = get_current_user(request)
-        if not user:
-            return JsonResponse({'error': 'Not authorized'}, status=401)
-
-        color = request.data.get('color')
-
-        if not color or not color.startswith('#'):
-            return JsonResponse({'error': 'Invalid color'}, status=400)
-
-        user.avatar_random_color = color
-        user.save()
-
-        return JsonResponse({'status': 'ok', 'color': color})
-
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateAvatarView(APIView):
     authentication_classes = []
@@ -101,98 +83,142 @@ class UpdateAvatarView(APIView):
         if not user:
             return JsonResponse({'error': 'Not authorized'}, status=401)
 
-        # Запрос к Telegram API для получения фото профиля
+        # Определяем тип операции
+        update_type = request.GET.get('type') or request.data.get('type')
+        
+        if update_type == 'color':
+            return self._update_color(request, user)
+        elif update_type == 'telegram':
+            return self._update_from_telegram(user)
+        elif update_type == 'upload':
+            return self._upload_avatar(request, user)
+        elif update_type == 'delete':
+            return self._delete_avatar(user)
+        else:
+            return JsonResponse({'error': 'Invalid update type'}, status=400)
+
+    def _delete_old_avatar(self, user):
+        """Удаляет старый файл аватара"""
+        if user.avatar and user.avatar.name:
+            # Проверяем существует ли файл
+            if default_storage.exists(user.avatar.name):
+                default_storage.delete(user.avatar.name)
+                print(f"Deleted old avatar: {user.avatar.name}")
+            user.avatar = None
+
+    def _update_color(self, request, user):
+        """Обновление цвета аватара"""
+        color = request.data.get('color')
+        
+        if not color or not color.startswith('#'):
+            return JsonResponse({'error': 'Invalid color'}, status=400)
+        
+        user.avatar_random_color = color
+        user.save()
+        
+        return JsonResponse({'status': 'ok', 'color': color})
+
+    def _update_from_telegram(self, user):
+        """Загрузка аватара из Telegram"""
+        # Удаляем старый аватар
+        self._delete_old_avatar(user)
+        
         bot_token = settings.TG_BOT_TOKEN
+        
+        # Получаем фото профиля
         url = f"https://api.telegram.org/bot{bot_token}/getUserProfilePhotos"
         params = {'user_id': user.telegram_id, 'limit': 1}
         response = requests.get(url, params=params)
         data = response.json()
-
+        
         if not data.get('ok') or not data['result']['total_count']:
             return JsonResponse({'error': 'No avatar found in Telegram'}, status=404)
-
-        # Получаем самое большое фото (последнее в списке)
-        photos = data['result']['photos'][0]  # первое фото из последних
-        # photos — список размеров, самый большой последний
+        
+        # Получаем самое большое фото
+        photos = data['result']['photos'][0]
         largest = photos[-1]
         file_id = largest['file_id']
-
+        
         # Получаем путь к файлу
         file_url = f"https://api.telegram.org/bot{bot_token}/getFile"
         file_params = {'file_id': file_id}
         file_resp = requests.get(file_url, params=file_params)
         file_data = file_resp.json()
+        
         if not file_data.get('ok'):
             return JsonResponse({'error': 'Failed to get file info'}, status=500)
-
+        
         file_path = file_data['result']['file_path']
         download_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
-
+        
         # Скачиваем изображение
         img_resp = requests.get(download_url, stream=True)
         if img_resp.status_code != 200:
             return JsonResponse({'error': 'Failed to download image'}, status=500)
-
+        
         img = Image.open(img_resp.raw)
-        # Оптимизируем размер и формат
         img.thumbnail((200, 200), Image.Resampling.LANCZOS)
         buffer = BytesIO()
         img.save(buffer, format='WebP', quality=80)
         buffer.seek(0)
-
-        # Сохраняем в поле avatar
+        
         user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
-
+        
         return JsonResponse({'status': 'ok', 'avatar_url': user.avatar.url})
-    
-@method_decorator(csrf_exempt, name='dispatch')
-class UploadAvatarView(APIView):
-    authentication_classes = []
-    permission_classes = [AllowAny]
 
-    def post(self, request):
-        user = get_current_user(request)
-        if not user:
-            return JsonResponse({'error': 'Not authorized'}, status=401)
-
+    def _upload_avatar(self, request, user):
+        """Загрузка аватара из галереи"""
         file = request.FILES.get('avatar')
         if not file:
             return JsonResponse({'error': 'No file'}, status=400)
-
+        
         try:
+            # Удаляем старый аватар
+            self._delete_old_avatar(user)
+            
             img = Image.open(file)
-
-            # 👉 обрезаем квадрат по центру
+            
+            # Обрезаем квадрат по центру
             min_side = min(img.size)
             left = (img.width - min_side) / 2
             top = (img.height - min_side) / 2
             right = (img.width + min_side) / 2
             bottom = (img.height + min_side) / 2
-
+            
             img = img.crop((left, top, right, bottom))
-
-            # 👉 уменьшаем
             img = img.resize((200, 200), Image.Resampling.LANCZOS)
-
+            
             buffer = BytesIO()
             img.save(buffer, format='WebP', quality=80)
             buffer.seek(0)
-
-            user.avatar.save(
-                f'avatar_{user.telegram_id}.webp',
-                buffer,
-                save=True
-            )
-
+            
+            user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
+            
             return JsonResponse({
                 'status': 'ok',
                 'avatar_url': user.avatar.url
             })
-
+            
         except Exception as e:
             print(e)
             return JsonResponse({'error': 'Invalid image'}, status=400)
-
+    
+    def _delete_avatar(self, user):
+        """Полное удаление аватара"""
+        try:
+            # Удаляем файл
+            self._delete_old_avatar(user)
+            # Сохраняем изменения
+            user.save()
+            
+            return JsonResponse({
+                'status': 'ok',
+                'message': 'Avatar deleted successfully'
+            })
+        except Exception as e:
+            print(f"Error deleting avatar: {e}")
+            return JsonResponse({'error': 'Failed to delete avatar'}, status=500)
+        
 def get_current_user(request):
     telegram_id = request.session.get('telegram_id')
     return TelegramUser.objects.filter(telegram_id=telegram_id).first() if telegram_id else None
@@ -214,7 +240,6 @@ def messages_view(request):
     if not user:
         return redirect('/authorize/')
     return render(request, 'messages.html', {'telegram_id': user.telegram_id})
-
 
 def profile_view(request):
     user = get_current_user(request)
@@ -242,8 +267,6 @@ def create_view(request):
 def authorize_view(request):
     return render(request, 'authorize.html')
 
-
-
 def avatar_view(request):
     user = get_current_user(request)
     if not user:
@@ -253,9 +276,7 @@ def avatar_view(request):
         'user': user
     }
 
-    # 👉 если это AJAX (SPA)
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, 'avatar.html', context)
 
-    # 👉 если прямой заход
     return render(request, 'base.html', context)

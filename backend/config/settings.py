@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-4r#u8=^_av+-hl%76u2pq*oplfv9$$+ghr2^o2rh4$4al184zl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'marleen-unfluffed-maura.ngrok-free.dev']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'marleen-unfluffed-maura.ngrok-free.dev', 'projector-justify-numerous-ralph.trycloudflare.com']
 
 
 # Application definition

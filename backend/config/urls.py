@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from api.views import search_view, home_view, messages_view, profile_view, create_view, authorize_view, avatar_view
-from api.views import UploadAvatarView, UpdateAvatarColorView, UpdateAvatarView
+from api.views import UpdateAvatarView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -17,7 +17,6 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('create/', create_view, name='create'),
     path('avatar/', avatar_view, name='avatar'),
-    path('upload-avatar/', UploadAvatarView.as_view()),
-    path('update-avatar-color/', UpdateAvatarColorView.as_view()),
-    path('update-avatar/', UpdateAvatarView.as_view()),
+    path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
