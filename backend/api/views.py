@@ -14,8 +14,9 @@ from io import BytesIO
 from django.views.decorators.cache import never_cache
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.db.models import Q
 
-from .models import TelegramUser
+from .models import TelegramUser, Follow
 from .utils import verify_telegram_init_data
 import random
 
@@ -72,7 +73,79 @@ class AuthorizeView(APIView):
         except Exception as e:
             print("CRITICAL ERROR:", str(e))
             return Response({'error': 'Server error'}, status=500)
-        
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SearchUsersView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+
+        query = request.GET.get('q', '').strip()
+        if not query:
+            return Response({'users': []})
+
+        users = TelegramUser.objects.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        ).exclude(telegram_id=current_user.telegram_id)[:20]
+
+        following_ids = set(
+            current_user.following.values_list('following__telegram_id', flat=True)
+        )
+
+        result = []
+        for u in users:
+            avatar_url = u.avatar.url if u.avatar else None
+            result.append({
+                'telegram_id': u.telegram_id,
+                'username': u.username or '',
+                'first_name': u.first_name or '',
+                'last_name': u.last_name or '',
+                'avatar_url': avatar_url,
+                'avatar_color': u.avatar_random_color or '#cccccc',
+                'is_following': u.telegram_id in following_ids,
+            })
+
+        return Response({'users': result})
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FollowToggleView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+
+        target_id = request.data.get('telegram_id')
+        if not target_id:
+            return Response({'error': 'telegram_id required'}, status=400)
+
+        try:
+            target = TelegramUser.objects.get(telegram_id=target_id)
+        except TelegramUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+
+        if target.telegram_id == current_user.telegram_id:
+            return Response({'error': 'Cannot follow yourself'}, status=400)
+
+        follow_qs = Follow.objects.filter(follower=current_user, following=target)
+        if follow_qs.exists():
+            follow_qs.delete()
+            return Response({'status': 'unfollowed'})
+        else:
+            Follow.objects.create(follower=current_user, following=target)
+            return Response({'status': 'followed'})
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateAvatarView(APIView):
     authentication_classes = []
@@ -83,7 +156,6 @@ class UpdateAvatarView(APIView):
         if not user:
             return JsonResponse({'error': 'Not authorized'}, status=401)
 
-        # Определяем тип операции
         update_type = request.GET.get('type') or request.data.get('type')
         
         if update_type == 'color':
@@ -98,127 +170,84 @@ class UpdateAvatarView(APIView):
             return JsonResponse({'error': 'Invalid update type'}, status=400)
 
     def _delete_old_avatar(self, user):
-        """Удаляет старый файл аватара и сбрасывает поле"""
         if user.avatar and user.avatar.name:
             if default_storage.exists(user.avatar.name):
                 default_storage.delete(user.avatar.name)
-                print(f"Deleted old avatar: {user.avatar.name}")
             user.avatar = None
-            user.save()   # ← БАГ: раньше этого не было — путь оставался в БД
+            user.save()
 
     def _update_color(self, request, user):
-        """Обновление цвета аватара"""
         color = request.data.get('color')
-        
         if not color or not color.startswith('#'):
             return JsonResponse({'error': 'Invalid color'}, status=400)
-        
         user.avatar_random_color = color
         user.save()
-        
         return JsonResponse({'status': 'ok', 'color': color})
 
     def _update_from_telegram(self, user):
-        """Загрузка аватара из Telegram"""
-        # Удаляем старый аватар
         self._delete_old_avatar(user)
-        
         bot_token = settings.TG_BOT_TOKEN
-        
-        # Получаем фото профиля
         url = f"https://api.telegram.org/bot{bot_token}/getUserProfilePhotos"
         params = {'user_id': user.telegram_id, 'limit': 1}
         response = requests.get(url, params=params)
         data = response.json()
-        
         if not data.get('ok') or not data['result']['total_count']:
             return JsonResponse({'error': 'No avatar found in Telegram'}, status=404)
-        
-        # Получаем самое большое фото
         photos = data['result']['photos'][0]
         largest = photos[-1]
         file_id = largest['file_id']
-        
-        # Получаем путь к файлу
         file_url = f"https://api.telegram.org/bot{bot_token}/getFile"
         file_params = {'file_id': file_id}
         file_resp = requests.get(file_url, params=file_params)
         file_data = file_resp.json()
-        
         if not file_data.get('ok'):
             return JsonResponse({'error': 'Failed to get file info'}, status=500)
-        
         file_path = file_data['result']['file_path']
         download_url = f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
-        
-        # Скачиваем изображение
         img_resp = requests.get(download_url, stream=True)
         if img_resp.status_code != 200:
             return JsonResponse({'error': 'Failed to download image'}, status=500)
-        
         img = Image.open(img_resp.raw)
         img.thumbnail((200, 200), Image.Resampling.LANCZOS)
         buffer = BytesIO()
         img.save(buffer, format='WebP', quality=80)
         buffer.seek(0)
-        
         user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
-        
         return JsonResponse({'status': 'ok', 'avatar_url': user.avatar.url})
 
     def _upload_avatar(self, request, user):
-        """Загрузка аватара из галереи"""
         file = request.FILES.get('avatar')
         if not file:
             return JsonResponse({'error': 'No file'}, status=400)
-        
         try:
-            # Удаляем старый аватар
             self._delete_old_avatar(user)
-            
             img = Image.open(file)
-            
-            # Обрезаем квадрат по центру
             min_side = min(img.size)
             left = (img.width - min_side) / 2
             top = (img.height - min_side) / 2
             right = (img.width + min_side) / 2
             bottom = (img.height + min_side) / 2
-            
             img = img.crop((left, top, right, bottom))
             img = img.resize((200, 200), Image.Resampling.LANCZOS)
-            
             buffer = BytesIO()
             img.save(buffer, format='WebP', quality=80)
             buffer.seek(0)
-            
             user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
-            
-            return JsonResponse({
-                'status': 'ok',
-                'avatar_url': user.avatar.url
-            })
-            
+            return JsonResponse({'status': 'ok', 'avatar_url': user.avatar.url})
         except Exception as e:
             print(e)
             return JsonResponse({'error': 'Invalid image'}, status=400)
-    
+
     def _delete_avatar(self, user):
-        """Полное удаление аватара"""
         try:
-            # Удаляем файл
             self._delete_old_avatar(user)
-            # Сохраняем изменения
             user.save()
-            
-            return JsonResponse({
-                'status': 'ok',
-                'message': 'Avatar deleted successfully'
-            })
+            return JsonResponse({'status': 'ok', 'message': 'Avatar deleted successfully'})
         except Exception as e:
             print(f"Error deleting avatar: {e}")
             return JsonResponse({'error': 'Failed to delete avatar'}, status=500)
-        
+
+
 def get_current_user(request):
     telegram_id = request.session.get('telegram_id')
     return TelegramUser.objects.filter(telegram_id=telegram_id).first() if telegram_id else None
@@ -233,7 +262,7 @@ def search_view(request):
     user = get_current_user(request)
     if not user:
         return redirect('/authorize/')
-    return render(request, 'search.html', {'telegram_id': user.telegram_id})
+    return render(request, 'search.html', {'user': user})
 
 def messages_view(request):
     user = get_current_user(request)
@@ -245,11 +274,9 @@ def profile_view(request):
     user = get_current_user(request)
     if not user:
         return redirect('/authorize/')
-    
     following_count = user.following.count()
     followers_count = user.followers.count()
     posts_count = user.posts.count()
-
     context = {
         'user': user,
         'following_count': following_count,
@@ -271,12 +298,7 @@ def avatar_view(request):
     user = get_current_user(request)
     if not user:
         return redirect('/authorize/')
-
-    context = {
-        'user': user
-    }
-
+    context = {'user': user}
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, 'avatar.html', context)
-
     return render(request, 'base.html', context)

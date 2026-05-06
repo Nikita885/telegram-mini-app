@@ -6,7 +6,7 @@
     <div class="profile-avatar">
         <button id="avatar-button" class="avatar-container" style="background-color: {{ user.avatar_random_color|default:'#cccccc' }};">
             {% if user.avatar %}
-                <img src="{{ user.avatar.url }}?t={{ now|date:'U' }}" class="avatar-img">
+                <img src="{{ user.avatar.url }}" class="avatar-img">
             {% else %}
                 <div class="avatar-letter">
                     {{ user.username|first }}
@@ -36,10 +36,5 @@
             <span class="stat-label">Постов</span>
         </div>
     </div>
-
-    {% comment %} <button id="load-avatar-btn" {% if user.avatar %}style="display:none;"{% endif %}>
-        Загрузить аватар из Telegram
-    </button> {% endcomment %}
-    
 </div>
 {% endblock %}

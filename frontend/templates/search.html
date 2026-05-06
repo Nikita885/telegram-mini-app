@@ -1,6 +1,42 @@
-
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}?v={% now 'U' %}">
+{% endblock %}
 
 {% block content %}
-<h1>Поиск</h1>
+<div class="search-page">
+    <div class="search-header">
+        <div class="search-bar-wrap">
+            <i class="ri-search-line search-icon"></i>
+            <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Имя, @username..."
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="false"
+            >
+            <button class="search-clear hidden" id="search-clear">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="search-results" class="search-results">
+        <div class="search-empty-state" id="empty-state">
+            <div class="empty-icon">
+                <i class="ri-group-line"></i>
+            </div>
+            <p class="empty-title">Найдите людей</p>
+            <p class="empty-sub">Введите имя или @username</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/search.js' %}?v={% now 'U' %}"></script>
 {% endblock %}

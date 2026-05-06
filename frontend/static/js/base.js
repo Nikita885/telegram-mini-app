@@ -9,6 +9,7 @@ function detectPlatform() {
 function initPage() {
     initProfilePage();
     initAvatarPage();
+    initSearchPage();
 }
 
 async function loadPage(url) {
@@ -28,9 +29,20 @@ async function loadPage(url) {
             document.getElementById('main-content').innerHTML = newContent.innerHTML;
         }
 
-        initPage(); // ← здесь initProfilePage подхватит sessionStorage
+        // Dynamically load page-specific CSS if not yet loaded
+        const cssLinks = doc.querySelectorAll('link[rel="stylesheet"]');
+        cssLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !document.querySelector(`link[href="${href}"]`)) {
+                const newLink = document.createElement('link');
+                newLink.rel = 'stylesheet';
+                newLink.href = href;
+                document.head.appendChild(newLink);
+            }
+        });
 
-        // Чистим только если ушли не на профиль и не на аватар
+        initPage();
+
         const isProfileRelated = url.startsWith('/profile') || url.startsWith('/avatar');
         if (!isProfileRelated) {
             sessionStorage.removeItem('avatar_updated');
