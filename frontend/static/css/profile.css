@@ -202,19 +202,3 @@
     height: 100%;
     object-fit: cover;
 }
-
-#color-picker {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%) scale(0.8);
-    opacity: 0;
-    transition: 0.2s ease;
-    pointer-events: none;
-}
-
-#color-picker.active {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-    pointer-events: auto;
-}

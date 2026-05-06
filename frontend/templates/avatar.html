@@ -7,29 +7,20 @@
             {% if user.avatar %}
                 <img src="{{ user.avatar.url }}" class="avatar-img">
             {% else %}
-                <div class="avatar-letter">
+                <span class="avatar-letter">
                     {{ user.username|first|default:'U' }}
-                </div>
+                </span>
             {% endif %}
         </div>
 
         <div class="avatar-actions">
-            <button id="color-btn" class="avatar-action-btn">
-                Изменить цвет
-            </button>
-            <input type="color" id="color-picker" hidden>
+            <input type="file" id="avatar-input"
+                   accept="image/jpeg,image/png,image/webp,image/gif"
+                   style="display:none">
 
-            <button id="gallery-btn" class="avatar-action-btn">
-                Галерея
-            </button>
-            
-            <button id="telegram-btn" class="avatar-action-btn">
-                Telegram
-            </button>
-
-            <button id="delete-btn" class="avatar-action-btn delete-btn">
-                Удалить аватар
-            </button>
+            <button id="gallery-btn" class="avatar-action-btn">Галерея</button>
+            <button id="telegram-btn" class="avatar-action-btn">Telegram</button>
+            <button id="delete-btn" class="avatar-action-btn">Удалить аватар</button>
         </div>
 
     </div>

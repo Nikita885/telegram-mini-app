@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
     build: ./backend
@@ -19,6 +19,7 @@ services:
     volumes:
       - ./backend:/app
       - ./frontend:/frontend
+      - ./media:/app/media
     ports:
       - "8000:8000"
     depends_on:

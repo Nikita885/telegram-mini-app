@@ -1,213 +1,173 @@
+function setButtonLoading(btn, text = 'Загрузка...') {
+    const original = btn.innerHTML;
+    btn.innerHTML = text;
+    btn.disabled = true;
+    return () => {
+        btn.innerHTML = original;
+        btn.disabled = false;
+    };
+}
+
+function validateAvatarFile(file) {
+    const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    const MAX_MB = 5;
+    if (!ALLOWED.includes(file.type)) {
+        return { ok: false, error: 'Разрешены только JPG, PNG, WEBP, GIF' };
+    }
+    if (file.size > MAX_MB * 1024 * 1024) {
+        return { ok: false, error: `Максимальный размер — ${MAX_MB} МБ` };
+    }
+    return { ok: true };
+}
+
+function updateAvatarPreview(avatarFull, src) {
+    if (!avatarFull) return;
+    let img = avatarFull.querySelector('.avatar-img');
+    const letter = avatarFull.querySelector('.avatar-letter');
+    if (!img) {
+        img = document.createElement('img');
+        img.className = 'avatar-img';
+        avatarFull.innerHTML = '';
+        avatarFull.appendChild(img);
+    }
+    img.src = src;
+    img.style.display = '';
+    if (letter) letter.style.display = 'none';
+}
+
+function tgConfirm(message) {
+    return new Promise((resolve) => {
+        if (window.Telegram?.WebApp?.showConfirm) {
+            window.Telegram.WebApp.showConfirm(message, resolve);
+        } else {
+            resolve(window.confirm(message));
+        }
+    });
+}
+
+function goToProfile() {
+    loadPage('/profile/');
+    history.pushState({}, '', '/profile/');
+}
+
 function initAvatarPage() {
     const avatarPage = document.querySelector('.avatar-page');
     if (!avatarPage) return;
 
     document.body.classList.add('hide-nav');
 
-    const input = document.getElementById('avatar-input');
-    const avatarFull = document.querySelector('.avatar-full');
-
-    const colorBtn = document.getElementById('color-btn');
-    const colorPicker = document.getElementById('color-picker');
-
-    const backBtn = document.querySelector('.avatar-back');
-    const galleryBtn = document.getElementById('gallery-btn');
+    const input       = document.getElementById('avatar-input');
+    const avatarFull  = document.querySelector('.avatar-full');
+    const backBtn     = document.querySelector('.avatar-back');
+    const galleryBtn  = document.getElementById('gallery-btn');
     const telegramBtn = document.getElementById('telegram-btn');
-    const deleteBtn = document.getElementById('delete-btn');
+    const deleteBtn   = document.getElementById('delete-btn');
 
-    let colorTimeout = null;
-
-    // =========================
-    // 📱 ГАЛЕРЕЯ / ЗАГРУЗКА
-    // =========================
+    // ── Галерея ──────────────────────────────
     if (galleryBtn && input) {
         galleryBtn.onclick = () => {
             input.removeAttribute('capture');
             input.click();
         };
-    }
 
-    if (input) {
         input.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Показываем индикатор загрузки
-            const loadingText = galleryBtn.innerHTML;
-            galleryBtn.innerHTML = '⏳ Загрузка...';
-            galleryBtn.disabled = true;
+            const validation = validateAvatarFile(file);
+            if (!validation.ok) {
+                alert(validation.error);
+                input.value = '';
+                return;
+            }
 
+            const previewUrl = URL.createObjectURL(file);
+            updateAvatarPreview(avatarFull, previewUrl);
+
+            const restore = setButtonLoading(galleryBtn, 'Загрузка...');
             const formData = new FormData();
             formData.append('avatar', file);
             formData.append('type', 'upload');
 
             try {
-                const response = await fetch('/update-avatar/?type=upload', {
+                const res = await fetch('/update-avatar/?type=upload', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
-
-                const data = await response.json();
+                const data = await res.json();
 
                 if (data.status === 'ok') {
-                    loadPage('/profile/');
-                    history.pushState({}, '', '/profile/');
+                    // Сохраняем url — профиль подхватит без перезагрузки
+                    sessionStorage.setItem('avatar_updated', data.avatar_url);
+                    goToProfile();
                 } else {
-                    console.error(data.error);
                     alert('Ошибка загрузки: ' + data.error);
                 }
-
             } catch (err) {
-                console.error('Ошибка загрузки:', err);
-                alert('Ошибка загрузки файла');
+                console.error(err);
+                alert('Не удалось загрузить файл. Проверьте соединение.');
             } finally {
-                galleryBtn.innerHTML = loadingText;
-                galleryBtn.disabled = false;
-                input.value = ''; // Очищаем input
+                restore();
+                input.value = '';
+                URL.revokeObjectURL(previewUrl);
             }
         };
     }
 
-    // =========================
-    // 🎨 ЦВЕТ
-    // =========================
-    if (colorBtn && colorPicker) {
-
-        colorBtn.onclick = () => {
-            colorPicker.classList.add('active');
-            colorPicker.click();
-        };
-
-        colorPicker.oninput = (e) => {
-            const color = e.target.value;
-
-            // Визуальное обновление
-            const img = avatarFull.querySelector('.avatar-img');
-            if (img) {
-                img.style.display = 'none';
-            }
-            avatarFull.style.backgroundImage = '';
-            avatarFull.style.backgroundColor = color;
-
-            clearTimeout(colorTimeout);
-
-            colorTimeout = setTimeout(async () => {
-                try {
-                    const res = await fetch('/update-avatar/?type=color', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ color, type: 'color' })
-                    });
-
-                    const data = await res.json();
-
-                    if (data.status !== 'ok') {
-                        console.error(data.error);
-                        alert('Ошибка изменения цвета');
-                    }
-
-                } catch (err) {
-                    console.error(err);
-                    alert('Ошибка изменения цвета');
-                }
-            }, 250);
-        };
-
-        colorPicker.onchange = () => {
-            colorPicker.classList.remove('active');
-        };
-    }
-
-    // =========================
-    // 🤖 TELEGRAM AVATAR
-    // =========================
+    // ── Telegram ──────────────────────────────
     if (telegramBtn) {
         telegramBtn.onclick = async () => {
-            const originalText = telegramBtn.innerHTML;
-            telegramBtn.innerHTML = '⏳ Загрузка...';
-            telegramBtn.disabled = true;
-
+            const restore = setButtonLoading(telegramBtn, 'Загрузка...');
             try {
                 const res = await fetch('/update-avatar/?type=telegram', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ type: 'telegram' })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'telegram' }),
                 });
-
                 const data = await res.json();
-
                 if (data.status === 'ok') {
-                    loadPage('/profile/');
-                    history.pushState({}, '', '/profile/');
+                    // Telegram тоже возвращает avatar_url
+                    sessionStorage.setItem('avatar_updated', data.avatar_url);
+                    goToProfile();
                 } else {
-                    console.error(data.error);
                     alert('Ошибка: ' + data.error);
                 }
-
-            } catch (err) {
-                console.error(err);
-                alert('Ошибка загрузки из Telegram');
+            } catch {
+                alert('Не удалось загрузить аватар из Telegram.');
             } finally {
-                telegramBtn.innerHTML = originalText;
-                telegramBtn.disabled = false;
+                restore();
             }
         };
     }
 
-    // =========================
-    // 🗑️ УДАЛЕНИЕ АВАТАРА
-    // =========================
+    // ── Удаление ──────────────────────────────
     if (deleteBtn) {
         deleteBtn.onclick = async () => {
-            // Подтверждение удаления
-            const confirmed = confirm('Вы уверены, что хотите удалить аватар?');
+            const confirmed = await tgConfirm('Удалить аватар?');
             if (!confirmed) return;
 
-            const originalText = deleteBtn.innerHTML;
-            deleteBtn.innerHTML = '⏳ Удаление...';
-            deleteBtn.disabled = true;
-
+            const restore = setButtonLoading(deleteBtn, 'Удаление...');
             try {
                 const res = await fetch('/update-avatar/?type=delete', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ type: 'delete' })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'delete' }),
                 });
-
                 const data = await res.json();
-
                 if (data.status === 'ok') {
-                    // Обновляем страницу для отображения изменений
-                    loadPage('/profile/');
-                    history.pushState({}, '', '/profile/');
+                    sessionStorage.removeItem('avatar_updated');
+                    goToProfile();
                 } else {
-                    console.error(data.error);
                     alert('Ошибка удаления: ' + data.error);
                 }
-
-            } catch (err) {
-                console.error(err);
-                alert('Ошибка при удалении аватара');
+            } catch {
+                alert('Ошибка при удалении аватара.');
             } finally {
-                deleteBtn.innerHTML = originalText;
-                deleteBtn.disabled = false;
+                restore();
             }
         };
     }
 
-    // =========================
-    // 🔙 BACK
-    // =========================
-    if (backBtn) {
-        backBtn.onclick = () => {
-            loadPage('/profile/');
-            history.pushState({}, '', '/profile/');
-        };
-    }
+    // ── Назад ────────────────────────────────
+    if (backBtn) backBtn.onclick = goToProfile;
 }

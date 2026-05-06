@@ -98,13 +98,13 @@ class UpdateAvatarView(APIView):
             return JsonResponse({'error': 'Invalid update type'}, status=400)
 
     def _delete_old_avatar(self, user):
-        """Удаляет старый файл аватара"""
+        """Удаляет старый файл аватара и сбрасывает поле"""
         if user.avatar and user.avatar.name:
-            # Проверяем существует ли файл
             if default_storage.exists(user.avatar.name):
                 default_storage.delete(user.avatar.name)
                 print(f"Deleted old avatar: {user.avatar.name}")
             user.avatar = None
+            user.save()   # ← БАГ: раньше этого не было — путь оставался в БД
 
     def _update_color(self, request, user):
         """Обновление цвета аватара"""

@@ -4,8 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from api.views import search_view, home_view, messages_view, profile_view, create_view, authorize_view, avatar_view
 from api.views import UpdateAvatarView
+from django.shortcuts import redirect
 
 urlpatterns = [
+    path('', lambda request: redirect('authorize')),
+
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
 

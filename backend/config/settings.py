@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-4r#u8=^_av+-hl%76u2pq*oplfv9$$+ghr2^o2rh4$4al184zl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'marleen-unfluffed-maura.ngrok-free.dev', 'projector-justify-numerous-ralph.trycloudflare.com']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -123,4 +123,4 @@ TG_BOT_TOKEN = "8644654149:AAG4xfWRe1Z67Ilfi_P0K2HBoqa1FwsBBBs"
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/app/media'
