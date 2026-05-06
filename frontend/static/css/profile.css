@@ -1,7 +1,7 @@
 .profile {
     display: flex;
     flex-direction: column;
-    align-items: center; /* центр по горизонтали */
+    align-items: center;
     justify-content: flex-start;
     text-align: center;
     padding-top: 20px;
@@ -23,9 +23,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    overflow: hidden; 
-
+    overflow: hidden;
     border: none;
     outline: none;
     background: none;
@@ -39,31 +37,26 @@
     font-size: 36px;
     font-weight: 700;
 }
+
 .avatar-button-overlay {
     position: absolute;
     bottom: 4px;
     right: 4px;
-
     width: 28px;
     height: 28px;
-
     background-color: #000;
     border: 3px solid #fff;
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     color: #fff;
     font-size: 16px;
-
-    transform: translate(25%, 25%); /* чуть вынос за край */
-
+    transform: translate(25%, 25%);
     z-index: 10;
 }
 
-/* ИМЯ (как в TikTok — жирное) */
+/* ИМЯ */
 .profile-name {
     font-size: 20px;
     font-weight: 700;
@@ -71,7 +64,7 @@
     margin-top: 5px;
 }
 
-/* USERNAME (серый, аккуратный) */
+/* USERNAME */
 .profile-username {
     font-size: 14px;
     color: #8a8a8a;
@@ -102,82 +95,103 @@
     color: #8a8a8a;
 }
 
-/* МОДАЛКА */
+/* ── Follow button on user profile page ─── */
+.profile-follow-btn {
+    margin-top: 20px;
+    padding: 10px 40px;
+    border-radius: 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    min-width: 160px;
+    text-align: center;
+    border: 1.5px solid #000;
+}
+
+.profile-follow-btn.follow {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.profile-follow-btn.unfollow {
+    background: #fff;
+    color: #000;
+    border-color: #ddd;
+}
+
+.profile-follow-btn:active {
+    transform: scale(0.96);
+}
+
+.profile-follow-btn:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* МОДАЛКА АВАТАРА */
 .avatar-page {
     position: fixed;
     inset: 0;
     background: #000;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* скрытие */
 .hidden {
     display: none;
 }
 
-/* КОНТЕНТ */
 .avatar-modal-content {
     position: relative;
     width: 100%;
     height: 100%;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+
 .avatar-back {
     position: absolute;
     top: 20px;
     right: 20px;
-
     background: rgba(255,255,255,0.1);
     border: none;
     color: #fff;
-
     width: 36px;
     height: 36px;
     border-radius: 50%;
 }
 
-/* КРЕСТИК */
 .avatar-close {
     position: absolute;
     top: 20px;
     right: 20px;
-
     background: rgba(255,255,255,0.1);
     border: none;
     color: #fff;
     font-size: 20px;
-
     width: 36px;
     height: 36px;
     border-radius: 50%;
-
     cursor: pointer;
 }
 
-/* БОЛЬШОЙ АВАТАР */
 .avatar-full {
     width: 200px;
     height: 200px;
-
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin-bottom: 40px;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
-/* КНОПКИ */
 .avatar-actions {
     display: flex;
     flex-direction: column;
@@ -189,10 +203,8 @@
     padding: 14px;
     border-radius: 12px;
     border: none;
-
     font-size: 14px;
     font-weight: 600;
-
     background: #fff;
     color: #000;
 }

@@ -2,30 +2,24 @@ function initSearchPage() {
     const searchPage = document.querySelector('.search-page');
     if (!searchPage) return;
 
-    const input      = document.getElementById('search-input');
-    const clearBtn   = document.getElementById('search-clear');
-    const results    = document.getElementById('search-results');
-    const emptyState = document.getElementById('empty-state');
+    const input    = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear');
+    const results  = document.getElementById('search-results');
 
     let debounceTimer = null;
 
-    // ── Input handler ─────────────────────────────────────
+    // ── Input handler ──────────────────────────────────────────────────────
     input.addEventListener('input', () => {
         const q = input.value.trim();
-
         clearBtn.classList.toggle('hidden', q.length === 0);
 
         clearTimeout(debounceTimer);
-
-        if (!q) {
-            showEmpty();
-            return;
-        }
+        if (!q) { showEmpty(); return; }
 
         debounceTimer = setTimeout(() => doSearch(q), 300);
     });
 
-    // ── Clear button ──────────────────────────────────────
+    // ── Clear ──────────────────────────────────────────────────────────────
     clearBtn.addEventListener('click', () => {
         input.value = '';
         clearBtn.classList.add('hidden');
@@ -33,30 +27,25 @@ function initSearchPage() {
         input.focus();
     });
 
-    // ── Restore focus after SPA navigation ───────────────
-    input.focus();
+    // Focus input when arriving on this page
+    setTimeout(() => input.focus(), 50);
 
-    // ─────────────────────────────────────────────────────
+    // ── Helpers ────────────────────────────────────────────────────────────
 
     function showEmpty() {
-        results.innerHTML = '';
-        const el = document.createElement('div');
-        el.className = 'search-empty-state';
-        el.id = 'empty-state';
-        el.innerHTML = `
-            <div class="empty-icon"><i class="ri-group-line"></i></div>
-            <p class="empty-title">Найдите людей</p>
-            <p class="empty-sub">Введите имя или @username</p>
-        `;
-        results.appendChild(el);
+        results.innerHTML = `
+            <div class="search-empty-state">
+                <div class="empty-icon"><i class="ri-group-line"></i></div>
+                <p class="empty-title">Найдите людей</p>
+                <p class="empty-sub">Введите имя или @username</p>
+            </div>`;
     }
 
     function showLoading() {
         results.innerHTML = `
             <div class="search-loading">
                 <div class="search-spinner"></div>
-            </div>
-        `;
+            </div>`;
     }
 
     function showNoResults(q) {
@@ -65,8 +54,7 @@ function initSearchPage() {
                 <div class="empty-icon"><i class="ri-user-search-line"></i></div>
                 <p class="empty-title">Никого не найдено</p>
                 <p class="empty-sub">По запросу «${escapeHtml(q)}» нет результатов</p>
-            </div>
-        `;
+            </div>`;
     }
 
     async function doSearch(q) {
@@ -82,7 +70,6 @@ function initSearchPage() {
                 showNoResults(q);
                 return;
             }
-
             renderUsers(data.users);
         } catch (e) {
             console.error('Search error:', e);
@@ -90,59 +77,62 @@ function initSearchPage() {
                 <div class="search-no-results">
                     <p class="empty-title">Ошибка поиска</p>
                     <p class="empty-sub">Попробуйте ещё раз</p>
-                </div>
-            `;
+                </div>`;
         }
     }
 
     function renderUsers(users) {
         results.innerHTML = '';
-        users.forEach(user => {
-            results.appendChild(createUserCard(user));
-        });
+        users.forEach(u => results.appendChild(createUserCard(u)));
     }
 
     function createUserCard(user) {
         const card = document.createElement('div');
         card.className = 'user-card';
-        card.dataset.telegramId = user.telegram_id;
 
-        const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username || 'Пользователь';
+        const displayName = [user.first_name, user.last_name].filter(Boolean).join(' ')
+            || user.username || 'Пользователь';
+
         const avatarHtml = user.avatar_url
             ? `<img src="${user.avatar_url}" alt="">`
             : `<span>${(displayName[0] || '?').toUpperCase()}</span>`;
 
-        const followLabel  = user.is_following ? 'Подписан' : 'Подписаться';
-        const followClass  = user.is_following ? 'unfollow' : 'follow';
-
         card.innerHTML = `
-            <div class="user-card-avatar" style="background-color: ${user.avatar_color}">
+            <div class="user-card-avatar" style="background-color:${user.avatar_color}">
                 ${avatarHtml}
             </div>
             <div class="user-card-info">
                 <div class="user-card-name">${escapeHtml(displayName)}</div>
-                ${user.username ? `<div class="user-card-username">@${escapeHtml(user.username)}</div>` : ''}
+                ${user.username
+                    ? `<div class="user-card-username">@${escapeHtml(user.username)}</div>`
+                    : ''}
             </div>
-            <button class="follow-btn ${followClass}" data-id="${user.telegram_id}" data-following="${user.is_following}">
-                ${followLabel}
-            </button>
+            <button
+                class="follow-btn ${user.is_following ? 'unfollow' : 'follow'}"
+                data-id="${user.telegram_id}"
+                data-following="${user.is_following}"
+            >${user.is_following ? 'Отписаться' : 'Подписаться'}</button>
         `;
 
-        const btn = card.querySelector('.follow-btn');
-        btn.addEventListener('click', (e) => {
+        // Navigate to profile on card click (but not follow button)
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.follow-btn')) return;
+            const url = `/user/${user.telegram_id}/`;
+            loadPage(url);
+            history.pushState({}, '', url);
+        });
+
+        card.querySelector('.follow-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleFollow(btn);
+            toggleFollow(card.querySelector('.follow-btn'));
         });
 
         return card;
     }
 
     async function toggleFollow(btn) {
-        const telegramId = btn.dataset.id;
-        const isFollowing = btn.dataset.following === 'true';
-
+        const telegramId = parseInt(btn.dataset.id);
         btn.disabled = true;
-
         try {
             const resp = await fetch('/api/follow/', {
                 method: 'POST',
@@ -150,9 +140,8 @@ function initSearchPage() {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                 },
-                body: JSON.stringify({ telegram_id: parseInt(telegramId) }),
+                body: JSON.stringify({ telegram_id: telegramId }),
             });
-
             const data = await resp.json();
 
             if (data.status === 'followed') {
@@ -163,8 +152,6 @@ function initSearchPage() {
                 btn.dataset.following = 'false';
                 btn.textContent = 'Подписаться';
                 btn.classList.replace('unfollow', 'follow');
-            } else {
-                console.error('Follow error:', data.error);
             }
         } catch (e) {
             console.error('Follow request failed:', e);

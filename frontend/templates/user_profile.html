@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="profile">
+    <div class="profile-avatar">
+        <div class="avatar-container" style="background-color: {{ profile_user.avatar_random_color|default:'#cccccc' }};">
+            {% if profile_user.avatar %}
+                <img src="{{ profile_user.avatar.url }}" class="avatar-img">
+            {% else %}
+                <div class="avatar-letter">
+                    {{ profile_user.username|first|default:'U' }}
+                </div>
+            {% endif %}
+        </div>
+        {# No overlay button — can't edit someone else's avatar #}
+    </div>
+
+    <div class="profile-name">
+        {{ profile_user.first_name }}{% if profile_user.last_name %} {{ profile_user.last_name }}{% endif %}
+    </div>
+
+    {% if profile_user.username %}
+    <div class="profile-username">@{{ profile_user.username }}</div>
+    {% endif %}
+
+    <div class="stats">
+        <div class="stat">
+            <span class="stat-value">{{ following_count }}</span>
+            <span class="stat-label">Подписок</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ followers_count }}</span>
+            <span class="stat-label">Подписчиков</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ posts_count }}</span>
+            <span class="stat-label">Постов</span>
+        </div>
+    </div>
+
+    <button
+        class="profile-follow-btn {% if is_following %}unfollow{% else %}follow{% endif %}"
+        data-id="{{ profile_user.telegram_id }}"
+        data-following="{{ is_following|yesno:'true,false' }}"
+    >
+        {% if is_following %}Отписаться{% else %}Подписаться{% endif %}
+    </button>
+</div>
+{% endblock %}

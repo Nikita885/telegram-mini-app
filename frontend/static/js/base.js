@@ -1,7 +1,6 @@
 function detectPlatform() {
     const userAgent = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(userAgent);
-    if (isIOS) {
+    if (/iphone|ipad|ipod/.test(userAgent)) {
         document.documentElement.classList.add('ios');
     }
 }
@@ -10,7 +9,10 @@ function initPage() {
     initProfilePage();
     initAvatarPage();
     initSearchPage();
+    initUserProfilePage();
 }
+
+// ── SPA navigation ────────────────────────────────────────────────────────────
 
 async function loadPage(url) {
     try {
@@ -29,18 +31,6 @@ async function loadPage(url) {
             document.getElementById('main-content').innerHTML = newContent.innerHTML;
         }
 
-        // Dynamically load page-specific CSS if not yet loaded
-        const cssLinks = doc.querySelectorAll('link[rel="stylesheet"]');
-        cssLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && !document.querySelector(`link[href="${href}"]`)) {
-                const newLink = document.createElement('link');
-                newLink.rel = 'stylesheet';
-                newLink.href = href;
-                document.head.appendChild(newLink);
-            }
-        });
-
         initPage();
 
         const isProfileRelated = url.startsWith('/profile') || url.startsWith('/avatar');
@@ -56,71 +46,75 @@ async function loadPage(url) {
     }
 }
 
+// ── Navigation icons ──────────────────────────────────────────────────────────
+
 function updateIcons() {
-    const navItems = document.querySelectorAll('.bottom-navigation__item');
-
-    navItems.forEach(item => {
-        const icon = item.querySelector('.bottom-navigation__icon');
+    document.querySelectorAll('.bottom-navigation__item').forEach(item => {
+        const icon      = item.querySelector('.bottom-navigation__icon');
         const actionBtn = item.querySelector('.bottom-navigation__action');
+        const active    = item.classList.contains('active');
 
-        if (item.classList.contains('active')) {
-            if (icon) {
-                if (icon.classList.contains('ri-home-line')) icon.classList.replace('ri-home-line', 'ri-home-2-fill');
-                else if (icon.classList.contains('ri-search-line')) icon.classList.replace('ri-search-line', 'ri-search-2-fill');
-                else if (icon.classList.contains('ri-message-2-line')) icon.classList.replace('ri-message-2-line', 'ri-message-2-fill');
-                else if (icon.classList.contains('ri-user-line')) icon.classList.replace('ri-user-line', 'ri-user-2-fill');
+        if (icon) {
+            const swaps = {
+                'ri-home-line':      'ri-home-2-fill',
+                'ri-search-line':    'ri-search-2-fill',
+                'ri-message-2-line': 'ri-message-2-fill',
+                'ri-user-line':      'ri-user-2-fill',
+            };
+            const reverseSwaps = Object.fromEntries(
+                Object.entries(swaps).map(([a, b]) => [b, a])
+            );
+
+            if (active) {
+                Object.entries(swaps).forEach(([from, to]) => {
+                    if (icon.classList.contains(from)) icon.classList.replace(from, to);
+                });
+            } else {
+                Object.entries(reverseSwaps).forEach(([from, to]) => {
+                    if (icon.classList.contains(from)) icon.classList.replace(from, to);
+                });
             }
-            if (actionBtn) actionBtn.classList.add('active');
-        } else {
-            if (icon) {
-                if (icon.classList.contains('ri-home-2-fill')) icon.classList.replace('ri-home-2-fill', 'ri-home-line');
-                else if (icon.classList.contains('ri-search-2-fill')) icon.classList.replace('ri-search-2-fill', 'ri-search-line');
-                else if (icon.classList.contains('ri-message-2-fill')) icon.classList.replace('ri-message-2-fill', 'ri-message-2-line');
-                else if (icon.classList.contains('ri-user-2-fill')) icon.classList.replace('ri-user-2-fill', 'ri-user-line');
-            }
-            if (actionBtn) actionBtn.classList.remove('active');
         }
+
+        if (actionBtn) actionBtn.classList.toggle('active', active);
     });
 }
 
 function setActiveButton() {
     const currentPath = window.location.pathname;
-    const navItems = document.querySelectorAll('.bottom-navigation__item');
-
-    navItems.forEach(item => {
+    document.querySelectorAll('.bottom-navigation__item').forEach(item => {
         item.classList.remove('active');
-        const href = item.getAttribute('href');
-        if (href === currentPath) {
+        if (item.getAttribute('href') === currentPath) {
             item.classList.add('active');
         }
     });
-
     updateIcons();
 }
 
 function handleNavClick(event) {
     event.preventDefault();
-    const item = event.currentTarget;
-    const href = item.getAttribute('href');
+    const href = event.currentTarget.getAttribute('href');
     if (!href) return;
-
     loadPage(href);
     history.pushState({}, '', href);
     setActiveButton();
 }
+
+// ── Popstate ──────────────────────────────────────────────────────────────────
 
 window.addEventListener('popstate', () => {
     loadPage(window.location.pathname);
     setActiveButton();
 });
 
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', () => {
     detectPlatform();
     setActiveButton();
     initPage();
 
-    const navItems = document.querySelectorAll('.bottom-navigation__item');
-    navItems.forEach(item => {
+    document.querySelectorAll('.bottom-navigation__item').forEach(item => {
         item.addEventListener('click', handleNavClick);
     });
 });

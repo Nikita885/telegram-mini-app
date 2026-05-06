@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from api.views import search_view, home_view, messages_view, profile_view, create_view, authorize_view, avatar_view
+from api.views import search_view, home_view, messages_view, profile_view, create_view, authorize_view, avatar_view, user_profile_view
 from api.views import UpdateAvatarView
 from django.shortcuts import redirect
 
@@ -21,5 +21,7 @@ urlpatterns = [
     path('create/', create_view, name='create'),
     path('avatar/', avatar_view, name='avatar'),
     path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
+
+    path('user/<int:telegram_id>/', user_profile_view, name='user-profile'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
