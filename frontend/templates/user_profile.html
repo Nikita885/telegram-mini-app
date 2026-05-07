@@ -13,7 +13,6 @@
                 </div>
             {% endif %}
         </div>
-        {# No overlay button — can't edit someone else's avatar #}
     </div>
 
     <div class="profile-name">
@@ -39,12 +38,18 @@
         </div>
     </div>
 
-    <button
-        class="profile-follow-btn {% if is_following %}unfollow{% else %}follow{% endif %}"
-        data-id="{{ profile_user.telegram_id }}"
-        data-following="{{ is_following|yesno:'true,false' }}"
-    >
-        {% if is_following %}Отписаться{% else %}Подписаться{% endif %}
-    </button>
+    <div class="profile-actions">
+        <button
+            class="profile-follow-btn {% if is_following %}unfollow{% else %}follow{% endif %}"
+            data-id="{{ profile_user.telegram_id }}"
+            data-following="{{ is_following|yesno:'true,false' }}"
+        >
+            {% if is_following %}Отписаться{% else %}Подписаться{% endif %}
+        </button>
+
+        <button class="profile-msg-btn" data-id="{{ profile_user.telegram_id }}">
+            <i class="ri-message-2-line"></i>
+        </button>
+    </div>
 </div>
 {% endblock %}

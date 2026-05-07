@@ -6,15 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-
     <link rel="stylesheet" href="{% static 'css/base.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/search.css' %}?v={% now 'U' %}">
-
+    <link rel="stylesheet" href="{% static 'css/messages.css' %}?v={% now 'U' %}">
     {% if user.avatar %}
         <link rel="preload" as="image" href="{{ user.avatar.url }}">
     {% endif %}
-
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -27,34 +25,29 @@
             <i class="ri-home-line bottom-navigation__icon"></i>
             <span class="bottom-navigation__label">Главная</span>
         </a>
-
         <a href="/search/" class="bottom-navigation__item">
             <i class="ri-search-line bottom-navigation__icon"></i>
             <span class="bottom-navigation__label">Поиск</span>
         </a>
-
         <a href="/create/" class="bottom-navigation__item">
             <button class="bottom-navigation__action">+</button>
         </a>
-
         <a href="/messages/" class="bottom-navigation__item">
             <i class="ri-message-2-line bottom-navigation__icon"></i>
             <span class="bottom-navigation__label">Сообщения</span>
         </a>
-
         <a href="/profile/" class="bottom-navigation__item">
             <i class="ri-user-line bottom-navigation__icon"></i>
             <span class="bottom-navigation__label">Профиль</span>
         </a>
     </nav>
 
-
     <script src="{% static 'js/profile.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/avatar.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/search.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/user_profile.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/messages.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/base.js' %}?v={% now 'U' %}"></script>
-
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Сообщения</h1>
+<div class="messages-page">
+    <div class="messages-header">
+        <h1 class="messages-title">Сообщения</h1>
+    </div>
+    <div id="dialogs-list" class="dialogs-list">
+        <div class="dialogs-loading">
+            <div class="search-spinner"></div>
+        </div>
+    </div>
+</div>
 {% endblock %}

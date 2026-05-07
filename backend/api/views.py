@@ -1,5 +1,4 @@
 import json
-import os
 import requests
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
@@ -13,14 +12,32 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.storage import default_storage
 from django.db.models import Q
+from django.utils import timezone
 
-from .models import TelegramUser, Follow
+from .models import TelegramUser, Follow, Dialog, Message
 from .utils import verify_telegram_init_data
 import random
 
 
-def generate_random_color() -> str:
+def generate_random_color():
     return '#{:06x}'.format(random.randint(0, 0xFFFFFF))
+
+
+def serialize_user(u):
+    return {
+        'telegram_id': u.telegram_id,
+        'username': u.username or '',
+        'first_name': u.first_name or '',
+        'last_name': u.last_name or '',
+        'avatar_url': u.avatar.url if u.avatar else None,
+        'avatar_color': u.avatar_random_color or '#cccccc',
+    }
+
+
+def get_or_create_dialog(user_a, user_b):
+    u1, u2 = (user_a, user_b) if user_a.telegram_id < user_b.telegram_id else (user_b, user_a)
+    dialog, _ = Dialog.objects.get_or_create(user1=u1, user2=u2)
+    return dialog
 
 
 # ── Authorize ─────────────────────────────────────────────────────────────────
@@ -35,18 +52,14 @@ class AuthorizeView(APIView):
             init_data = request.data.get('initData')
             if not init_data:
                 return Response({'error': 'initData required'}, status=400)
-
             data = verify_telegram_init_data(init_data, settings.TG_BOT_TOKEN)
             if not data:
                 return Response({'error': 'Invalid Telegram data'}, status=403)
-
             user_raw = data.get('user')
             if not user_raw:
                 return Response({'error': 'No user data'}, status=400)
-
             user_data = json.loads(user_raw) if isinstance(user_raw, str) else user_raw
             telegram_id = user_data.get('id')
-
             user, created = TelegramUser.objects.get_or_create(
                 telegram_id=telegram_id,
                 defaults={
@@ -57,24 +70,21 @@ class AuthorizeView(APIView):
                     'avatar_random_color': generate_random_color(),
                 }
             )
-
             if not created:
                 user.username = user_data.get('username')
                 user.first_name = user_data.get('first_name')
                 user.last_name = user_data.get('last_name')
                 user.language_code = user_data.get('language_code')
                 user.save()
-
             request.session['telegram_id'] = telegram_id
             request.session.save()
             return Response({'status': 'ok'}, status=200)
-
         except Exception as e:
             print("CRITICAL ERROR:", str(e))
             return Response({'error': 'Server error'}, status=500)
 
 
-# ── Search users ──────────────────────────────────────────────────────────────
+# ── Search ────────────────────────────────────────────────────────────────────
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SearchUsersView(APIView):
@@ -85,42 +95,24 @@ class SearchUsersView(APIView):
         current_user = get_current_user(request)
         if not current_user:
             return Response({'error': 'Not authorized'}, status=401)
-
         query = request.GET.get('q', '').strip()
-
-        # Strip leading @ so "@username" and "username" both work
         if query.startswith('@'):
             query = query[1:]
-
         if not query:
             return Response({'users': []})
-
         users = TelegramUser.objects.filter(
-            Q(username__icontains=query) |
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query)
+            Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
         ).exclude(telegram_id=current_user.telegram_id)[:20]
-
-        following_ids = set(
-            current_user.following.values_list('following__telegram_id', flat=True)
-        )
-
+        following_ids = set(current_user.following.values_list('following__telegram_id', flat=True))
         result = []
         for u in users:
-            result.append({
-                'telegram_id': u.telegram_id,
-                'username': u.username or '',
-                'first_name': u.first_name or '',
-                'last_name': u.last_name or '',
-                'avatar_url': u.avatar.url if u.avatar else None,
-                'avatar_color': u.avatar_random_color or '#cccccc',
-                'is_following': u.telegram_id in following_ids,
-            })
-
+            d = serialize_user(u)
+            d['is_following'] = u.telegram_id in following_ids
+            result.append(d)
         return Response({'users': result})
 
 
-# ── Follow toggle ─────────────────────────────────────────────────────────────
+# ── Follow ────────────────────────────────────────────────────────────────────
 
 @method_decorator(csrf_exempt, name='dispatch')
 class FollowToggleView(APIView):
@@ -131,29 +123,147 @@ class FollowToggleView(APIView):
         current_user = get_current_user(request)
         if not current_user:
             return Response({'error': 'Not authorized'}, status=401)
-
         target_id = request.data.get('telegram_id')
         if not target_id:
             return Response({'error': 'telegram_id required'}, status=400)
-
         try:
             target = TelegramUser.objects.get(telegram_id=target_id)
         except TelegramUser.DoesNotExist:
             return Response({'error': 'User not found'}, status=404)
-
         if target.telegram_id == current_user.telegram_id:
             return Response({'error': 'Cannot follow yourself'}, status=400)
-
-        follow_qs = Follow.objects.filter(follower=current_user, following=target)
-        if follow_qs.exists():
-            follow_qs.delete()
+        qs = Follow.objects.filter(follower=current_user, following=target)
+        if qs.exists():
+            qs.delete()
             return Response({'status': 'unfollowed'})
-        else:
-            Follow.objects.create(follower=current_user, following=target)
-            return Response({'status': 'followed'})
+        Follow.objects.create(follower=current_user, following=target)
+        return Response({'status': 'followed'})
 
 
-# ── Avatar update ─────────────────────────────────────────────────────────────
+# ── Dialogs list ──────────────────────────────────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DialogListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+
+        dialogs = Dialog.objects.filter(
+            Q(user1=current_user) | Q(user2=current_user)
+        ).select_related('user1', 'user2').order_by('-updated_at')
+
+        result = []
+        for d in dialogs:
+            other = d.get_other_user(current_user)
+            last_msg = d.messages.order_by('-created_at').first()
+            unread = d.messages.filter(is_read=False).exclude(sender=current_user).count()
+            result.append({
+                'dialog_id': d.id,
+                'other_user': serialize_user(other),
+                'last_message': {
+                    'text': last_msg.text,
+                    'time': last_msg.created_at.strftime('%H:%M'),
+                    'is_mine': last_msg.sender == current_user,
+                } if last_msg else None,
+                'unread_count': unread,
+            })
+        return Response({'dialogs': result})
+
+
+# ── Start dialog ──────────────────────────────────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StartDialogView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+        target_id = request.data.get('telegram_id')
+        if not target_id:
+            return Response({'error': 'telegram_id required'}, status=400)
+        if int(target_id) == current_user.telegram_id:
+            return Response({'error': 'Cannot message yourself'}, status=400)
+        try:
+            target = TelegramUser.objects.get(telegram_id=target_id)
+        except TelegramUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+        dialog = get_or_create_dialog(current_user, target)
+        return Response({'dialog_id': dialog.id})
+
+
+# ── Dialog messages ───────────────────────────────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DialogMessagesView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def _get_dialog(self, request, dialog_id):
+        current_user = get_current_user(request)
+        if not current_user:
+            return None, None, Response({'error': 'Not authorized'}, status=401)
+        try:
+            dialog = Dialog.objects.get(
+                Q(user1=current_user) | Q(user2=current_user),
+                id=dialog_id
+            )
+        except Dialog.DoesNotExist:
+            return None, None, Response({'error': 'Not found'}, status=404)
+        return current_user, dialog, None
+
+    def get(self, request, dialog_id):
+        current_user, dialog, err = self._get_dialog(request, dialog_id)
+        if err:
+            return err
+
+        after_id = request.GET.get('after')
+        qs = dialog.messages.select_related('sender').order_by('created_at')
+        if after_id:
+            qs = qs.filter(id__gt=int(after_id))
+
+        # mark incoming as read
+        qs.filter(is_read=False).exclude(sender=current_user).update(is_read=True)
+
+        return Response({
+            'messages': [
+                {
+                    'id': m.id,
+                    'text': m.text,
+                    'time': m.created_at.strftime('%H:%M'),
+                    'is_mine': m.sender == current_user,
+                }
+                for m in qs
+            ]
+        })
+
+    def post(self, request, dialog_id):
+        current_user, dialog, err = self._get_dialog(request, dialog_id)
+        if err:
+            return err
+
+        text = request.data.get('text', '').strip()
+        if not text:
+            return Response({'error': 'Empty message'}, status=400)
+
+        msg = Message.objects.create(dialog=dialog, sender=current_user, text=text)
+        Dialog.objects.filter(id=dialog.id).update(updated_at=timezone.now())
+
+        return Response({
+            'id': msg.id,
+            'text': msg.text,
+            'time': msg.created_at.strftime('%H:%M'),
+            'is_mine': True,
+        }, status=201)
+
+
+# ── Avatar ────────────────────────────────────────────────────────────────────
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UpdateAvatarView(APIView):
@@ -164,9 +274,7 @@ class UpdateAvatarView(APIView):
         user = get_current_user(request)
         if not user:
             return JsonResponse({'error': 'Not authorized'}, status=401)
-
         update_type = request.GET.get('type') or request.data.get('type')
-
         if update_type == 'color':
             return self._update_color(request, user)
         elif update_type == 'telegram':
@@ -175,8 +283,7 @@ class UpdateAvatarView(APIView):
             return self._upload_avatar(request, user)
         elif update_type == 'delete':
             return self._delete_avatar(user)
-        else:
-            return JsonResponse({'error': 'Invalid update type'}, status=400)
+        return JsonResponse({'error': 'Invalid update type'}, status=400)
 
     def _delete_old_avatar(self, user):
         if user.avatar and user.avatar.name:
@@ -196,32 +303,25 @@ class UpdateAvatarView(APIView):
     def _update_from_telegram(self, user):
         self._delete_old_avatar(user)
         bot_token = settings.TG_BOT_TOKEN
-        response = requests.get(
-            f"https://api.telegram.org/bot{bot_token}/getUserProfilePhotos",
-            params={'user_id': user.telegram_id, 'limit': 1}
-        )
-        data = response.json()
+        r = requests.get(f"https://api.telegram.org/bot{bot_token}/getUserProfilePhotos",
+                         params={'user_id': user.telegram_id, 'limit': 1})
+        data = r.json()
         if not data.get('ok') or not data['result']['total_count']:
             return JsonResponse({'error': 'No avatar found in Telegram'}, status=404)
         file_id = data['result']['photos'][0][-1]['file_id']
-        file_resp = requests.get(
-            f"https://api.telegram.org/bot{bot_token}/getFile",
-            params={'file_id': file_id}
-        ).json()
-        if not file_resp.get('ok'):
+        fr = requests.get(f"https://api.telegram.org/bot{bot_token}/getFile",
+                          params={'file_id': file_id}).json()
+        if not fr.get('ok'):
             return JsonResponse({'error': 'Failed to get file info'}, status=500)
-        file_path = file_resp['result']['file_path']
-        img_resp = requests.get(
-            f"https://api.telegram.org/file/bot{bot_token}/{file_path}", stream=True
-        )
+        img_resp = requests.get(f"https://api.telegram.org/file/bot{bot_token}/{fr['result']['file_path']}", stream=True)
         if img_resp.status_code != 200:
             return JsonResponse({'error': 'Failed to download image'}, status=500)
         img = Image.open(img_resp.raw)
         img.thumbnail((200, 200), Image.Resampling.LANCZOS)
-        buffer = BytesIO()
-        img.save(buffer, format='WebP', quality=80)
-        buffer.seek(0)
-        user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
+        buf = BytesIO()
+        img.save(buf, format='WebP', quality=80)
+        buf.seek(0)
+        user.avatar.save(f'avatar_{user.telegram_id}.webp', buf, save=True)
         return JsonResponse({'status': 'ok', 'avatar_url': user.avatar.url})
 
     def _upload_avatar(self, request, user):
@@ -231,15 +331,14 @@ class UpdateAvatarView(APIView):
         try:
             self._delete_old_avatar(user)
             img = Image.open(file)
-            min_side = min(img.size)
-            left = (img.width - min_side) / 2
-            top = (img.height - min_side) / 2
-            img = img.crop((left, top, left + min_side, top + min_side))
-            img = img.resize((200, 200), Image.Resampling.LANCZOS)
-            buffer = BytesIO()
-            img.save(buffer, format='WebP', quality=80)
-            buffer.seek(0)
-            user.avatar.save(f'avatar_{user.telegram_id}.webp', buffer, save=True)
+            s = min(img.size)
+            l = (img.width - s) / 2
+            t = (img.height - s) / 2
+            img = img.crop((l, t, l + s, t + s)).resize((200, 200), Image.Resampling.LANCZOS)
+            buf = BytesIO()
+            img.save(buf, format='WebP', quality=80)
+            buf.seek(0)
+            user.avatar.save(f'avatar_{user.telegram_id}.webp', buf, save=True)
             return JsonResponse({'status': 'ok', 'avatar_url': user.avatar.url})
         except Exception as e:
             print(e)
@@ -248,101 +347,93 @@ class UpdateAvatarView(APIView):
     def _delete_avatar(self, user):
         try:
             self._delete_old_avatar(user)
-            user.save()
-            return JsonResponse({'status': 'ok', 'message': 'Avatar deleted successfully'})
+            return JsonResponse({'status': 'ok'})
         except Exception as e:
-            print(f"Error deleting avatar: {e}")
+            print(e)
             return JsonResponse({'error': 'Failed to delete avatar'}, status=500)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def get_current_user(request):
-    telegram_id = request.session.get('telegram_id')
-    return TelegramUser.objects.filter(telegram_id=telegram_id).first() if telegram_id else None
+    tid = request.session.get('telegram_id')
+    return TelegramUser.objects.filter(telegram_id=tid).first() if tid else None
 
 
 # ── Page views ────────────────────────────────────────────────────────────────
 
 def home_view(request):
-    user = get_current_user(request)
-    if not user:
-        return redirect('/authorize/')
-    return render(request, 'home.html', {'user': user})
-
+    u = get_current_user(request)
+    return render(request, 'home.html', {'user': u}) if u else redirect('/authorize/')
 
 def search_view(request):
-    user = get_current_user(request)
-    if not user:
-        return redirect('/authorize/')
-    return render(request, 'search.html', {'user': user})
-
+    u = get_current_user(request)
+    return render(request, 'search.html', {'user': u}) if u else redirect('/authorize/')
 
 def messages_view(request):
-    user = get_current_user(request)
-    if not user:
-        return redirect('/authorize/')
-    return render(request, 'messages.html', {'telegram_id': user.telegram_id})
+    u = get_current_user(request)
+    return render(request, 'messages.html', {'user': u}) if u else redirect('/authorize/')
 
+def chat_view(request, dialog_id):
+    current_user = get_current_user(request)
+    if not current_user:
+        return redirect('/authorize/')
+    try:
+        dialog = Dialog.objects.select_related('user1', 'user2').get(
+            Q(user1=current_user) | Q(user2=current_user), id=dialog_id
+        )
+    except Dialog.DoesNotExist:
+        return redirect('/messages/')
+    other = dialog.get_other_user(current_user)
+    return render(request, 'chat.html', {
+        'user': current_user,
+        'dialog_id': dialog.id,
+        'other_user': other,
+    })
 
 def profile_view(request):
-    user = get_current_user(request)
-    if not user:
+    u = get_current_user(request)
+    if not u:
         return redirect('/authorize/')
-    context = {
-        'user': user,
-        'following_count': user.following.count(),
-        'followers_count': user.followers.count(),
-        'posts_count': user.posts.count(),
-    }
-    return render(request, 'profile.html', context)
-
+    return render(request, 'profile.html', {
+        'user': u,
+        'following_count': u.following.count(),
+        'followers_count': u.followers.count(),
+        'posts_count': u.posts.count(),
+    })
 
 def user_profile_view(request, telegram_id):
     current_user = get_current_user(request)
     if not current_user:
         return redirect('/authorize/')
-
-    # Own profile → redirect
     if current_user.telegram_id == telegram_id:
         return redirect('/profile/')
-
     try:
         profile_user = TelegramUser.objects.get(telegram_id=telegram_id)
     except TelegramUser.DoesNotExist:
         return redirect('/search/')
-
-    is_following = Follow.objects.filter(
-        follower=current_user, following=profile_user
-    ).exists()
-
-    context = {
+    is_following = Follow.objects.filter(follower=current_user, following=profile_user).exists()
+    return render(request, 'user_profile.html', {
         'user': current_user,
         'profile_user': profile_user,
         'following_count': profile_user.following.count(),
         'followers_count': profile_user.followers.count(),
         'posts_count': profile_user.posts.count(),
         'is_following': is_following,
-    }
-    return render(request, 'user_profile.html', context)
-
+    })
 
 def create_view(request):
-    user = get_current_user(request)
-    if not user:
-        return redirect('/authorize/')
-    return render(request, 'create.html', {'telegram_id': user.telegram_id})
-
+    u = get_current_user(request)
+    return render(request, 'create.html', {'telegram_id': u.telegram_id}) if u else redirect('/authorize/')
 
 def authorize_view(request):
     return render(request, 'authorize.html')
 
-
 def avatar_view(request):
-    user = get_current_user(request)
-    if not user:
+    u = get_current_user(request)
+    if not u:
         return redirect('/authorize/')
-    context = {'user': user}
+    ctx = {'user': u}
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render(request, 'avatar.html', context)
-    return render(request, 'base.html', context)
+        return render(request, 'avatar.html', ctx)
+    return render(request, 'base.html', ctx)

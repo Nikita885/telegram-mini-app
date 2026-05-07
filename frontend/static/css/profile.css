@@ -2,12 +2,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     text-align: center;
     padding-top: 20px;
 }
 
-/* АВАТАР */
+/* ── Avatar ── */
 .profile-avatar {
     margin-bottom: 10px;
     position: relative;
@@ -56,7 +55,7 @@
     z-index: 10;
 }
 
-/* ИМЯ */
+/* ── Name / Username ── */
 .profile-name {
     font-size: 20px;
     font-weight: 700;
@@ -64,14 +63,13 @@
     margin-top: 5px;
 }
 
-/* USERNAME */
 .profile-username {
     font-size: 14px;
     color: #8a8a8a;
     margin-top: 4px;
 }
 
-/* СТАТИСТИКА */
+/* ── Stats ── */
 .stats {
     display: flex;
     justify-content: center;
@@ -95,16 +93,22 @@
     color: #8a8a8a;
 }
 
-/* ── Follow button on user profile page ─── */
-.profile-follow-btn {
+/* ── Action buttons row (on other user's profile) ── */
+.profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-top: 20px;
-    padding: 10px 40px;
+}
+
+.profile-follow-btn {
+    padding: 10px 32px;
     border-radius: 22px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.18s ease;
-    min-width: 160px;
+    min-width: 140px;
     text-align: center;
     border: 1.5px solid #000;
 }
@@ -121,16 +125,33 @@
     border-color: #ddd;
 }
 
-.profile-follow-btn:active {
-    transform: scale(0.96);
+.profile-follow-btn:active  { transform: scale(0.96); }
+.profile-follow-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* Message icon button */
+.profile-msg-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1.5px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
 }
 
-.profile-follow-btn:disabled {
-    opacity: 0.5;
-    pointer-events: none;
+.profile-msg-btn i {
+    font-size: 19px;
+    color: #000;
 }
 
-/* МОДАЛКА АВАТАРА */
+.profile-msg-btn:active { transform: scale(0.93); }
+.profile-msg-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+/* ── Avatar modal ── */
 .avatar-page {
     position: fixed;
     inset: 0;
@@ -141,9 +162,7 @@
     justify-content: center;
 }
 
-.hidden {
-    display: none;
-}
+.hidden { display: none; }
 
 .avatar-modal-content {
     position: relative;
@@ -155,19 +174,7 @@
     justify-content: center;
 }
 
-.avatar-back {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: #fff;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-}
-
-.avatar-close {
+.avatar-back, .avatar-close {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -207,6 +214,7 @@
     font-weight: 600;
     background: #fff;
     color: #000;
+    cursor: pointer;
 }
 
 .avatar-img {

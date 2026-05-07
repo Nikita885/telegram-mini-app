@@ -1,15 +1,21 @@
 function detectPlatform() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(userAgent)) {
+    if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
         document.documentElement.classList.add('ios');
     }
 }
 
 function initPage() {
+    // Stop chat polling whenever we navigate away
+    if (typeof _stopChatPolling === 'function') _stopChatPolling();
+
+    document.body.classList.remove('hide-nav');
+
     initProfilePage();
     initAvatarPage();
     initSearchPage();
     initUserProfilePage();
+    initMessagesPage();
+    initChatPage();
 }
 
 // ── SPA navigation ────────────────────────────────────────────────────────────
@@ -19,8 +25,7 @@ async function loadPage(url) {
         const response = await fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         });
-
-        if (!response.ok) throw new Error('Ошибка сервера');
+        if (!response.ok) throw new Error('Server error');
 
         const html = await response.text();
         const parser = new DOMParser();
@@ -31,89 +36,70 @@ async function loadPage(url) {
             document.getElementById('main-content').innerHTML = newContent.innerHTML;
         }
 
-        initPage();
-
         const isProfileRelated = url.startsWith('/profile') || url.startsWith('/avatar');
-        if (!isProfileRelated) {
-            sessionStorage.removeItem('avatar_updated');
-        }
+        if (!isProfileRelated) sessionStorage.removeItem('avatar_updated');
 
+        initPage();
         setActiveButton();
 
     } catch (error) {
-        console.error('Ошибка загрузки страницы:', error);
+        console.error('Ошибка загрузки:', error);
         window.location.href = url;
     }
 }
 
-// ── Navigation icons ──────────────────────────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
 
 function updateIcons() {
+    const swaps = {
+        'ri-home-line':      'ri-home-2-fill',
+        'ri-search-line':    'ri-search-2-fill',
+        'ri-message-2-line': 'ri-message-2-fill',
+        'ri-user-line':      'ri-user-2-fill',
+    };
+    const rev = Object.fromEntries(Object.entries(swaps).map(([a, b]) => [b, a]));
+
     document.querySelectorAll('.bottom-navigation__item').forEach(item => {
-        const icon      = item.querySelector('.bottom-navigation__icon');
-        const actionBtn = item.querySelector('.bottom-navigation__action');
-        const active    = item.classList.contains('active');
+        const icon = item.querySelector('.bottom-navigation__icon');
+        const btn  = item.querySelector('.bottom-navigation__action');
+        const on   = item.classList.contains('active');
 
         if (icon) {
-            const swaps = {
-                'ri-home-line':      'ri-home-2-fill',
-                'ri-search-line':    'ri-search-2-fill',
-                'ri-message-2-line': 'ri-message-2-fill',
-                'ri-user-line':      'ri-user-2-fill',
-            };
-            const reverseSwaps = Object.fromEntries(
-                Object.entries(swaps).map(([a, b]) => [b, a])
-            );
-
-            if (active) {
-                Object.entries(swaps).forEach(([from, to]) => {
-                    if (icon.classList.contains(from)) icon.classList.replace(from, to);
-                });
-            } else {
-                Object.entries(reverseSwaps).forEach(([from, to]) => {
-                    if (icon.classList.contains(from)) icon.classList.replace(from, to);
-                });
-            }
+            const map = on ? swaps : rev;
+            Object.entries(map).forEach(([from, to]) => {
+                if (icon.classList.contains(from)) icon.classList.replace(from, to);
+            });
         }
-
-        if (actionBtn) actionBtn.classList.toggle('active', active);
+        if (btn) btn.classList.toggle('active', on);
     });
 }
 
 function setActiveButton() {
-    const currentPath = window.location.pathname;
+    const path = window.location.pathname;
     document.querySelectorAll('.bottom-navigation__item').forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href') === currentPath) {
-            item.classList.add('active');
-        }
+        item.classList.toggle('active', item.getAttribute('href') === path);
     });
     updateIcons();
 }
 
-function handleNavClick(event) {
-    event.preventDefault();
-    const href = event.currentTarget.getAttribute('href');
+function handleNavClick(e) {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute('href');
     if (!href) return;
     loadPage(href);
     history.pushState({}, '', href);
     setActiveButton();
 }
 
-// ── Popstate ──────────────────────────────────────────────────────────────────
-
 window.addEventListener('popstate', () => {
     loadPage(window.location.pathname);
     setActiveButton();
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-
 document.addEventListener('DOMContentLoaded', () => {
     detectPlatform();
     setActiveButton();
     initPage();
-
     document.querySelectorAll('.bottom-navigation__item').forEach(item => {
         item.addEventListener('click', handleNavClick);
     });
