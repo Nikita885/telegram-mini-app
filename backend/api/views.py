@@ -281,6 +281,7 @@ class DialogMessagesView(APIView):
                     'text': m.text,
                     'time': m.created_at.strftime('%H:%M'),
                     'is_mine': m.sender == current_user,
+                    'edited': m.edited,
                 }
                 for m in qs
             ]
@@ -303,7 +304,61 @@ class DialogMessagesView(APIView):
             'text': msg.text,
             'time': msg.created_at.strftime('%H:%M'),
             'is_mine': True,
+            'edited': False,
         }, status=201)
+
+
+# ── Edit/Delete Message ───────────────────────────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class MessageDetailView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def _get_message(self, request, dialog_id, message_id):
+        current_user = get_current_user(request)
+        if not current_user:
+            return None, None, Response({'error': 'Not authorized'}, status=401)
+        
+        try:
+            dialog = Dialog.objects.get(
+                Q(user1=current_user) | Q(user2=current_user),
+                id=dialog_id
+            )
+            message = Message.objects.get(id=message_id, dialog=dialog)
+            
+            # Only sender can edit/delete
+            if message.sender != current_user:
+                return None, None, Response({'error': 'Permission denied'}, status=403)
+                
+            return message, dialog, None
+        except (Dialog.DoesNotExist, Message.DoesNotExist):
+            return None, None, Response({'error': 'Not found'}, status=404)
+
+    def put(self, request, dialog_id, message_id):
+        """Edit message"""
+        message, dialog, err = self._get_message(request, dialog_id, message_id)
+        if err:
+            return err
+
+        new_text = request.data.get('text', '').strip()
+        if not new_text:
+            return Response({'error': 'Empty message'}, status=400)
+
+        message.text = new_text
+        message.edited = True
+        message.save()
+
+        return Response({'status': 'ok'})
+
+    def delete(self, request, dialog_id, message_id):
+        """Delete message"""
+        message, dialog, err = self._get_message(request, dialog_id, message_id)
+        if err:
+            return err
+
+        message.delete()
+        return Response({'status': 'ok'})
 
 
 # ── Avatar ────────────────────────────────────────────────────────────────────

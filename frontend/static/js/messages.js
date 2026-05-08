@@ -1,6 +1,7 @@
 // ── Global chat state ──────────────────────────────────────────────────────────
 let _chatPollingInterval = null;
 let _lastMessageId = 0;
+let _editingMessageId = null;
 
 function _stopChatPolling() {
     if (_chatPollingInterval) {
@@ -107,14 +108,25 @@ function initChatPage() {
     const input     = document.getElementById('chat-input');
     const sendBtn   = document.getElementById('chat-send-btn');
     const backBtn   = document.getElementById('chat-back-btn');
+    const editIndicator = document.getElementById('chat-edit-indicator');
+    const editClose = document.getElementById('chat-edit-close');
+
+    // ── Context Menu Setup ────────────────────────────────────────────────────
+    setupContextMenu(dialogId, input);
 
     // ── Back ──────────────────────────────────────────────────────────────────
     if (backBtn) {
         backBtn.addEventListener('click', () => {
             _stopChatPolling();
+            cancelEdit();
             loadPage('/messages/');
             history.pushState({}, '', '/messages/');
         });
+    }
+
+    // ── Cancel Edit ───────────────────────────────────────────────────────────
+    if (editClose) {
+        editClose.addEventListener('click', cancelEdit);
     }
 
     // ── Load initial messages ─────────────────────────────────────────────────
@@ -135,19 +147,37 @@ function initChatPage() {
         sendBtn.disabled = true;
 
         try {
-            const resp = await fetch(`/api/dialogs/${dialogId}/messages/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({ text }),
-            });
-            const msg = await resp.json();
-            if (msg.id) {
-                appendMessage(msgArea, msg);
-                _lastMessageId = Math.max(_lastMessageId, msg.id);
-                scrollToBottom(msgArea);
+            if (_editingMessageId) {
+                // Edit message
+                const resp = await fetch(`/api/dialogs/${dialogId}/messages/${_editingMessageId}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ text }),
+                });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    updateMessageInDOM(_editingMessageId, text, true);
+                    cancelEdit();
+                }
+            } else {
+                // Send new message
+                const resp = await fetch(`/api/dialogs/${dialogId}/messages/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({ text }),
+                });
+                const msg = await resp.json();
+                if (msg.id) {
+                    appendMessage(msgArea, msg);
+                    _lastMessageId = Math.max(_lastMessageId, msg.id);
+                    scrollToBottom(msgArea);
+                }
             }
         } catch (e) {
             console.error('Send error:', e);
@@ -164,8 +194,198 @@ function initChatPage() {
             e.preventDefault();
             doSend();
         }
+        if (e.key === 'Escape') {
+            cancelEdit();
+        }
     });
 }
+
+// ── Context Menu ──────────────────────────────────────────────────────────────
+
+function setupContextMenu(dialogId, input) {
+    let longPressTimer = null;
+    let currentMessageId = null;
+    let currentMessageText = null;
+    let currentIsMine = false;
+
+    const menu = document.createElement('div');
+    menu.className = 'message-menu';
+    menu.innerHTML = `
+        <button class="message-menu-item" data-action="copy">
+            <i class="ri-file-copy-line"></i>
+            <span>Копировать</span>
+        </button>
+        <button class="message-menu-item" data-action="edit">
+            <i class="ri-edit-line"></i>
+            <span>Редактировать</span>
+        </button>
+        <button class="message-menu-item delete" data-action="delete">
+            <i class="ri-delete-bin-line"></i>
+            <span>Удалить</span>
+        </button>
+    `;
+    document.body.appendChild(menu);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'message-menu-overlay';
+    document.body.appendChild(overlay);
+
+    // Hide menu
+    function hideMenu() {
+        menu.classList.remove('show');
+        overlay.classList.remove('show');
+        currentMessageId = null;
+        currentMessageText = null;
+        currentIsMine = false;
+    }
+
+    overlay.addEventListener('click', hideMenu);
+
+    // Show menu
+    function showMenu(msgId, msgText, isMine, event) {
+        currentMessageId = msgId;
+        currentMessageText = msgText;
+        currentIsMine = isMine;
+
+        // Show only edit/delete for own messages
+        const editBtn = menu.querySelector('[data-action="edit"]');
+        const deleteBtn = menu.querySelector('[data-action="delete"]');
+        
+        if (isMine) {
+            editBtn.style.display = 'flex';
+            deleteBtn.style.display = 'flex';
+        } else {
+            editBtn.style.display = 'none';
+            deleteBtn.style.display = 'none';
+        }
+
+        // Position menu
+        const rect = event.target.getBoundingClientRect();
+        const menuHeight = isMine ? 150 : 60; // approximate
+        
+        menu.style.left = rect.left + 'px';
+        menu.style.top = (rect.top - menuHeight - 10) + 'px';
+
+        menu.classList.add('show');
+        overlay.classList.add('show');
+    }
+
+    // Menu actions
+    menu.addEventListener('click', async (e) => {
+        const button = e.target.closest('.message-menu-item');
+        if (!button) return;
+
+        const action = button.dataset.action;
+        hideMenu();
+
+        if (action === 'copy') {
+            try {
+                await navigator.clipboard.writeText(currentMessageText);
+            } catch (err) {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = currentMessageText;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        } else if (action === 'edit') {
+            startEdit(currentMessageId, currentMessageText, input);
+        } else if (action === 'delete') {
+            await deleteMessage(dialogId, currentMessageId);
+        }
+    });
+
+    // Long press detection
+    document.addEventListener('pointerdown', (e) => {
+        const bubble = e.target.closest('.chat-bubble');
+        if (!bubble) return;
+
+        const wrap = bubble.closest('.chat-bubble-wrap');
+        const msgId = parseInt(wrap.dataset.id);
+        const msgText = bubble.textContent.replace(/ \(изменено\)$/, '').trim();
+        const isMine = wrap.classList.contains('mine');
+
+        longPressTimer = setTimeout(() => {
+            navigator.vibrate?.(50);
+            showMenu(msgId, msgText, isMine, e);
+        }, 500);
+    });
+
+    document.addEventListener('pointerup', () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    });
+
+    document.addEventListener('pointermove', () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    });
+}
+
+// ── Edit Functions ────────────────────────────────────────────────────────────
+
+function startEdit(messageId, text, input) {
+    _editingMessageId = messageId;
+    input.value = text;
+    input.focus();
+
+    const indicator = document.getElementById('chat-edit-indicator');
+    const preview = document.getElementById('chat-edit-preview');
+    
+    if (indicator) indicator.classList.add('show');
+    if (preview) preview.textContent = text;
+}
+
+function cancelEdit() {
+    _editingMessageId = null;
+    const input = document.getElementById('chat-input');
+    const indicator = document.getElementById('chat-edit-indicator');
+    
+    if (input) input.value = '';
+    if (indicator) indicator.classList.remove('show');
+}
+
+function updateMessageInDOM(messageId, newText, edited) {
+    const wrap = document.querySelector(`.chat-bubble-wrap[data-id="${messageId}"]`);
+    if (!wrap) return;
+
+    const bubble = wrap.querySelector('.chat-bubble');
+    if (bubble) {
+        bubble.textContent = newText;
+        if (edited) {
+            bubble.classList.add('edited');
+        }
+    }
+}
+
+// ── Delete Message ────────────────────────────────────────────────────────────
+
+async function deleteMessage(dialogId, messageId) {
+    try {
+        const resp = await fetch(`/api/dialogs/${dialogId}/messages/${messageId}/`, {
+            method: 'DELETE',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const data = await resp.json();
+        
+        if (data.status === 'ok') {
+            const wrap = document.querySelector(`.chat-bubble-wrap[data-id="${messageId}"]`);
+            if (wrap) wrap.remove();
+        }
+    } catch (e) {
+        console.error('Delete error:', e);
+    }
+}
+
+// ── Load Messages ─────────────────────────────────────────────────────────────
 
 async function loadMessages(dialogId, msgArea, initial) {
     try {
@@ -212,10 +432,18 @@ function appendMessage(msgArea, msg) {
     const wrap = document.createElement('div');
     wrap.className = `chat-bubble-wrap ${msg.is_mine ? 'mine' : 'theirs'}`;
     wrap.dataset.id = msg.id;
-    wrap.innerHTML = `
-        <div class="chat-bubble">${escHtml(msg.text)}</div>
-        <div class="chat-bubble-time">${msg.time}</div>
-    `;
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    if (msg.edited) bubble.classList.add('edited');
+    bubble.textContent = msg.text;
+    
+    const time = document.createElement('div');
+    time.className = 'chat-bubble-time';
+    time.textContent = msg.time;
+    
+    wrap.appendChild(bubble);
+    wrap.appendChild(time);
     msgArea.appendChild(wrap);
 }
 
