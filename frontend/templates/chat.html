@@ -2,30 +2,32 @@
 
 {% block content %}
 <div class="chat-page"
-     data-dialog-id="{{ dialog_id }}"
-     data-other-id="{{ other_user.telegram_id }}"
-     data-other-name="{{ other_user.first_name }}{% if other_user.last_name %} {{ other_user.last_name }}{% endif %}"
-     data-other-color="{{ other_user.avatar_random_color|default:'#cccccc' }}"
-     data-other-avatar="{% if other_user.avatar %}{{ other_user.avatar.url }}{% endif %}"
+     data-dialog-id="{% if dialog_id %}{{ dialog_id }}{% endif %}"
+     data-target-telegram-id="{{ target_telegram_id }}"
+     data-current-user-id="{{ user.telegram_id }}"
+     data-other-id="{{ target_user.telegram_id }}"
+     data-other-name="{{ target_user.first_name }}{% if target_user.last_name %} {{ target_user.last_name }}{% endif %}"
+     data-other-color="{{ target_user.avatar_random_color|default:'#cccccc' }}"
+     data-other-avatar="{% if target_user.avatar %}{{ target_user.avatar.url }}{% endif %}"
 >
     <div class="chat-header">
         <button class="chat-back-btn" id="chat-back-btn">
             <i class="ri-arrow-left-s-line"></i>
         </button>
         <div class="chat-header-avatar"
-             style="background-color: {{ other_user.avatar_random_color|default:'#cccccc' }}">
-            {% if other_user.avatar %}
-                <img src="{{ other_user.avatar.url }}" alt="">
+             style="background-color: {{ target_user.avatar_random_color|default:'#cccccc' }}">
+            {% if target_user.avatar %}
+                <img src="{{ target_user.avatar.url }}" alt="">
             {% else %}
-                <span>{{ other_user.first_name|first|default:'U' }}</span>
+                <span>{{ target_user.first_name|first|default:'U' }}</span>
             {% endif %}
         </div>
         <div class="chat-header-info">
             <div class="chat-header-name">
-                {{ other_user.first_name }}{% if other_user.last_name %} {{ other_user.last_name }}{% endif %}
+                {{ target_user.first_name }}{% if target_user.last_name %} {{ target_user.last_name }}{% endif %}
             </div>
-            {% if other_user.username %}
-            <div class="chat-header-username">@{{ other_user.username }}</div>
+            {% if target_user.username %}
+            <div class="chat-header-username">@{{ target_user.username }}</div>
             {% endif %}
         </div>
     </div>

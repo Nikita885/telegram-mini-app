@@ -108,6 +108,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     }
                 )
         
+        elif message_type == 'mark_as_read':
+            # Помечаем сообщения как прочитанные
+            await self.mark_messages_as_read(
+                dialog_id=self.dialog_id,
+                user_id=data.get('user_id')
+            )
+        
         elif message_type == 'typing':
             # Индикатор печати
             await self.channel_layer.group_send(
@@ -122,9 +129,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     
     async def chat_message(self, event):
         """Отправка нового сообщения клиенту"""
+        message = event['message']
+        
+        # Вычисляем is_mine для текущего клиента
+        user = await self.get_user()
+        if user:
+            message['is_mine'] = (message['sender_id'] == user.telegram_id)
+        
         await self.send(text_data=json.dumps({
             'type': 'chat_message',
-            'message': event['message']
+            'message': message
         }))
     
     async def message_edited(self, event):
@@ -230,4 +244,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return True
         except Exception as e:
             print(f"Error deleting message: {e}")
+            return False
+    
+    @database_sync_to_async
+    def mark_messages_as_read(self, dialog_id, user_id):
+        """Помечаем непрочитанные сообщения как прочитанные"""
+        try:
+            dialog = Dialog.objects.get(id=dialog_id)
+            reader = TelegramUser.objects.get(telegram_id=user_id)
+            
+            # Помечаем все непрочитанные сообщения (не от текущего пользователя) как прочитанные
+            updated = Message.objects.filter(
+                dialog=dialog,
+                is_read=False
+            ).exclude(sender=reader).update(is_read=True)
+            
+            print(f"Marked {updated} messages as read for user {user_id}")
+            return True
+        except Exception as e:
+            print(f"Error marking messages as read: {e}")
             return False

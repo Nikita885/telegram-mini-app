@@ -105,10 +105,7 @@ function initChatPage() {
 
     document.body.classList.add('hide-nav');
 
-    // ✅ ИЗМЕНЕНИЕ: dialogId может быть null для нового чата
-    const dialogId  = page.dataset.dialogId ? parseInt(page.dataset.dialogId) : null;
-    const targetTelegramId = page.dataset.targetTelegramId ? parseInt(page.dataset.targetTelegramId) : null;
-    
+    const dialogId  = parseInt(page.dataset.dialogId);
     const msgArea   = document.getElementById('chat-messages');
     const input     = document.getElementById('chat-input');
     const sendBtn   = document.getElementById('chat-send-btn');
@@ -122,12 +119,9 @@ function initChatPage() {
     _currentUserId = parseInt(page.dataset.currentUserId);
     
     console.log('Current User ID:', _currentUserId); // Для отладки
-    console.log('Dialog ID:', dialogId, 'Target ID:', targetTelegramId);
 
     // ── Context Menu Setup ────────────────────────────────────────────────────
-    if (dialogId) {
-        setupContextMenu(dialogId, input);
-    }
+    setupContextMenu(dialogId, input);
 
     // ── Back ──────────────────────────────────────────────────────────────────
     if (backBtn) {
@@ -145,15 +139,10 @@ function initChatPage() {
     }
 
     // ── Load initial messages ─────────────────────────────────────────────────
-    // ✅ Загружаем сообщения только если диалог уже существует
-    if (dialogId) {
-        loadMessages(dialogId, msgArea, true);
-        // ── WebSocket Connection ──────────────────────────────────────────────────
-        connectWebSocket(dialogId, msgArea);
-    } else {
-        // Новый чат - показываем placeholder
-        msgArea.innerHTML = '<div style="text-align:center;padding:40px;color:#888">Начните переписку</div>';
-    }
+    loadMessages(dialogId, msgArea, true);
+
+    // ── WebSocket Connection ──────────────────────────────────────────────────
+    connectWebSocket(dialogId, msgArea);
 
     // ── Send ──────────────────────────────────────────────────────────────────
     const doSend = async () => {
@@ -164,50 +153,6 @@ function initChatPage() {
         sendBtn.disabled = true;
 
         try {
-            // ✅ ИЗМЕНЕНИЕ: Если диалога нет - создаем его перед отправкой
-            let actualDialogId = dialogId || _currentDialogId;
-            
-            if (!actualDialogId && targetTelegramId) {
-                console.log('Creating new dialog...');
-                
-                // Создаем диалог через API
-                const createResp = await fetch('/api/dialogs/create/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    body: JSON.stringify({ target_telegram_id: targetTelegramId }),
-                });
-                
-                const createData = await createResp.json();
-                
-                if (createData.dialog_id) {
-                    actualDialogId = createData.dialog_id;
-                    _currentDialogId = actualDialogId;
-                    
-                    // ✅ Обновляем URL на правильный
-                    const newUrl = `/chat/${actualDialogId}/`;
-                    history.replaceState({}, '', newUrl);
-                    
-                    // ✅ Обновляем data-атрибут страницы
-                    page.dataset.dialogId = actualDialogId;
-                    
-                    // ✅ Подключаем WebSocket для нового диалога
-                    connectWebSocket(actualDialogId, msgArea);
-                    
-                    // ✅ Настраиваем контекстное меню
-                    setupContextMenu(actualDialogId, input);
-                    
-                    console.log('Dialog created:', actualDialogId);
-                    
-                    // Даем WebSocket время подключиться
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else {
-                    throw new Error('Failed to create dialog');
-                }
-            }
-            
             if (_editingMessageId) {
                 // Edit via WebSocket
                 if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
@@ -222,11 +167,6 @@ function initChatPage() {
             } else {
                 // Send via WebSocket
                 if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
-                    // ✅ Удаляем "Начните переписку" если есть
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
-                    
                     _chatSocket.send(JSON.stringify({
                         type: 'chat_message',
                         text: text,
@@ -235,13 +175,7 @@ function initChatPage() {
                 } else {
                     // Fallback to HTTP if WebSocket not connected
                     console.warn('WebSocket not connected, falling back to HTTP');
-                    
-                    // ✅ Удаляем "Начните переписку" если есть
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
-                    
-                    const resp = await fetch(`/api/dialogs/${actualDialogId}/messages/`, {
+                    const resp = await fetch(`/api/dialogs/${dialogId}/messages/`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -299,14 +233,6 @@ function connectWebSocket(dialogId, msgArea) {
     _chatSocket.onopen = (e) => {
         console.log('✅ WebSocket connected');
         showConnectionStatus('connected');
-        
-        // ✅ Помечаем все непрочитанные сообщения как прочитанные
-        if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
-            _chatSocket.send(JSON.stringify({
-                type: 'mark_as_read',
-                user_id: _currentUserId
-            }));
-        }
     };
     
     _chatSocket.onmessage = (e) => {
@@ -332,14 +258,6 @@ function connectWebSocket(dialogId, msgArea) {
                 
                 appendMessage(msgArea, message);
                 scrollToBottom(msgArea);
-                
-                // ✅ Если это не мое сообщение - помечаем как прочитанное
-                if (!message.is_mine && _chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
-                    _chatSocket.send(JSON.stringify({
-                        type: 'mark_as_read',
-                        user_id: _currentUserId
-                    }));
-                }
                 break;
                 
             case 'message_edited':
@@ -476,8 +394,6 @@ function setupContextMenu(dialogId, input) {
     }
 
     menu.addEventListener('click', async (e) => {
-        e.stopPropagation(); // ✅ Останавливаем всплытие события
-        
         const button = e.target.closest('.message-menu-item');
         if (!button) return;
 
