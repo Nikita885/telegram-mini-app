@@ -259,14 +259,42 @@ function setupContextMenu(dialogId, input) {
             deleteBtn.style.display = 'none';
         }
 
-        // Position menu
-        const rect = event.target.getBoundingClientRect();
-        const menuHeight = isMine ? 150 : 60; // approximate
-        
-        menu.style.left = rect.left + 'px';
-        menu.style.top = (rect.top - menuHeight - 10) + 'px';
-
+        // Сначала показываем меню чтобы получить его размеры
+        menu.style.visibility = 'hidden';
         menu.classList.add('show');
+        
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+        
+        // Получаем координаты сообщения
+        const bubble = event.target.closest('.chat-bubble');
+        const rect = bubble ? bubble.getBoundingClientRect() : event.target.getBoundingClientRect();
+        
+        // Позиционируем меню ПОД сообщением, по правому краю
+        let left = rect.right - menuWidth;
+        let top = rect.bottom + 10;
+        
+        // Проверяем, не вылезает ли меню за левый край экрана
+        if (left < 10) {
+            left = 10;
+        }
+        
+        // Проверяем, не вылезает ли меню за правый край экрана
+        if (left + menuWidth > window.innerWidth - 10) {
+            left = window.innerWidth - menuWidth - 10;
+        }
+        
+        // Проверяем, не вылезает ли меню за нижний край экрана
+        if (top + menuHeight > window.innerHeight - 10) {
+            // Если не помещается снизу, показываем сверху
+            top = rect.top - menuHeight - 10;
+        }
+        
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+        
+        // Теперь делаем меню видимым
+        menu.style.visibility = 'visible';
         overlay.classList.add('show');
     }
 
@@ -276,15 +304,20 @@ function setupContextMenu(dialogId, input) {
         if (!button) return;
 
         const action = button.dataset.action;
+        
+        // ВАЖНО: Сохраняем значения ДО hideMenu(), потому что hideMenu очищает их!
+        const messageId = currentMessageId;
+        const messageText = currentMessageText;
+        
         hideMenu();
 
         if (action === 'copy') {
             try {
-                await navigator.clipboard.writeText(currentMessageText);
+                await navigator.clipboard.writeText(messageText);
             } catch (err) {
                 // Fallback for older browsers
                 const textarea = document.createElement('textarea');
-                textarea.value = currentMessageText;
+                textarea.value = messageText;
                 textarea.style.position = 'fixed';
                 textarea.style.opacity = '0';
                 document.body.appendChild(textarea);
@@ -293,21 +326,45 @@ function setupContextMenu(dialogId, input) {
                 document.body.removeChild(textarea);
             }
         } else if (action === 'edit') {
-            startEdit(currentMessageId, currentMessageText, input);
+            startEdit(messageId, messageText, input);
         } else if (action === 'delete') {
-            await deleteMessage(dialogId, currentMessageId);
+            await deleteMessage(dialogId, messageId);
         }
     });
 
     // Long press detection
     document.addEventListener('pointerdown', (e) => {
-        const bubble = e.target.closest('.chat-bubble');
-        if (!bubble) return;
+        // Ищем wrap напрямую, чтобы работало при клике на любую часть сообщения
+        const wrap = e.target.closest('.chat-bubble-wrap');
+        if (!wrap) return;
 
-        const wrap = bubble.closest('.chat-bubble-wrap');
-        const msgId = parseInt(wrap.dataset.id);
+        // Пробуем оба способа получить id
+        const datasetId = wrap.dataset.id;
+        const attrId = wrap.getAttribute('data-id');
+        
+        console.log('Long press detected:', {
+            datasetId,
+            attrId,
+            classList: wrap.className
+        });
+
+        const msgId = parseInt(attrId || datasetId);
+        
+        if (!msgId || isNaN(msgId)) {
+            console.error('Invalid message ID:', { datasetId, attrId, msgId });
+            return;
+        }
+
+        const bubble = wrap.querySelector('.chat-bubble');
+        if (!bubble) {
+            console.error('Bubble not found in wrap');
+            return;
+        }
+
         const msgText = bubble.textContent.replace(/ \(изменено\)$/, '').trim();
         const isMine = wrap.classList.contains('mine');
+
+        console.log('Will show menu for message:', { msgId, msgText: msgText.substring(0, 20), isMine });
 
         longPressTimer = setTimeout(() => {
             navigator.vibrate?.(50);
@@ -327,6 +384,27 @@ function setupContextMenu(dialogId, input) {
             clearTimeout(longPressTimer);
             longPressTimer = null;
         }
+    });
+
+    // Context menu (правый клик) для ПК
+    document.addEventListener('contextmenu', (e) => {
+        const wrap = e.target.closest('.chat-bubble-wrap');
+        if (!wrap) return;
+
+        e.preventDefault(); // Отменяем стандартное контекстное меню браузера
+
+        const attrId = wrap.getAttribute('data-id');
+        const msgId = parseInt(attrId);
+        
+        if (!msgId || isNaN(msgId)) return;
+
+        const bubble = wrap.querySelector('.chat-bubble');
+        if (!bubble) return;
+
+        const msgText = bubble.textContent.replace(/ \(изменено\)$/, '').trim();
+        const isMine = wrap.classList.contains('mine');
+
+        showMenu(msgId, msgText, isMine, e);
     });
 }
 
@@ -354,8 +432,12 @@ function cancelEdit() {
 }
 
 function updateMessageInDOM(messageId, newText, edited) {
+    // Используем селектор атрибута напрямую
     const wrap = document.querySelector(`.chat-bubble-wrap[data-id="${messageId}"]`);
-    if (!wrap) return;
+    if (!wrap) {
+        console.error('Message wrap not found for id:', messageId);
+        return;
+    }
 
     const bubble = wrap.querySelector('.chat-bubble');
     if (bubble) {
@@ -363,12 +445,15 @@ function updateMessageInDOM(messageId, newText, edited) {
         if (edited) {
             bubble.classList.add('edited');
         }
+        console.log('Message updated:', messageId);
     }
 }
 
 // ── Delete Message ────────────────────────────────────────────────────────────
 
 async function deleteMessage(dialogId, messageId) {
+    console.log('Deleting message:', { dialogId, messageId });
+    
     try {
         const resp = await fetch(`/api/dialogs/${dialogId}/messages/${messageId}/`, {
             method: 'DELETE',
@@ -376,9 +461,16 @@ async function deleteMessage(dialogId, messageId) {
         });
         const data = await resp.json();
         
+        console.log('Delete response:', data);
+        
         if (data.status === 'ok') {
             const wrap = document.querySelector(`.chat-bubble-wrap[data-id="${messageId}"]`);
-            if (wrap) wrap.remove();
+            if (wrap) {
+                wrap.remove();
+                console.log('Message removed from DOM');
+            } else {
+                console.error('Could not find message wrap to remove:', messageId);
+            }
         }
     } catch (e) {
         console.error('Delete error:', e);
@@ -431,7 +523,11 @@ async function loadMessages(dialogId, msgArea, initial) {
 function appendMessage(msgArea, msg) {
     const wrap = document.createElement('div');
     wrap.className = `chat-bubble-wrap ${msg.is_mine ? 'mine' : 'theirs'}`;
-    wrap.dataset.id = msg.id;
+    
+    // КРИТИЧЕСКИ ВАЖНО: устанавливаем data-id как строку
+    wrap.setAttribute('data-id', String(msg.id));
+    
+    console.log('Creating message with id:', msg.id, 'data-id:', wrap.getAttribute('data-id'));
     
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble';
