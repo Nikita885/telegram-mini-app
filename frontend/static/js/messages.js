@@ -16,6 +16,9 @@ function _stopChatPolling() {
         _dialogsSocket = null;
     }
     _currentDialogId = null;
+    
+    // ✅ Сбрасываем флаг инициализации меню
+    document.body.dataset.dialogMenuInitialized = 'false';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -67,9 +70,12 @@ async function loadDialogs() {
 function createDialogItem(d) {
     const el = document.createElement('div');
     el.className = 'dialog-item';
-    el.dataset.dialogId = d.dialog_id;  // ✅ Добавляем data-атрибут
+    el.dataset.dialogId = d.dialog_id;
+    
+    // ✅ Добавляем timestamp для сортировки
+    el.dataset.updatedAt = Date.now(); // Используем текущее время, так как данные свежие
 
-    // ✅ NEW: Добавляем класс для закрепленных диалогов
+    // ✅ Добавляем класс для закрепленных диалогов
     if (d.pinned) {
         el.classList.add('pinned');
     }
@@ -88,7 +94,7 @@ function createDialogItem(d) {
         ? `<div class="dialog-unread">${d.unread_count}</div>`
         : '';
     
-    // ✅ NEW: Иконка закрепленного чата
+    // ✅ Иконка закрепленного чата
     const pinnedIcon = d.pinned
         ? `<i class="ri-pushpin-fill dialog-pin-icon"></i>`
         : '';
@@ -170,6 +176,9 @@ function updateDialogInList(dialogData) {
     // Создаем новый элемент
     const newItem = createDialogItem(dialogData);
     
+    // ✅ Устанавливаем текущее время для правильной сортировки
+    newItem.dataset.updatedAt = Date.now();
+    
     if (existingItem) {
         // Заменяем существующий
         existingItem.replaceWith(newItem);
@@ -182,7 +191,7 @@ function updateDialogInList(dialogData) {
         }
     }
     
-    // Пересортировываем список (закрепленные сверху, остальные по updated_at)
+    // ✅ Пересортировываем список (теперь с учетом времени!)
     sortDialogList(list);
 }
 
@@ -198,9 +207,10 @@ function sortDialogList(list) {
         if (aPinned && !bPinned) return -1;
         if (!aPinned && bPinned) return 1;
         
-        // Внутри группы сортируем по времени (новые сверху)
-        // Используем data-time если есть, иначе оставляем текущий порядок
-        return 0;
+        // ✅ Внутри группы сортируем по времени (новые сверху)
+        const aTime = parseInt(a.dataset.updatedAt) || 0;
+        const bTime = parseInt(b.dataset.updatedAt) || 0;
+        return bTime - aTime; // Новые первыми
     });
     
     // Перестраиваем DOM
@@ -209,6 +219,12 @@ function sortDialogList(list) {
 
 // ✅ NEW: Контекстное меню для диалогов
 function setupDialogContextMenu() {
+    // ✅ Проверяем, уже ли настроено меню
+    if (document.body.dataset.dialogMenuInitialized === 'true') {
+        return; // Уже настроено, не создаем повторно
+    }
+    document.body.dataset.dialogMenuInitialized = 'true';
+    
     let longPressTimer = null;
     let currentDialogId = null;
     let currentIsPinned = false;
