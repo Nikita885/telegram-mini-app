@@ -1,6 +1,6 @@
 import json
 import requests
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
@@ -153,17 +153,14 @@ class ConnectionsView(APIView):
             return Response({'error': 'Not authorized'}, status=401)
 
         if connection_type == 'following':
-            # Users that current_user follows
             users = TelegramUser.objects.filter(
                 followers__follower=current_user
             ).distinct()
         elif connection_type == 'followers':
-            # Users that follow current_user
             users = TelegramUser.objects.filter(
                 following__following=current_user
             ).distinct()
         elif connection_type == 'friends':
-            # Mutual follows
             following_ids = set(current_user.following.values_list('following__telegram_id', flat=True))
             followers_ids = set(current_user.followers.values_list('follower__telegram_id', flat=True))
             mutual_ids = following_ids & followers_ids
@@ -171,7 +168,6 @@ class ConnectionsView(APIView):
         else:
             return Response({'error': 'Invalid connection type'}, status=400)
 
-        # Get current following status for each user
         current_following_ids = set(current_user.following.values_list('following__telegram_id', flat=True))
 
         result = []
@@ -217,7 +213,7 @@ class DialogListView(APIView):
         return Response({'dialogs': result})
 
 
-# ── Start dialog ──────────────────────────────────────────────────────────────
+# ── Start dialog (DEPRECATED - kept for backward compatibility) ───────────────
 
 @method_decorator(csrf_exempt, name='dispatch')
 class StartDialogView(APIView):
@@ -239,6 +235,51 @@ class StartDialogView(APIView):
             return Response({'error': 'User not found'}, status=404)
         dialog = get_or_create_dialog(current_user, target)
         return Response({'dialog_id': dialog.id})
+
+
+# ── ✅ NEW: Create dialog API ─────────────────────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CreateDialogView(APIView):
+    """
+    API endpoint для создания нового диалога.
+    Вызывается из JavaScript при отправке первого сообщения.
+    """
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+        
+        target_telegram_id = request.data.get('target_telegram_id')
+        if not target_telegram_id:
+            return Response({'error': 'target_telegram_id required'}, status=400)
+        
+        if int(target_telegram_id) == current_user.telegram_id:
+            return Response({'error': 'Cannot message yourself'}, status=400)
+        
+        try:
+            target_user = TelegramUser.objects.get(telegram_id=target_telegram_id)
+        except TelegramUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+        
+        # Проверяем, может уже есть диалог
+        dialog = Dialog.objects.filter(
+            Q(user1=current_user, user2=target_user) |
+            Q(user1=target_user, user2=current_user)
+        ).first()
+        
+        # Если нет - создаем
+        if not dialog:
+            u1, u2 = (current_user, target_user) if current_user.telegram_id < target_user.telegram_id else (target_user, current_user)
+            dialog = Dialog.objects.create(user1=u1, user2=u2)
+        
+        return Response({
+            'dialog_id': dialog.id,
+            'created': True
+        })
 
 
 # ── Dialog messages ───────────────────────────────────────────────────────────
@@ -327,7 +368,6 @@ class MessageDetailView(APIView):
             )
             message = Message.objects.get(id=message_id, dialog=dialog)
             
-            # Only sender can edit/delete
             if message.sender != current_user:
                 return None, None, Response({'error': 'Permission denied'}, status=403)
                 
@@ -472,6 +512,38 @@ def messages_view(request):
     u = get_current_user(request)
     return render(request, 'messages.html', {'user': u}) if u else redirect('/authorize/')
 
+
+# ── ✅ NEW: Chat with user (no dialog yet) ────────────────────────────────────
+
+def chat_with_user_view(request, telegram_id):
+    """
+    Показывает страницу чата с пользователем БЕЗ создания диалога.
+    Диалог будет создан при отправке первого сообщения.
+    """
+    current_user = get_current_user(request)
+    if not current_user:
+        return redirect('/authorize/')
+    
+    target_user = get_object_or_404(TelegramUser, telegram_id=telegram_id)
+    
+    # Проверяем, может уже есть диалог?
+    existing_dialog = Dialog.objects.filter(
+        Q(user1=current_user, user2=target_user) |
+        Q(user1=target_user, user2=current_user)
+    ).first()
+    
+    context = {
+        'user': current_user,
+        'target_user': target_user,
+        'dialog_id': existing_dialog.id if existing_dialog else None,
+        'target_telegram_id': telegram_id,
+    }
+    
+    return render(request, 'chat.html', context)
+
+
+# ── Existing chat view ────────────────────────────────────────────────────────
+
 def chat_view(request, dialog_id):
     current_user = get_current_user(request)
     if not current_user:
@@ -482,12 +554,16 @@ def chat_view(request, dialog_id):
         )
     except Dialog.DoesNotExist:
         return redirect('/messages/')
+    
     other = dialog.get_other_user(current_user)
+    
     return render(request, 'chat.html', {
         'user': current_user,
         'dialog_id': dialog.id,
-        'other_user': other,
+        'target_user': other,
+        'target_telegram_id': other.telegram_id,
     })
+
 
 def profile_view(request):
     u = get_current_user(request)
@@ -525,7 +601,6 @@ def connections_view(request, connection_type):
     if not u:
         return redirect('/authorize/')
     
-    # Если это не AJAX запрос (обновление страницы), редиректим на профиль
     if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
         return redirect('/profile/')
     
@@ -553,7 +628,6 @@ def avatar_view(request):
     if not u:
         return redirect('/authorize/')
     
-    # Если это не AJAX запрос (обновление страницы), редиректим на профиль
     if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
         return redirect('/profile/')
     

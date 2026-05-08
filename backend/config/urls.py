@@ -4,7 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
 from api.views import (
-    authorize_view, home_view, search_view, messages_view, chat_view,
+    authorize_view, home_view, search_view, messages_view, 
+    chat_view, chat_with_user_view,  # ✅ NEW
     profile_view, user_profile_view, create_view, avatar_view,
     connections_view, UpdateAvatarView,
 )
@@ -18,7 +19,13 @@ urlpatterns = [
     path('home/', home_view, name='home'),
     path('search/', search_view, name='search'),
     path('messages/', messages_view, name='messages'),
+    
+    # ✅ NEW: Chat with user (no dialog yet)
+    path('chat/with/<int:telegram_id>/', chat_with_user_view, name='chat-with-user'),
+    
+    # Existing chat with dialog
     path('chat/<int:dialog_id>/', chat_view, name='chat'),
+    
     path('profile/', profile_view, name='profile'),
     path('user/<int:telegram_id>/', user_profile_view, name='user-profile'),
     path('create/', create_view, name='create'),

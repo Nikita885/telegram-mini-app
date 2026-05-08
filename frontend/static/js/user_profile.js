@@ -40,33 +40,15 @@ function initUserProfilePage() {
         });
     }
 
-    // ── Message ───────────────────────────────────────────────────────────────
+    // ── ✅ Message - NEW: Navigate without creating dialog ────────────────────
     if (msgBtn) {
-        msgBtn.addEventListener('click', async () => {
+        msgBtn.addEventListener('click', () => {
             const telegramId = parseInt(msgBtn.dataset.id);
-            msgBtn.disabled = true;
-
-            try {
-                const resp = await fetch('/api/dialogs/start/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    body: JSON.stringify({ telegram_id: telegramId }),
-                });
-                const data = await resp.json();
-
-                if (data.dialog_id) {
-                    const url = `/chat/${data.dialog_id}/`;
-                    loadPage(url);
-                    history.pushState({}, '', url);
-                }
-            } catch (e) {
-                console.error('Start dialog error:', e);
-            } finally {
-                msgBtn.disabled = false;
-            }
+            
+            // ✅ Переходим на чат БЕЗ создания диалога
+            const url = `/chat/with/${telegramId}/`;
+            loadPage(url);
+            history.pushState({}, '', url);
         });
     }
 }
