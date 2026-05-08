@@ -6,9 +6,10 @@ from .views import (
     ConnectionsView,
     DialogListView,
     StartDialogView,
-    CreateDialogView,  # ✅ NEW
+    CreateDialogView,
     DialogMessagesView,
     MessageDetailView,
+    DialogActionView,  # ✅ NEW
 )
 
 urlpatterns = [
@@ -22,8 +23,9 @@ urlpatterns = [
     # Messenger
     path('dialogs/', DialogListView.as_view(), name='api-dialogs'),
     path('dialogs/start/', StartDialogView.as_view(), name='api-dialogs-start'),  # Deprecated
-    path('dialogs/create/', CreateDialogView.as_view(), name='api-dialogs-create'),  # ✅ NEW
+    path('dialogs/create/', CreateDialogView.as_view(), name='api-dialogs-create'),
     path('dialogs/<int:dialog_id>/messages/', DialogMessagesView.as_view(), name='api-dialog-messages'),
+    path('dialogs/<int:dialog_id>/action/', DialogActionView.as_view(), name='api-dialog-action'),  # ✅ NEW
     
     # Edit/Delete message
     path('dialogs/<int:dialog_id>/messages/<int:message_id>/', MessageDetailView.as_view(), name='api-message-detail'),

@@ -633,3 +633,42 @@ def avatar_view(request):
     
     ctx = {'user': u}
     return render(request, 'avatar.html', ctx)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DialogActionView(APIView):
+    """
+    API для действий с диалогом: закрепить/удалить
+    """
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request, dialog_id):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+        
+        try:
+            dialog = Dialog.objects.get(
+                Q(user1=current_user) | Q(user2=current_user),
+                id=dialog_id
+            )
+        except Dialog.DoesNotExist:
+            return Response({'error': 'Dialog not found'}, status=404)
+        
+        action = request.data.get('action')
+        
+        if action == 'pin':
+            # Переключаем состояние закрепления
+            dialog.pinned = not dialog.pinned
+            dialog.save()
+            return Response({
+                'status': 'ok',
+                'pinned': dialog.pinned
+            })
+        
+        elif action == 'delete':
+            # Полное удаление диалога и всех сообщений (cascade)
+            dialog.delete()
+            return Response({'status': 'ok'})
+        
+        return Response({'error': 'Invalid action'}, status=400)

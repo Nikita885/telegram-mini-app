@@ -48,10 +48,11 @@ class Dialog(models.Model):
     user2 = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='dialogs_as_user2')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)  # обновляется при каждом новом сообщении
+    pinned = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('user1', 'user2')
-        ordering = ['-updated_at']
+        ordering = ['-pinned', '-updated_at']  # Закрепленные сверху
 
     def get_other_user(self, current_user):
         return self.user2 if self.user1 == current_user else self.user1

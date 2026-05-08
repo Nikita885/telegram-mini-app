@@ -72,6 +72,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message': message
                     }
                 )
+                
+                # ✅ NEW: Уведомляем обоих участников об обновлении диалога
+                dialog_update = await self.get_dialog_update(self.dialog_id, message)
+                if dialog_update:
+                    await self.channel_layer.group_send(
+                        f'dialogs_{message["sender_id"]}',
+                        {
+                            'type': 'dialog_updated',
+                            'dialog': dialog_update['sender_view']
+                        }
+                    )
+                    await self.channel_layer.group_send(
+                        f'dialogs_{dialog_update["other_user_id"]}',
+                        {
+                            'type': 'dialog_updated',
+                            'dialog': dialog_update['other_view']
+                        }
+                    )
         
         elif message_type == 'message_edit':
             # Редактирование сообщения
@@ -91,6 +109,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'edited': True
                     }
                 )
+                
+                # ✅ Обновляем диалог в списке (изменился текст последнего сообщения)
+                dialog_update = await self.get_dialog_update_after_edit(self.dialog_id, data.get('message_id'), data.get('text', ''))
+                if dialog_update:
+                    for user_id, view in dialog_update.items():
+                        await self.channel_layer.group_send(
+                            f'dialogs_{user_id}',
+                            {
+                                'type': 'dialog_updated',
+                                'dialog': view
+                            }
+                        )
         
         elif message_type == 'message_delete':
             # Удаление сообщения
@@ -107,13 +137,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'message_id': data.get('message_id')
                     }
                 )
+                
+                # ✅ Обновляем диалог в списке (может измениться последнее сообщение)
+                dialog_update = await self.get_dialog_update_after_delete(self.dialog_id)
+                if dialog_update:
+                    for user_id, view in dialog_update.items():
+                        await self.channel_layer.group_send(
+                            f'dialogs_{user_id}',
+                            {
+                                'type': 'dialog_updated',
+                                'dialog': view
+                            }
+                        )
         
         elif message_type == 'mark_as_read':
             # Помечаем сообщения как прочитанные
-            await self.mark_messages_as_read(
+            updated = await self.mark_messages_as_read(
                 dialog_id=self.dialog_id,
                 user_id=data.get('user_id')
             )
+            
+            # ✅ Обновляем диалог в списке (сбросился счетчик непрочитанных)
+            if updated > 0:
+                dialog_update = await self.get_dialog_update_simple(self.dialog_id)
+                if dialog_update:
+                    for user_id, view in dialog_update.items():
+                        await self.channel_layer.group_send(
+                            f'dialogs_{user_id}',
+                            {
+                                'type': 'dialog_updated',
+                                'dialog': view
+                            }
+                        )
         
         elif message_type == 'typing':
             # Индикатор печати
@@ -215,6 +270,132 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return None
     
     @database_sync_to_async
+    def get_dialog_update(self, dialog_id, message_data):
+        """Получаем данные обновленного диалога для обоих участников"""
+        try:
+            dialog = Dialog.objects.select_related('user1', 'user2').get(id=dialog_id)
+            sender = TelegramUser.objects.get(telegram_id=message_data['sender_id'])
+            other_user = dialog.get_other_user(sender)
+            
+            # Счетчик непрочитанных для получателя
+            unread_count = Message.objects.filter(
+                dialog=dialog,
+                is_read=False
+            ).exclude(sender=other_user).count()
+            
+            def serialize_user(u):
+                return {
+                    'telegram_id': u.telegram_id,
+                    'username': u.username or '',
+                    'first_name': u.first_name or '',
+                    'last_name': u.last_name or '',
+                    'avatar_url': u.avatar.url if u.avatar else None,
+                    'avatar_color': u.avatar_random_color or '#cccccc',
+                }
+            
+            return {
+                'sender_view': {
+                    'dialog_id': dialog.id,
+                    'other_user': serialize_user(other_user),
+                    'last_message': {
+                        'text': message_data['text'],
+                        'time': message_data['time'],
+                        'is_mine': True,
+                    },
+                    'unread_count': 0,
+                    'pinned': dialog.pinned,
+                },
+                'other_view': {
+                    'dialog_id': dialog.id,
+                    'other_user': serialize_user(sender),
+                    'last_message': {
+                        'text': message_data['text'],
+                        'time': message_data['time'],
+                        'is_mine': False,
+                    },
+                    'unread_count': unread_count,
+                    'pinned': dialog.pinned,
+                },
+                'other_user_id': other_user.telegram_id
+            }
+        except Exception as e:
+            print(f"Error getting dialog update: {e}")
+            return None
+    
+    @database_sync_to_async
+    def get_dialog_update_after_edit(self, dialog_id, message_id, new_text):
+        """Обновление диалога после редактирования сообщения"""
+        try:
+            dialog = Dialog.objects.select_related('user1', 'user2').get(id=dialog_id)
+            last_msg = dialog.messages.order_by('-created_at').first()
+            
+            # Если отредактировали не последнее сообщение - не обновляем список
+            if not last_msg or last_msg.id != message_id:
+                return None
+            
+            return self._serialize_dialog_for_both(dialog, new_text)
+        except Exception as e:
+            print(f"Error in get_dialog_update_after_edit: {e}")
+            return None
+    
+    @database_sync_to_async
+    def get_dialog_update_after_delete(self, dialog_id):
+        """Обновление диалога после удаления сообщения"""
+        try:
+            dialog = Dialog.objects.select_related('user1', 'user2').get(id=dialog_id)
+            return self._serialize_dialog_for_both(dialog)
+        except Exception as e:
+            print(f"Error in get_dialog_update_after_delete: {e}")
+            return None
+    
+    @database_sync_to_async
+    def get_dialog_update_simple(self, dialog_id):
+        """Простое обновление диалога (например, после прочтения)"""
+        try:
+            dialog = Dialog.objects.select_related('user1', 'user2').get(id=dialog_id)
+            return self._serialize_dialog_for_both(dialog)
+        except Exception as e:
+            print(f"Error in get_dialog_update_simple: {e}")
+            return None
+    
+    def _serialize_dialog_for_both(self, dialog, override_text=None):
+        """Сериализует диалог для обоих участников"""
+        last_msg = dialog.messages.order_by('-created_at').first()
+        
+        def serialize_user(u):
+            return {
+                'telegram_id': u.telegram_id,
+                'username': u.username or '',
+                'first_name': u.first_name or '',
+                'last_name': u.last_name or '',
+                'avatar_url': u.avatar.url if u.avatar else None,
+                'avatar_color': u.avatar_random_color or '#cccccc',
+            }
+        
+        result = {}
+        
+        for user in [dialog.user1, dialog.user2]:
+            other = dialog.get_other_user(user)
+            unread = Message.objects.filter(
+                dialog=dialog,
+                is_read=False
+            ).exclude(sender=user).count()
+            
+            result[user.telegram_id] = {
+                'dialog_id': dialog.id,
+                'other_user': serialize_user(other),
+                'last_message': {
+                    'text': override_text or (last_msg.text if last_msg else ''),
+                    'time': last_msg.created_at.strftime('%H:%M') if last_msg else '',
+                    'is_mine': last_msg.sender == user if last_msg else False,
+                } if last_msg else None,
+                'unread_count': unread,
+                'pinned': dialog.pinned,
+            }
+        
+        return result
+    
+    @database_sync_to_async
     def edit_message(self, message_id, new_text, sender_id):
         """Редактируем сообщение"""
         try:
@@ -260,7 +441,62 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ).exclude(sender=reader).update(is_read=True)
             
             print(f"Marked {updated} messages as read for user {user_id}")
-            return True
+            return updated
         except Exception as e:
             print(f"Error marking messages as read: {e}")
-            return False
+            return 0
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  ✅ NEW: DialogListConsumer для real-time обновления списка диалогов
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class DialogListConsumer(AsyncWebsocketConsumer):
+    """
+    WebSocket consumer для списка диалогов.
+    Получает уведомления об обновлениях диалогов в реальном времени.
+    """
+    
+    async def connect(self):
+        user = await self.get_user()
+        if not user:
+            await self.close()
+            return
+        
+        self.user_id = user.telegram_id
+        self.room_group_name = f'dialogs_{self.user_id}'
+        
+        # Присоединяемся к личной группе для обновлений диалогов
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+        
+        await self.send(text_data=json.dumps({
+            'type': 'connection_established',
+            'message': 'Connected to dialog list'
+        }))
+    
+    async def disconnect(self, close_code):
+        if hasattr(self, 'room_group_name'):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+    
+    async def dialog_updated(self, event):
+        """Отправляем обновление диалога клиенту"""
+        await self.send(text_data=json.dumps({
+            'type': 'dialog_updated',
+            'dialog': event['dialog']
+        }))
+    
+    @database_sync_to_async
+    def get_user(self):
+        session = self.scope.get('session', {})
+        telegram_id = session.get('telegram_id')
+        if not telegram_id:
+            return None
+        return TelegramUser.objects.filter(telegram_id=telegram_id).first()
