@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════
+   CONNECTIONS PAGE
+═══════════════════════════════════════════ */
+
+.connections-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    background: #fff;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+}
+
+/* ── Header ── */
+.connections-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.connections-back {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    flex-shrink: 0;
+}
+
+.connections-back i {
+    font-size: 26px;
+}
+
+.connections-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    flex: 1;
+}
+
+/* ── Tabs ── */
+.connections-tabs {
+    display: flex;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 14px 8px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #999;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.tab-btn.active {
+    color: #000;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #000;
+}
+
+.tab-btn:active {
+    background: #f8f8f8;
+}
+
+/* ── Search ── */
+.connections-search {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+/* ── List ── */
+.connections-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.connections-loading {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.connections-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.connections-empty .empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.connections-empty .empty-icon i {
+    font-size: 28px;
+    color: #bbb;
+}
+
+.connections-empty p {
+    font-size: 15px;
+    color: #999;
+    margin: 4px 0 0;
+}
+
+.connections-empty .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+    margin: 0 0 6px;
+}

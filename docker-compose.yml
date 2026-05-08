@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:18
+    image: postgres:16
     env_file:
       - ./backend/.env
     ports:
@@ -8,14 +8,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
   backend:
     build: ./backend
     env_file:
       - ./backend/.env
+    environment:
+      - REDIS_HOST=redis
     command: >
       sh -c "./scripts/wait-for-it.sh db:5432 --strict --timeout=60 &&
+            ./scripts/wait-for-it.sh redis:6379 --strict --timeout=60 &&
             python manage.py migrate &&
-            exec python manage.py runserver 0.0.0.0:8000 --noreload"
+            python manage.py collectstatic --noinput &&
+            exec daphne -b 0.0.0.0 -p 8000 config.asgi:application"
     volumes:
       - ./backend:/app
       - ./frontend:/frontend
@@ -24,6 +36,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - redis
 
 volumes:
   postgres_data:
+  redis_data:
