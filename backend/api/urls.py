@@ -3,6 +3,7 @@ from .views import (
     AuthorizeView,
     SearchUsersView,
     FollowToggleView,
+    ConnectionsView,
     DialogListView,
     StartDialogView,
     DialogMessagesView,
@@ -12,6 +13,9 @@ urlpatterns = [
     path('authorize/', AuthorizeView.as_view(), name='api-authorize'),
     path('search/', SearchUsersView.as_view(), name='api-search'),
     path('follow/', FollowToggleView.as_view(), name='api-follow'),
+    
+    # Connections
+    path('connections/<str:connection_type>/', ConnectionsView.as_view(), name='api-connections'),
 
     # Messenger
     path('dialogs/', DialogListView.as_view(), name='api-dialogs'),

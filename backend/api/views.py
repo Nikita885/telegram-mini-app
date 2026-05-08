@@ -140,6 +140,49 @@ class FollowToggleView(APIView):
         return Response({'status': 'followed'})
 
 
+# ── Connections (Following/Followers/Friends) ─────────────────────────────────
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ConnectionsView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request, connection_type):
+        current_user = get_current_user(request)
+        if not current_user:
+            return Response({'error': 'Not authorized'}, status=401)
+
+        if connection_type == 'following':
+            # Users that current_user follows
+            users = TelegramUser.objects.filter(
+                followers__follower=current_user
+            ).distinct()
+        elif connection_type == 'followers':
+            # Users that follow current_user
+            users = TelegramUser.objects.filter(
+                following__following=current_user
+            ).distinct()
+        elif connection_type == 'friends':
+            # Mutual follows
+            following_ids = set(current_user.following.values_list('following__telegram_id', flat=True))
+            followers_ids = set(current_user.followers.values_list('follower__telegram_id', flat=True))
+            mutual_ids = following_ids & followers_ids
+            users = TelegramUser.objects.filter(telegram_id__in=mutual_ids)
+        else:
+            return Response({'error': 'Invalid connection type'}, status=400)
+
+        # Get current following status for each user
+        current_following_ids = set(current_user.following.values_list('following__telegram_id', flat=True))
+
+        result = []
+        for u in users:
+            d = serialize_user(u)
+            d['is_following'] = u.telegram_id in current_following_ids
+            result.append(d)
+
+        return Response({'users': result})
+
+
 # ── Dialogs list ──────────────────────────────────────────────────────────────
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -422,6 +465,27 @@ def user_profile_view(request, telegram_id):
         'is_following': is_following,
     })
 
+def connections_view(request, connection_type):
+    u = get_current_user(request)
+    if not u:
+        return redirect('/authorize/')
+    
+    # Если это не AJAX запрос (обновление страницы), редиректим на профиль
+    if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        return redirect('/profile/')
+    
+    titles = {
+        'following': 'Подписки',
+        'followers': 'Подписчики',
+        'friends': 'Друзья'
+    }
+    
+    return render(request, 'connections.html', {
+        'user': u,
+        'active_tab': connection_type,
+        'page_title': titles.get(connection_type, 'Связи'),
+    })
+
 def create_view(request):
     u = get_current_user(request)
     return render(request, 'create.html', {'telegram_id': u.telegram_id}) if u else redirect('/authorize/')
@@ -433,7 +497,10 @@ def avatar_view(request):
     u = get_current_user(request)
     if not u:
         return redirect('/authorize/')
+    
+    # Если это не AJAX запрос (обновление страницы), редиректим на профиль
+    if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
+        return redirect('/profile/')
+    
     ctx = {'user': u}
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render(request, 'avatar.html', ctx)
-    return render(request, 'base.html', ctx)
+    return render(request, 'avatar.html', ctx)

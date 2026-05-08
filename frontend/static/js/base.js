@@ -16,6 +16,7 @@ function initPage() {
     initUserProfilePage();
     initMessagesPage();
     initChatPage();
+    initConnectionsPage();
 }
 
 // ── SPA navigation ────────────────────────────────────────────────────────────
@@ -100,7 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform();
     setActiveButton();
     initPage();
+    
+    // Navigation buttons
     document.querySelectorAll('.bottom-navigation__item').forEach(item => {
         item.addEventListener('click', handleNavClick);
+    });
+    
+    // Handle clicks on stat links
+    document.addEventListener('click', (e) => {
+        const statLink = e.target.closest('.stat-link');
+        if (statLink) {
+            e.preventDefault();
+            const href = statLink.getAttribute('href');
+            if (href) {
+                loadPage(href);
+                history.pushState({}, '', href);
+                setActiveButton();
+            }
+        }
     });
 });

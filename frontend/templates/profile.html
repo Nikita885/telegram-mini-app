@@ -23,14 +23,14 @@
     {% endif %} 
 
     <div class="stats">
-        <div class="stat">
+        <a href="/connections/following/" class="stat stat-link">
             <span class="stat-value">{{ following_count }}</span>
             <span class="stat-label">Подписок</span>
-        </div>
-        <div class="stat">
+        </a>
+        <a href="/connections/followers/" class="stat stat-link">
             <span class="stat-value">{{ followers_count }}</span>
             <span class="stat-label">Подписчиков</span>
-        </div>
+        </a>
         <div class="stat">
             <span class="stat-value">{{ posts_count }}</span>
             <span class="stat-label">Постов</span>

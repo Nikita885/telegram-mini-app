@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from api.views import (
     authorize_view, home_view, search_view, messages_view, chat_view,
     profile_view, user_profile_view, create_view, avatar_view,
-    UpdateAvatarView,
+    connections_view, UpdateAvatarView,
 )
 
 urlpatterns = [
@@ -23,5 +23,6 @@ urlpatterns = [
     path('user/<int:telegram_id>/', user_profile_view, name='user-profile'),
     path('create/', create_view, name='create'),
     path('avatar/', avatar_view, name='avatar'),
+    path('connections/<str:connection_type>/', connections_view, name='connections'),
     path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

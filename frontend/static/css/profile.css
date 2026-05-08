@@ -83,6 +83,17 @@
     align-items: center;
 }
 
+.stat-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.stat-link:active {
+    opacity: 0.6;
+}
+
 .stat-value {
     font-weight: 700;
     font-size: 16px;

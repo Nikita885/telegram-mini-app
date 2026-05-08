@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/profile.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/search.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/messages.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/connections.css' %}?v={% now 'U' %}">
     {% if user.avatar %}
         <link rel="preload" as="image" href="{{ user.avatar.url }}">
     {% endif %}
@@ -47,6 +48,7 @@
     <script src="{% static 'js/search.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/user_profile.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/messages.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/connections.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/base.js' %}?v={% now 'U' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
