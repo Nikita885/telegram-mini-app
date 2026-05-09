@@ -672,3 +672,23 @@ class DialogActionView(APIView):
             return Response({'status': 'ok'})
         
         return Response({'error': 'Invalid action'}, status=400)
+    
+# backend/api/views.py
+
+def outfit_creator_view(request):
+    u = get_current_user(request)
+    if not u:
+        return redirect('/authorize/')
+    return render(request, 'outfit_creator.html', {'user': u})
+
+def outfit_feed_view(request):
+    u = get_current_user(request)
+    if not u:
+        return redirect('/authorize/')
+    return render(request, 'outfit_feed.html', {'user': u})
+
+def outfit_detail_view(request, outfit_id):
+    u = get_current_user(request)
+    if not u:
+        return redirect('/authorize/')
+    return render(request, 'outfit_detail.html', {'user': u, 'outfit_id': outfit_id})

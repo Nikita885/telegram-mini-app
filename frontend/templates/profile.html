@@ -21,7 +21,12 @@
     {% if user.username %}
     <div class="profile-username">@{{ user.username }}</div>
     {% endif %} 
-
+    <div class="profile-actions">
+        <a href="/outfits/create/" class="btn-primary">
+            <i class="ri-add-line"></i>
+            Создать образ
+        </a>
+    </div>
     <div class="stats">
         <a href="/connections/following/" class="stat stat-link">
             <span class="stat-value">{{ following_count }}</span>

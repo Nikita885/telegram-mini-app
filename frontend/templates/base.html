@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/search.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/messages.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/connections.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/outfit-creator.css' %}?v={% now 'U' %}">
     {% if user.avatar %}
         <link rel="preload" as="image" href="{{ user.avatar.url }}">
     {% endif %}
@@ -21,16 +22,17 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- frontend/templates/base.html -->
     <nav class="bottom-navigation">
         <a href="/home/" class="bottom-navigation__item">
             <i class="ri-home-line bottom-navigation__icon"></i>
             <span class="bottom-navigation__label">Главная</span>
         </a>
-        <a href="/search/" class="bottom-navigation__item">
-            <i class="ri-search-line bottom-navigation__icon"></i>
-            <span class="bottom-navigation__label">Поиск</span>
+        <a href="/outfits/" class="bottom-navigation__item">
+            <i class="ri-gallery-line bottom-navigation__icon"></i>
+            <span class="bottom-navigation__label">Образы</span>
         </a>
-        <a href="/create/" class="bottom-navigation__item">
+        <a href="/outfits/create/" class="bottom-navigation__item">
             <button class="bottom-navigation__action">+</button>
         </a>
         <a href="/messages/" class="bottom-navigation__item">

@@ -8,6 +8,7 @@ from api.views import (
     chat_view, chat_with_user_view,  # ✅ NEW
     profile_view, user_profile_view, create_view, avatar_view,
     connections_view, UpdateAvatarView,
+    outfit_creator_view, outfit_feed_view, outfit_detail_view,
 )
 
 urlpatterns = [
@@ -32,4 +33,8 @@ urlpatterns = [
     path('avatar/', avatar_view, name='avatar'),
     path('connections/<str:connection_type>/', connections_view, name='connections'),
     path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
+
+    path('outfits/create/', outfit_creator_view, name='outfit-create'),
+    path('outfits/', outfit_feed_view, name='outfit-feed'),
+    path('outfit/<int:outfit_id>/', outfit_detail_view, name='outfit-detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
