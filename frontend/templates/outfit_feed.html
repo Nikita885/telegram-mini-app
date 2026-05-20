@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="outfit-feed">
+    
+    <!-- Header -->
+    <div class="feed-header">
+        <h1 class="feed-title">Образы</h1>
+        
+        <!-- Filters -->
+        <div class="feed-filters">
+            <button class="feed-filter-btn active" data-type="recommended">
+                Рекомендации
+            </button>
+            <button class="feed-filter-btn" data-type="following">
+                Подписки
+            </button>
+            <button class="feed-filter-btn" data-type="popular">
+                Популярное
+            </button>
+        </div>
+    </div>
+    
+    <!-- Outfit List -->
+    <div class="outfit-list" id="outfit-list">
+        <div style="text-align:center;padding:40px;">
+            <div class="search-spinner"></div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/outfit.js' %}?v={% now 'U' %}"></script>
+{% endblock %}

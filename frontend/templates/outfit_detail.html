@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="outfit-detail" data-outfit-id="{{ outfit_id }}">
+    
+    <!-- Header -->
+    <div class="outfit-detail-header">
+        <button class="outfit-detail-back" id="outfit-back-btn">
+            <i class="ri-arrow-left-line"></i>
+        </button>
+        <h1>Образ</h1>
+    </div>
+    
+    <!-- Image -->
+    <div class="outfit-detail-image" id="outfit-image">
+        <div style="padding:40px;">
+            <div class="search-spinner"></div>
+        </div>
+    </div>
+    
+    <!-- Info -->
+    <div class="outfit-detail-info" id="outfit-info">
+        <!-- Will be loaded dynamically -->
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/outfit.js' %}?v={% now 'U' %}"></script>
+{% endblock %}

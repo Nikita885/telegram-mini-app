@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="outfit-creator">
+    
+    <!-- Header -->
+    <div class="creator-header">
+        <button class="back-btn" id="creator-back-btn">
+            <i class="ri-arrow-left-line"></i>
+        </button>
+        <h1>Создать образ</h1>
+        <button class="save-btn" id="creator-save-btn">
+            Сохранить
+        </button>
+    </div>
+    
+    <!-- Main Area -->
+    <div class="creator-main">
+        
+        <!-- Canvas Container -->
+        <div class="canvas-container">
+            <canvas id="outfit-canvas" class="outfit-canvas" width="400" height="600"></canvas>
+            
+            <!-- Selected Items List -->
+            <div class="selected-items-list" id="selected-items-list">
+                <!-- Items will be added dynamically -->
+            </div>
+        </div>
+        
+        <!-- Clothing Library -->
+        <div class="clothing-library">
+            
+            <!-- Category Tabs -->
+            <div class="categories-tabs" id="categories-tabs">
+                <button class="category-tab active" data-category="tops">
+                    <i class="ri-t-shirt-line"></i>
+                    <span>Верх</span>
+                </button>
+                <button class="category-tab" data-category="bottoms">
+                    <i class="ri-folder-line"></i>
+                    <span>Низ</span>
+                </button>
+                <button class="category-tab" data-category="shoes">
+                    <i class="ri-footprint-line"></i>
+                    <span>Обувь</span>
+                </button>
+                <button class="category-tab" data-category="accessories">
+                    <i class="ri-bear-smile-line"></i>
+                    <span>Аксессуары</span>
+                </button>
+            </div>
+            
+            <!-- Tag Filters -->
+            <div class="tag-filters" id="tag-filters">
+                <div class="tag-selector" id="tag-selector">
+                    <!-- Tags will be loaded dynamically -->
+                </div>
+            </div>
+            
+            <!-- Clothing Grid -->
+            <div class="clothing-grid" id="clothing-grid">
+                <div style="text-align:center;padding:40px;color:#999;">
+                    Загрузка...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toolbar -->
+    <div class="creator-toolbar">
+        <button id="clear-btn">
+            <i class="ri-delete-bin-line"></i>
+            Очистить
+        </button>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/outfit.js' %}?v={% now 'U' %}"></script>
+{% endblock %}
