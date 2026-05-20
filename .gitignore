@@ -1,0 +1,19 @@
+﻿# Datasets
+fashion-product-images-dataset/
+
+# Media files
+media/
+*.jpg
+*.jpeg
+*.png
+*.webp
+
+# Static files (они генерируются автоматически)
+backend/staticfiles/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
