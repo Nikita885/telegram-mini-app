@@ -1,11 +1,14 @@
-# Добавить в api/views.py
-
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .models import ClothingCategory, ClothingItem, OutfitPost, PostClothingItem, Hashtag
+from .models import ClothingCategory, ClothingItem, OutfitPost, PostClothingItem, Hashtag, TelegramUser
+
+# ✅ Функция получения текущего пользователя
+def get_current_user(request):
+    tid = request.session.get('telegram_id')
+    return TelegramUser.objects.filter(telegram_id=tid).first() if tid else None
 
 # ═══════════════════════════════════════════════════════════════════════════════
 #  CLOTHING CONSTRUCTOR API

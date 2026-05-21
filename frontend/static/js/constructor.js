@@ -167,9 +167,47 @@ function initConstructorPage() {
                 const btn = createCategoryButton(cat);
                 categoriesScroll.appendChild(btn);
             });
+            
+            // ✅ Добавляем drag-scroll для ПК
+            setupDragScroll(categoriesScroll);
         } catch (e) {
             console.error('Load categories error:', e);
         }
+    }
+
+    // ✅ Drag-scroll для categories на ПК
+    function setupDragScroll(element) {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        element.addEventListener('mousedown', (e) => {
+            // Игнорируем клик на кнопках
+            if (e.target.closest('.category-btn')) return;
+            
+            isDown = true;
+            element.style.cursor = 'grabbing';
+            startX = e.pageX - element.offsetLeft;
+            scrollLeft = element.scrollLeft;
+        });
+
+        element.addEventListener('mouseleave', () => {
+            isDown = false;
+            element.style.cursor = 'default';
+        });
+
+        element.addEventListener('mouseup', () => {
+            isDown = false;
+            element.style.cursor = 'default';
+        });
+
+        element.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - element.offsetLeft;
+            const walk = (x - startX) * 2; // Множитель для скорости
+            element.scrollLeft = scrollLeft - walk;
+        });
     }
 
     function createCategoryButton(category) {
@@ -269,24 +307,57 @@ function initConstructorPage() {
             scale: 1.0,
             rotation: 0,
             zIndex: state.clothingObjects.length,
-            element: null
+            element: null,
+            width: 150,  // Начальное значение
+            height: 200
         };
         
         const el = document.createElement('div');
         el.className = 'clothing-layer';
         el.dataset.id = obj.id;
         el.style.position = 'absolute';
-        el.style.width = '150px';
-        el.style.height = '200px';
         el.style.zIndex = obj.zIndex;
         
         const img = document.createElement('img');
         img.src = obj.imageUrl;
         img.draggable = false;
+        
+        // ✅ Подгоняем размер под реальное изображение
+        img.onload = () => {
+            const naturalRatio = img.naturalWidth / img.naturalHeight;
+            const maxSize = 200;
+            
+            if (naturalRatio > 1) {
+                // Широкое изображение
+                obj.width = maxSize;
+                obj.height = maxSize / naturalRatio;
+            } else {
+                // Высокое изображение
+                obj.height = maxSize;
+                obj.width = maxSize * naturalRatio;
+            }
+            
+            el.style.width = obj.width + 'px';
+            el.style.height = obj.height + 'px';
+            updateObjectTransform(obj);
+        };
+        
         el.appendChild(img);
+        
+        // ✅ Добавляем resize handles
+        ['tl', 'tr', 'bl', 'br'].forEach(corner => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle resize-${corner}`;
+            handle.dataset.corner = corner;
+            el.appendChild(handle);
+        });
         
         canvas.appendChild(el);
         obj.element = el;
+        
+        // Устанавливаем начальные размеры
+        el.style.width = obj.width + 'px';
+        el.style.height = obj.height + 'px';
         
         updateObjectTransform(obj);
         state.clothingObjects.push(obj);
@@ -300,18 +371,29 @@ function initConstructorPage() {
     function addClothingFromData(objData) {
         const obj = { ...objData, element: null };
         
+        if (!obj.width) obj.width = 150;
+        if (!obj.height) obj.height = 200;
+        
         const el = document.createElement('div');
         el.className = 'clothing-layer';
         el.dataset.id = obj.id;
         el.style.position = 'absolute';
-        el.style.width = '150px';
-        el.style.height = '200px';
+        el.style.width = obj.width + 'px';
+        el.style.height = obj.height + 'px';
         el.style.zIndex = obj.zIndex;
         
         const img = document.createElement('img');
         img.src = obj.imageUrl;
         img.draggable = false;
         el.appendChild(img);
+        
+        // ✅ Добавляем resize handles
+        ['tl', 'tr', 'bl', 'br'].forEach(corner => {
+            const handle = document.createElement('div');
+            handle.className = `resize-handle resize-${corner}`;
+            handle.dataset.corner = corner;
+            el.appendChild(handle);
+        });
         
         canvas.appendChild(el);
         obj.element = el;
@@ -325,8 +407,9 @@ function initConstructorPage() {
     function updateObjectTransform(obj) {
         if (!obj.element) return;
         
-        const centerX = obj.x - 75; // половина ширины (150/2)
-        const centerY = obj.y - 100; // половина высоты (200/2)
+        // ✅ Используем реальные размеры объекта
+        const centerX = obj.x - (obj.width / 2);
+        const centerY = obj.y - (obj.height / 2);
         
         obj.element.style.transform = `
             translate(${centerX}px, ${centerY}px)
@@ -353,13 +436,16 @@ function initConstructorPage() {
         if (!el) return;
         
         let isDragging = false;
-        let startX, startY;
+        let isResizing = false;
+        let resizeCorner = null;
+        let startObjX, startObjY; // ✅ Начальная позиция объекта
+        let startClientX, startClientY;
         let initialScale = obj.scale;
         let initialRotation = obj.rotation;
         let initialDistance = 0;
         let initialAngle = 0;
         
-        // Touch events
+        // Touch/Mouse events
         el.addEventListener('touchstart', onStart, { passive: false });
         el.addEventListener('mousedown', onStart);
         
@@ -369,8 +455,28 @@ function initConstructorPage() {
             
             selectObject(obj);
             
-            if (e.touches && e.touches.length === 2) {
-                // Two fingers - scale & rotate
+            // Проверяем, кликнули ли на resize handle
+            const handle = e.target.closest('.resize-handle');
+            
+            if (handle) {
+                // ── Resize ──
+                isResizing = true;
+                resizeCorner = handle.dataset.corner;
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                startClientX = clientX;
+                startClientY = clientY;
+                initialScale = obj.scale;
+                
+                document.addEventListener('touchmove', onResizeMove, { passive: false });
+                document.addEventListener('mousemove', onResizeMove);
+                document.addEventListener('touchend', onEnd);
+                document.addEventListener('mouseup', onEnd);
+                
+            } else if (e.touches && e.touches.length === 2) {
+                // ── Two fingers - scale & rotate ──
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
                 
@@ -382,12 +488,18 @@ function initConstructorPage() {
                 document.addEventListener('touchmove', onTwoFingerMove, { passive: false });
                 document.addEventListener('touchend', onEnd);
             } else {
-                // One finger/mouse - drag
+                // ── One finger/mouse - drag ──
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 
-                startX = clientX - obj.x;
-                startY = clientY - obj.y;
+                // ✅ Запоминаем начальную позицию объекта
+                startObjX = obj.x;
+                startObjY = obj.y;
+                
+                // ✅ Запоминаем начальные координаты клика
+                startClientX = clientX;
+                startClientY = clientY;
+                
                 isDragging = true;
                 
                 document.addEventListener('touchmove', onMove, { passive: false });
@@ -401,12 +513,48 @@ function initConstructorPage() {
             if (!isDragging) return;
             e.preventDefault();
             
+            const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            const rect = canvas.getBoundingClientRect();
-            obj.x = clientX - rect.left - startX;
-            obj.y = clientY - rect.top - startY;
+            // ✅ Вычисляем дельту от начального клика
+            const deltaX = clientX - startClientX;
+            const deltaY = clientY - startClientY;
+            
+            // ✅ Применяем к начальной позиции объекта
+            obj.x = startObjX + deltaX;
+            obj.y = startObjY + deltaY;
+            
+            updateObjectTransform(obj);
+        }
+        
+        function onResizeMove(e) {
+            if (!isResizing) return;
+            e.preventDefault();
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Вычисляем изменение расстояния
+            const deltaX = clientX - startClientX;
+            const deltaY = clientY - startClientY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            // Определяем направление (от центра или к центру)
+            let direction = 1;
+            if (resizeCorner === 'tl') {
+                direction = (deltaX < 0 || deltaY < 0) ? -1 : 1;
+            } else if (resizeCorner === 'tr') {
+                direction = (deltaX > 0 || deltaY < 0) ? 1 : -1;
+            } else if (resizeCorner === 'bl') {
+                direction = (deltaX < 0 || deltaY > 0) ? 1 : -1;
+            } else if (resizeCorner === 'br') {
+                direction = (deltaX > 0 || deltaY > 0) ? 1 : -1;
+            }
+            
+            // Применяем изменение scale
+            const scaleDelta = (distance / 100) * direction;
+            obj.scale = Math.max(0.3, Math.min(3, initialScale + scaleDelta));
             
             updateObjectTransform(obj);
         }
@@ -434,8 +582,13 @@ function initConstructorPage() {
         
         function onEnd() {
             isDragging = false;
+            isResizing = false;
+            resizeCorner = null;
+            
             document.removeEventListener('touchmove', onMove);
             document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('touchmove', onResizeMove);
+            document.removeEventListener('mousemove', onResizeMove);
             document.removeEventListener('touchmove', onTwoFingerMove);
             document.removeEventListener('touchend', onEnd);
             document.removeEventListener('mouseup', onEnd);
@@ -486,14 +639,69 @@ function initConstructorPage() {
     document.getElementById('publish-back')?.addEventListener('click', closePublishScreen);
 
     async function generatePreview() {
-        // TODO: Захватить canvas как изображение и отправить на сервер
-        // Используем html2canvas или аналог для рендера
-        
         const previewImg = document.getElementById('publish-preview-img');
         if (!previewImg) return;
         
-        // Временно: показываем mannequin
-        previewImg.src = mannequinImg.src;
+        try {
+            // ✅ Создаём canvas для рендера
+            const renderCanvas = document.createElement('canvas');
+            const ctx = renderCanvas.getContext('2d');
+            
+            // Размеры canvas
+            const rect = canvas.getBoundingClientRect();
+            renderCanvas.width = canvas.offsetWidth;
+            renderCanvas.height = canvas.offsetHeight;
+            
+            // Белый фон
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
+            
+            // Рисуем mannequin
+            const mannequinImgEl = document.getElementById('mannequin-img');
+            if (mannequinImgEl && mannequinImgEl.complete) {
+                const mw = mannequinImgEl.naturalWidth;
+                const mh = mannequinImgEl.naturalHeight;
+                const scale = Math.min(
+                    (renderCanvas.width * 0.9) / mw,
+                    (renderCanvas.height * 0.9) / mh
+                );
+                const w = mw * scale;
+                const h = mh * scale;
+                const x = (renderCanvas.width - w) / 2;
+                const y = (renderCanvas.height - h) / 2;
+                
+                ctx.drawImage(mannequinImgEl, x, y, w, h);
+            }
+            
+            // Рисуем все clothing objects (сортируем по zIndex)
+            const sortedObjects = [...state.clothingObjects].sort((a, b) => a.zIndex - b.zIndex);
+            
+            for (const obj of sortedObjects) {
+                const img = obj.element?.querySelector('img');
+                if (!img || !img.complete) continue;
+                
+                ctx.save();
+                
+                // Применяем трансформации
+                ctx.translate(obj.x, obj.y);
+                ctx.rotate(obj.rotation * Math.PI / 180);
+                ctx.scale(obj.scale, obj.scale);
+                
+                // Рисуем с центром в (0, 0)
+                ctx.drawImage(img, -obj.width / 2, -obj.height / 2, obj.width, obj.height);
+                
+                ctx.restore();
+            }
+            
+            // Конвертируем в dataURL
+            const dataUrl = renderCanvas.toDataURL('image/png');
+            previewImg.src = dataUrl;
+            
+        } catch (e) {
+            console.error('Generate preview error:', e);
+            // Fallback - показываем mannequin
+            previewImg.src = mannequinImg.src;
+        }
     }
 
     document.getElementById('publish-submit')?.addEventListener('click', async () => {
@@ -547,6 +755,54 @@ function initConstructorPage() {
             console.error('Publish error:', e);
             alert('Ошибка при публикации');
         }
+    });
+
+    // ── Filters ──────────────────────────────────────────────────────────
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const filterType = chip.dataset.filter;
+            const value = chip.dataset.value;
+            
+            // Toggle active
+            const isActive = chip.classList.contains('active');
+            
+            // Remove active from same group
+            document.querySelectorAll(`.filter-chip[data-filter="${filterType}"]`).forEach(c => {
+                c.classList.remove('active');
+            });
+            
+            if (!isActive) {
+                chip.classList.add('active');
+                state.categoryFilters[filterType] = value;
+            } else {
+                state.categoryFilters[filterType] = null;
+            }
+            
+            loadClothingItems();
+        });
+    });
+
+    // ── Click outside to close gallery ────────────────────────────────────
+    document.addEventListener('click', (e) => {
+        if (!categoriesContainer) return;
+        if (!categoriesContainer.classList.contains('open')) return;
+        
+        // Если кликнули на categories-container или внутри него - игнорируем
+        if (e.target.closest('.categories-container')) return;
+        
+        // Если кликнули на action buttons - игнорируем
+        if (e.target.closest('.constructor-actions')) return;
+        
+        // Закрываем
+        closeGallery();
+    });
+
+    // ── Click on canvas to deselect ───────────────────────────────────────
+    canvas?.addEventListener('click', (e) => {
+        // Если кликнули на clothing-layer - не снимаем выделение
+        if (e.target.closest('.clothing-layer')) return;
+        
+        selectObject(null);
     });
 
     // ── Initialization ──────────────────────────────────────────────────
