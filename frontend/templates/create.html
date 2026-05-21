@@ -1,5 +1,126 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/constructor.css' %}?v={% now 'U' %}">
+{% endblock %}
 
 {% block content %}
-<h1>Создать</h1>
+<div class="constructor-page">
+    <!-- Close button -->
+    <button class="constructor-close" id="constructor-close">
+        <i class="ri-close-line"></i>
+    </button>
+
+    <!-- Gender Toggle (center) -->
+    <label class="gender-toggle">
+        <input type="checkbox" id="gender-toggle">
+        <div class="gender-option male">
+            <i class="ri-user-6-line"></i>
+        </div>
+        <div class="gender-option female">
+            <i class="ri-user-3-line"></i>
+        </div>
+    </label>
+
+    <!-- Action buttons (right) -->
+    <div class="constructor-actions">
+        <button class="action-btn" id="undo-btn" title="Отменить" disabled>
+            <i class="ri-arrow-go-back-line"></i>
+        </button>
+        <button class="action-btn" id="redo-btn" title="Вперед" disabled>
+            <i class="ri-arrow-go-forward-line"></i>
+        </button>
+        <button class="action-btn" id="save-btn" title="Сохранить">
+            <i class="ri-save-line"></i>
+        </button>
+        <button class="action-btn" id="clear-btn" title="Очистить">
+            <i class="ri-delete-bin-line"></i>
+        </button>
+    </div>
+
+    <!-- Canvas Scene -->
+    <div class="constructor-scene">
+        <div class="scene-canvas" id="scene-canvas">
+            <div class="mannequin-base">
+                <img id="mannequin-img" src="{% static 'images/mannequin_male.png' %}" alt="Mannequin">
+            </div>
+            <!-- Clothing layers added dynamically -->
+        </div>
+    </div>
+
+    <!-- Categories Menu -->
+    <div class="categories-container">
+        <div class="categories-scroll">
+            <!-- Categories loaded dynamically -->
+        </div>
+
+        <!-- Clothing Gallery (slides up) -->
+        <div class="clothing-gallery" id="clothing-gallery">
+            <div class="gallery-filters">
+                <div class="filter-group">
+                    <span class="filter-label">Стиль</span>
+                    <div class="filter-chips">
+                        <button class="filter-chip" data-filter="style" data-value="casual">Casual</button>
+                        <button class="filter-chip" data-filter="style" data-value="formal">Formal</button>
+                        <button class="filter-chip" data-filter="style" data-value="sport">Sport</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <span class="filter-label">Цвет</span>
+                    <div class="filter-chips">
+                        <button class="filter-chip" data-filter="color" data-value="black">Черный</button>
+                        <button class="filter-chip" data-filter="color" data-value="white">Белый</button>
+                        <button class="filter-chip" data-filter="color" data-value="gray">Серый</button>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery-grid" id="gallery-grid">
+                <!-- Items loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish Screen (overlay) -->
+    <div class="publish-screen" id="publish-screen">
+        <div class="publish-header">
+            <button class="publish-back" id="publish-back">
+                <i class="ri-arrow-left-line"></i>
+            </button>
+            <div class="publish-title">Публикация</div>
+            <button class="publish-btn" id="publish-submit">Опубликовать</button>
+        </div>
+
+        <div class="publish-content">
+            <div class="publish-preview">
+                <img id="publish-preview-img" src="" alt="Preview">
+            </div>
+
+            <div class="publish-field">
+                <label class="publish-field-label" for="publish-description">Описание *</label>
+                <textarea 
+                    id="publish-description" 
+                    class="publish-textarea" 
+                    placeholder="Расскажите о вашем образе..."
+                    maxlength="500"
+                ></textarea>
+            </div>
+
+            <div class="publish-field">
+                <label class="publish-field-label" for="publish-hashtags">Хештеги</label>
+                <input 
+                    type="text" 
+                    id="publish-hashtags" 
+                    class="publish-input" 
+                    placeholder="#мода #стиль #образ"
+                >
+                <div class="hashtag-preview" id="hashtag-preview"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/constructor.js' %}?v={% now 'U' %}"></script>
 {% endblock %}

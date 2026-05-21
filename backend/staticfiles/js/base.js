@@ -17,6 +17,7 @@ function initPage() {
     initMessagesPage();
     initChatPage();
     initConnectionsPage();
+    initConstructorPage();
 }
 
 // ── SPA navigation ────────────────────────────────────────────────────────────

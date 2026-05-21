@@ -672,3 +672,4 @@ class DialogActionView(APIView):
             return Response({'status': 'ok'})
         
         return Response({'error': 'Invalid action'}, status=400)
+    

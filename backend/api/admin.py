@@ -7,3 +7,11 @@ admin.site.register(Follow)
 admin.site.register(Post)
 admin.site.register(Dialog)
 admin.site.register(Message)
+
+from .models import ClothingCategory, ClothingItem, OutfitPost, PostClothingItem, Hashtag
+
+admin.site.register(ClothingCategory)
+admin.site.register(ClothingItem)
+admin.site.register(OutfitPost)
+admin.site.register(PostClothingItem)
+admin.site.register(Hashtag)

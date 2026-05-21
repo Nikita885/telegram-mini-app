@@ -1,0 +1,500 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CLOTHING CONSTRUCTOR
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.constructor-page {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    z-index: 200;
+    overflow: hidden;
+}
+
+/* ── Header Elements (без контейнера) ──────────────────────────────────────── */
+
+.constructor-close {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    z-index: 10;
+}
+
+.constructor-close i {
+    font-size: 24px;
+    color: #000;
+}
+
+.constructor-close:active {
+    transform: scale(0.85);
+}
+
+/* ── Gender Toggle (чекбокс-слайдер) ──────────────────────────────────────── */
+
+.gender-toggle {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 25px;
+    padding: 3px;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.gender-toggle input {
+    display: none;
+}
+
+.gender-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.gender-option i {
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.gender-toggle input:not(:checked) ~ .gender-option.male {
+    background: #000;
+}
+
+.gender-toggle input:not(:checked) ~ .gender-option.male i {
+    color: #fff;
+}
+
+.gender-toggle input:not(:checked) ~ .gender-option.female i {
+    color: #000;
+}
+
+.gender-toggle input:checked ~ .gender-option.female {
+    background: #000;
+}
+
+.gender-toggle input:checked ~ .gender-option.female i {
+    color: #fff;
+}
+
+.gender-toggle input:checked ~ .gender-option.male i {
+    color: #000;
+}
+
+/* ── Actions (кнопки справа) ──────────────────────────────────────────────── */
+
+.constructor-actions {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.action-btn i {
+    font-size: 20px;
+    color: #000;
+}
+
+.action-btn:active {
+    transform: scale(0.85);
+}
+
+.action-btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ── Canvas Scene ─────────────────────────────────────────────────────────── */
+
+.constructor-scene {
+    position: absolute;
+    top: 60px;
+    bottom: 90px;
+    left: 0;
+    right: 0;
+    background: #fafafa;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.scene-canvas {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    aspect-ratio: 3/4;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    overflow: hidden;
+    touch-action: none;
+    margin: auto;
+}
+
+.mannequin-base {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.mannequin-base img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.clothing-layer {
+    position: absolute;
+    cursor: move;
+    transition: outline 0.2s;
+}
+
+.clothing-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.clothing-layer.selected {
+    outline: 2px solid #0066ff;
+    outline-offset: 2px;
+}
+
+/* ── Categories Menu ──────────────────────────────────────────────────────── */
+
+.categories-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+.categories-scroll {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-top: 1px solid #e8e8e8;
+    justify-content: center;
+    order: 1;
+}
+
+.categories-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.category-btn {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+}
+
+.category-btn i {
+    font-size: 24px;
+    color: #000;
+    transition: color 0.25s;
+}
+
+.category-btn.active {
+    background: #000;
+    transform: translateY(-8px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.category-btn.active i {
+    color: #fff;
+}
+
+.category-btn:active {
+    transform: scale(0.95);
+}
+
+/* ── Clothing Gallery (выдвигающееся меню) ────────────────────────────────── */
+
+.clothing-gallery {
+    height: 0;
+    max-height: 50vh;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    order: 2;
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.categories-container.open .clothing-gallery {
+    height: 50vh;
+    overflow-y: auto;
+}
+
+.gallery-filters {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.filter-group {
+    margin-bottom: 12px;
+}
+
+.filter-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.filter-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 6px 14px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    font-size: 13px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-chip.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #f0f0f0;
+    padding: 1px;
+}
+
+.clothing-item-card {
+    aspect-ratio: 3/4;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.clothing-item-card img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.clothing-item-card:active {
+    background: #f8f8f8;
+}
+
+.gallery-empty {
+    padding: 60px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+/* ── Publish Screen ───────────────────────────────────────────────────────── */
+
+.publish-screen {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    z-index: 20;
+    display: none;
+    flex-direction: column;
+}
+
+.publish-screen.show {
+    display: flex;
+}
+
+.publish-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.publish-back {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.publish-back i {
+    font-size: 24px;
+    color: #000;
+}
+
+.publish-title {
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+}
+
+.publish-btn {
+    padding: 8px 20px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.publish-btn:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.publish-btn:active {
+    transform: scale(0.95);
+}
+
+.publish-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.publish-preview {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 24px;
+    aspect-ratio: 3/4;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.publish-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.publish-field {
+    margin-bottom: 20px;
+}
+
+.publish-field-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.publish-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.publish-textarea:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.publish-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.publish-input:focus {
+    outline: none;
+    border-color: #000;
+}
+
+.hashtag-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.hashtag-tag {
+    padding: 6px 12px;
+    background: #f0f0f0;
+    border-radius: 16px;
+    font-size: 13px;
+    color: #000;
+}

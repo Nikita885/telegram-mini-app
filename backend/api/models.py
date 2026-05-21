@@ -74,3 +74,111 @@ class Message(models.Model):
 
     def __str__(self):
         return f"[{self.dialog_id}] {self.sender}: {self.text[:40]}"
+    
+# Добавить в конец файла models.py после класса Message:
+
+class ClothingCategory(models.Model):
+    """Категории одежды"""
+    CATEGORY_CHOICES = [
+        ('top', 'Верхняя одежда'),
+        ('shirt', 'Рубашки и футболки'),
+        ('pants', 'Брюки'),
+        ('dress', 'Платья'),
+        ('skirt', 'Юбки'),
+        ('shoes', 'Обувь'),
+        ('accessories', 'Аксессуары'),
+    ]
+    
+    name = models.CharField(max_length=50, choices=CATEGORY_CHOICES, unique=True)
+    icon_class = models.CharField(max_length=50, default='ri-shirt-line')
+    order = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+    
+    def __str__(self):
+        return self.get_name_display()
+
+
+class ClothingItem(models.Model):
+    """Предмет одежды"""
+    GENDER_CHOICES = [
+        ('male', 'Мужское'),
+        ('female', 'Женское'),
+        ('unisex', 'Унисекс'),
+    ]
+    
+    STYLE_CHOICES = [
+        ('casual', 'Casual'),
+        ('formal', 'Formal'),
+        ('sport', 'Sport'),
+        ('street', 'Street'),
+        ('business', 'Business'),
+    ]
+    
+    category = models.ForeignKey(ClothingCategory, on_delete=models.CASCADE, related_name='items')
+    name = models.CharField(max_length=255)
+    image = models.ImageField(upload_to='clothing/')
+    
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True)
+    color = models.CharField(max_length=50, blank=True)
+    tags = models.CharField(max_length=500, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} ({self.get_gender_display()})"
+
+
+class Hashtag(models.Model):
+    """Хештеги"""
+    tag = models.CharField(max_length=100, unique=True)
+    usage_count = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"#{self.tag}"
+
+
+class OutfitPost(models.Model):
+    """Пост с образом"""
+    MANNEQUIN_CHOICES = [
+        ('male', 'Мужской'),
+        ('female', 'Женский'),
+    ]
+    
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='outfit_posts')
+    mannequin_type = models.CharField(max_length=10, choices=MANNEQUIN_CHOICES)
+    description = models.TextField(blank=True)
+    hashtags = models.ManyToManyField(Hashtag, blank=True, related_name='posts')
+    final_image = models.ImageField(upload_to='outfits/', blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    likes_count = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Outfit by {self.user} - {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class PostClothingItem(models.Model):
+    """Одежда в посте с трансформацией"""
+    post = models.ForeignKey(OutfitPost, on_delete=models.CASCADE, related_name='items')
+    clothing = models.ForeignKey(ClothingItem, on_delete=models.CASCADE)
+    
+    position_x = models.FloatField(default=0)
+    position_y = models.FloatField(default=0)
+    scale = models.FloatField(default=1.0)
+    rotation = models.FloatField(default=0)
+    z_index = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['z_index']
+    
+    def __str__(self):
+        return f"{self.clothing.name} in {self.post}"

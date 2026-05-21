@@ -9,8 +9,9 @@ from .views import (
     CreateDialogView,
     DialogMessagesView,
     MessageDetailView,
-    DialogActionView,  # ✅ NEW
+    DialogActionView,
 )
+from .views_constructor import ClothingCategoriesView, ClothingItemsView, CreateOutfitView, UserOutfitsView
 
 urlpatterns = [
     path('authorize/', AuthorizeView.as_view(), name='api-authorize'),
@@ -29,4 +30,11 @@ urlpatterns = [
     
     # Edit/Delete message
     path('dialogs/<int:dialog_id>/messages/<int:message_id>/', MessageDetailView.as_view(), name='api-message-detail'),
+
+    # Clothing Constructor
+    path('clothing/categories/', ClothingCategoriesView.as_view(), name='api-clothing-categories'),
+    path('clothing/items/', ClothingItemsView.as_view(), name='api-clothing-items'),
+    path('outfit/create/', CreateOutfitView.as_view(), name='api-outfit-create'),
+    path('outfit/user/<int:telegram_id>/', UserOutfitsView.as_view(), name='api-user-outfits'),
+
 ]
