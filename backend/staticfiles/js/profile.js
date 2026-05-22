@@ -22,4 +22,7 @@ function initProfilePage() {
 
     if (avatarBtn) avatarBtn.onclick = openAvatar;
     if (overlayBtn) overlayBtn.onclick = openAvatar;
+    
+    // ✅ NEW: Initialize posts
+    initProfilePosts();
 }

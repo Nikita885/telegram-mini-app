@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/posts.css' %}?v={% now 'U' %}">
+{% endblock %}
+
 {% block content %}
 <div class="profile">
     <div class="profile-avatar">
@@ -36,5 +40,19 @@
             <span class="stat-label">Постов</span>
         </div>
     </div>
+
+    <!-- ✅ NEW: Posts grid -->
+    <div class="profile-posts">
+        <div class="posts-grid" id="posts-grid" data-user-id="{{ user.telegram_id }}">
+            <div class="posts-empty">
+                <i class="ri-t-shirt-line"></i>
+                <p>Загрузка...</p>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/posts.js' %}?v={% now 'U' %}"></script>
 {% endblock %}

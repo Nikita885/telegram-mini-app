@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/search.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/messages.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/connections.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/posts.css' %}?v={% now 'U' %}">
     {% if user.avatar %}
         <link rel="preload" as="image" href="{{ user.avatar.url }}">
     {% endif %}
@@ -43,6 +44,7 @@
         </a>
     </nav>
 
+    <script src="{% static 'js/posts.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/profile.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/avatar.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/search.js' %}?v={% now 'U' %}"></script>

@@ -269,11 +269,17 @@
     order: 1;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    cursor: grab;
 }
 
-.categories-scroll:active {
-    cursor: grabbing;
+/* Только на desktop показываем grab cursor */
+@media (pointer: fine) {
+    .categories-scroll {
+        cursor: grab;
+    }
+    
+    .categories-scroll:active {
+        cursor: grabbing;
+    }
 }
 
 .categories-scroll::-webkit-scrollbar {

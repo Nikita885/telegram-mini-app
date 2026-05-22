@@ -178,36 +178,58 @@ function initConstructorPage() {
     // ✅ Drag-scroll для categories на ПК
     function setupDragScroll(element) {
         let isDown = false;
+        let isDragging = false;
         let startX;
         let scrollLeft;
+        let startScrollLeft;
 
         element.addEventListener('mousedown', (e) => {
-            // Игнорируем клик на кнопках
-            if (e.target.closest('.category-btn')) return;
+            // ✅ Если клик на кнопку - полностью игнорируем
+            if (e.target.closest('.category-btn')) {
+                return;
+            }
             
             isDown = true;
+            isDragging = false;
             element.style.cursor = 'grabbing';
-            startX = e.pageX - element.offsetLeft;
+            startX = e.pageX;
             scrollLeft = element.scrollLeft;
+            startScrollLeft = element.scrollLeft;
         });
 
         element.addEventListener('mouseleave', () => {
             isDown = false;
-            element.style.cursor = 'default';
+            isDragging = false;
+            element.style.cursor = 'grab';
         });
 
         element.addEventListener('mouseup', () => {
             isDown = false;
-            element.style.cursor = 'default';
+            isDragging = false;
+            element.style.cursor = 'grab';
         });
 
         element.addEventListener('mousemove', (e) => {
             if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - element.offsetLeft;
-            const walk = (x - startX) * 2; // Множитель для скорости
-            element.scrollLeft = scrollLeft - walk;
+            
+            const x = e.pageX;
+            const walk = (x - startX) * 2;
+            
+            // ✅ Если начали двигаться - это drag
+            if (Math.abs(walk) > 3) {
+                isDragging = true;
+                e.preventDefault();
+                element.scrollLeft = scrollLeft - walk;
+            }
         });
+        
+        // ✅ Отключаем клик если был drag
+        element.addEventListener('click', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
     }
 
     function createCategoryButton(category) {
@@ -216,7 +238,10 @@ function initConstructorPage() {
         btn.dataset.category = category.name;
         btn.innerHTML = `<i class="${category.icon_class}"></i>`;
         
-        btn.addEventListener('click', () => {
+        // ✅ Обработчик клика - работает и на ПК и на мобильном
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Останавливаем всплытие к scroll
+            
             if (state.selectedCategory === category.name) {
                 closeGallery();
             } else {
