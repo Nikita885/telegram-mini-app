@@ -265,7 +265,7 @@ function _startHomeFeedPolling() {
                 }
             }
         } catch (e) {}
-    }, 30000);
+    }, 10000);
 }
 
 function _stopHomeFeedPolling() {

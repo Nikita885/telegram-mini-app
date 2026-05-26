@@ -736,15 +736,25 @@ function initConstructorPage() {
 
     document.getElementById('publish-back')?.addEventListener('click', closePublishScreen);
 
-    // Загружает изображение с crossOrigin чтобы canvas не был tainted
+    // Same-origin image (static files) — no crossOrigin needed, canvas won't be tainted
+    function loadSameOriginImage(src) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+    }
+
+    // Cross-origin image (Cloudinary) — needs crossOrigin + cache-bust so browser
+    // fetches fresh with CORS headers (avoids serving cached no-CORS version)
     function loadImageForCanvas(src) {
         return new Promise(resolve => {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = () => resolve(img);
             img.onerror = () => resolve(null);
-            // Добавляем timestamp чтобы обойти кэш без CORS заголовков
-            img.src = src + (src.includes('?') ? '&' : '?') + '_cors=1';
+            img.src = src + (src.includes('?') ? '&' : '?') + '_t=' + Date.now();
         });
     }
 
@@ -761,9 +771,9 @@ function initConstructorPage() {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
 
-            // Манекен — берём из static (same-origin, нет CORS проблем с canvas)
+            // Манекен — same-origin static файл, не нужен crossOrigin
             const staticSrc = `/static/images/mannequin_${state.gender}.png`;
-            const mannequinDraw = await loadImageForCanvas(staticSrc);
+            const mannequinDraw = await loadSameOriginImage(staticSrc);
             if (mannequinDraw) {
                 const mw = mannequinDraw.naturalWidth;
                 const mh = mannequinDraw.naturalHeight;

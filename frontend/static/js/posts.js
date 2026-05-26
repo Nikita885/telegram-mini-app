@@ -487,6 +487,21 @@ function createPostSlide(post, index) {
         await deletePost(post.id);
         currentPosts.splice(index, 1);
         slide.remove();
+
+        // Also remove the thumbnail from the profile grid (if it's visible behind the viewer)
+        const thumb = document.querySelector(`.post-thumbnail[data-post-id="${post.id}"]`);
+        if (thumb) {
+            thumb.remove();
+            const grid = document.getElementById('posts-grid');
+            if (grid && !grid.querySelector('.post-thumbnail')) {
+                grid.innerHTML = `
+                    <div class="posts-empty">
+                        <i class="ri-t-shirt-line"></i>
+                        <p>Пока нет постов</p>
+                    </div>`;
+            }
+        }
+
         if (currentPosts.length === 0) closePostViewer();
     });
 
