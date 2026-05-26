@@ -61,11 +61,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ── Django Channels Configuration ────────────────────────────────────────────
 ASGI_APPLICATION = 'config.asgi.application'
 
+_redis_url = os.environ.get('REDIS_URL')
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [(os.environ.get('REDIS_HOST', 'redis'), 6379)],
+            "hosts": [_redis_url] if _redis_url else [(os.environ.get('REDIS_HOST', 'redis'), 6379)],
         },
     },
 }
@@ -73,16 +74,31 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'database-tg-app'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'Qiwe1419as'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'db'),  # default to docker service host
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+_database_url = os.environ.get('DATABASE_URL')
+if _database_url:
+    from urllib.parse import urlparse as _urlparse
+    _db = _urlparse(_database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _db.path[1:],
+            'USER': _db.username,
+            'PASSWORD': _db.password,
+            'HOST': _db.hostname,
+            'PORT': _db.port or 5432,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('POSTGRES_DB', 'database-tg-app'),
+            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'Qiwe1419as'),
+            'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -121,9 +137,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '..', 'frontend', 'static'),
-]
+_frontend_static = os.path.join(BASE_DIR, '..', 'frontend', 'static')
+STATICFILES_DIRS = [_frontend_static] if os.path.exists(_frontend_static) else []
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
