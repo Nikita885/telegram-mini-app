@@ -456,6 +456,7 @@ class HomeFeedView(APIView):
                 count = (
                     OutfitPost.objects
                     .filter(id__gt=int(since_id))
+                    .exclude(user=user)
                     .count()
                 )
             except (ValueError, TypeError):
@@ -468,22 +469,18 @@ class HomeFeedView(APIView):
             user.following.values_list('following__telegram_id', flat=True)
         )
 
-        # Показываем все посты (включая свои): алгоритм строит ленту
-        # из подписок + популярных, без исключения автора —
-        # иначе при малом числе пользователей лента всегда пустая.
         base_qs = (
             OutfitPost.objects
             .select_related('user')
             .prefetch_related('hashtags', 'items__clothing__category')
+            .exclude(user=user)
         )
 
         if following_ids:
-            # Посты подписок — в первую очередь
             following_posts = list(
                 base_qs.filter(user__telegram_id__in=following_ids)
                 .order_by('-created_at')[:20]
             )
-            # Остальные популярные (и свои)
             popular_posts = list(
                 base_qs.exclude(user__telegram_id__in=following_ids)
                 .order_by('-likes_count', '-created_at')[:20]
