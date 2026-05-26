@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{% static 'css/messages.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/connections.css' %}?v={% now 'U' %}">
     <link rel="stylesheet" href="{% static 'css/posts.css' %}?v={% now 'U' %}">
+    <link rel="stylesheet" href="{% static 'css/constructor.css' %}?v={% now 'U' %}">
     {% if user.avatar %}
         <link rel="preload" as="image" href="{{ user.avatar.url }}">
     {% endif %}
@@ -35,7 +36,10 @@
             <button class="bottom-navigation__action">+</button>
         </a>
         <a href="/messages/" class="bottom-navigation__item">
-            <i class="ri-message-2-line bottom-navigation__icon"></i>
+            <span class="bottom-nav-icon-wrap">
+                <i class="ri-message-2-line bottom-navigation__icon"></i>
+                <span id="nav-msg-badge" class="nav-msg-badge" style="display:none"></span>
+            </span>
             <span class="bottom-navigation__label">Сообщения</span>
         </a>
         <a href="/profile/" class="bottom-navigation__item">
@@ -44,13 +48,17 @@
         </a>
     </nav>
 
+    <script src="{% static 'js/constructor.js' %}?v={% now 'U' %}"></script>
+    {% if user %}<script>window.__currentUserId = {{ user.telegram_id }};</script>{% endif %}
     <script src="{% static 'js/posts.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/home.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/profile.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/avatar.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/search.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/user_profile.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/messages.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/connections.js' %}?v={% now 'U' %}"></script>
+    <script src="{% static 'js/constructor.js' %}?v={% now 'U' %}"></script>
     <script src="{% static 'js/base.js' %}?v={% now 'U' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

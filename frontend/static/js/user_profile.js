@@ -40,17 +40,18 @@ function initUserProfilePage() {
         });
     }
 
-    // ── ✅ Message - NEW: Navigate without creating dialog ────────────────────
+    // ── Message ────────────────────────────────────────────────────────────────
     if (msgBtn) {
         msgBtn.addEventListener('click', () => {
             const telegramId = parseInt(msgBtn.dataset.id);
-            
-            // ✅ Переходим на чат БЕЗ создания диалога
             const url = `/chat/with/${telegramId}/`;
             loadPage(url);
             history.pushState({}, '', url);
         });
     }
+
+    // ── Posts grid for visited profile ────────────────────────────────────────
+    initProfilePosts();
 }
 
 function _adjustStat(index, delta) {

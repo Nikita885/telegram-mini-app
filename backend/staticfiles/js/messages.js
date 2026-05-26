@@ -1,9 +1,10 @@
 // ── Global chat state ──────────────────────────────────────────────────────────
 let _chatSocket = null;
-let _dialogsSocket = null;  // ✅ NEW: WebSocket для списка диалогов
+let _dialogsSocket = null;
 let _editingMessageId = null;
 let _currentDialogId = null;
 let _currentUserId = null;
+let _dialogsPollingInterval = null;
 
 function _stopChatPolling() {
     // Закрываем WebSocket соединения
@@ -15,10 +16,15 @@ function _stopChatPolling() {
         _dialogsSocket.close();
         _dialogsSocket = null;
     }
+    if (_dialogsPollingInterval) {
+        clearInterval(_dialogsPollingInterval);
+        _dialogsPollingInterval = null;
+    }
     _currentDialogId = null;
-    
-    // ✅ Сбрасываем флаг инициализации меню
+
+    // ✅ Сбрасываем флаги инициализации меню
     document.body.dataset.dialogMenuInitialized = 'false';
+    document.body.dataset.messageMenuInitialized = 'false';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -31,12 +37,23 @@ function initMessagesPage() {
 
     _stopChatPolling();
     loadDialogs();
-    
-    // ✅ NEW: Подключаем WebSocket для real-time обновлений
+
     connectDialogListWebSocket();
-    
-    // ✅ NEW: Настраиваем контекстное меню для диалогов
+    _startDialogPolling();
     setupDialogContextMenu();
+}
+
+// Polling fallback so dialog list stays fresh even if WebSocket misses an event
+function _startDialogPolling() {
+    if (_dialogsPollingInterval) clearInterval(_dialogsPollingInterval);
+    _dialogsPollingInterval = setInterval(() => {
+        if (!document.querySelector('.messages-page')) {
+            clearInterval(_dialogsPollingInterval);
+            _dialogsPollingInterval = null;
+            return;
+        }
+        loadDialogs();
+    }, 10000);
 }
 
 async function loadDialogs() {
@@ -71,11 +88,8 @@ function createDialogItem(d) {
     const el = document.createElement('div');
     el.className = 'dialog-item';
     el.dataset.dialogId = d.dialog_id;
-    
-    // ✅ Добавляем timestamp для сортировки
-    el.dataset.updatedAt = Date.now(); // Используем текущее время, так как данные свежие
+    el.dataset.updatedAt = Date.now();
 
-    // ✅ Добавляем класс для закрепленных диалогов
     if (d.pinned) {
         el.classList.add('pinned');
     }
@@ -86,15 +100,17 @@ function createDialogItem(d) {
         ? `<img src="${u.avatar_url}" alt="">`
         : `<span>${(name[0] || '?').toUpperCase()}</span>`;
 
-    const lastMsgHtml = d.last_message
-        ? `<div class="dialog-last-msg${d.last_message.is_mine ? ' mine' : ''}">${escHtml(d.last_message.text)}</div>`
+    const lastText = d.last_message?.text?.startsWith('[post:')
+        ? '📤 Поделились постом'
+        : d.last_message?.text;
+    const lastMsgHtml = lastText
+        ? `<div class="dialog-last-msg${d.last_message.is_mine ? ' mine' : ''}">${escHtml(lastText)}</div>`
         : `<div class="dialog-last-msg" style="color:#ccc">Нет сообщений</div>`;
 
     const unreadHtml = d.unread_count > 0
         ? `<div class="dialog-unread">${d.unread_count}</div>`
         : '';
     
-    // ✅ Иконка закрепленного чата
     const pinnedIcon = d.pinned
         ? `<i class="ri-pushpin-fill dialog-pin-icon"></i>`
         : '';
@@ -112,7 +128,6 @@ function createDialogItem(d) {
     `;
 
     el.addEventListener('click', (e) => {
-        // Не переходим в чат если кликнули по контекстному меню
         if (e.target.closest('.dialog-menu')) return;
         
         const url = `/chat/${d.dialog_id}/`;
@@ -123,7 +138,6 @@ function createDialogItem(d) {
     return el;
 }
 
-// ✅ NEW: WebSocket для real-time обновления списка диалогов
 function connectDialogListWebSocket() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/dialogs/`;
@@ -152,7 +166,6 @@ function connectDialogListWebSocket() {
     _dialogsSocket.onclose = (e) => {
         console.log('Dialogs WebSocket closed:', e.code);
         
-        // Переподключение через 3 секунды если все еще на странице messages
         const page = document.querySelector('.messages-page');
         if (page) {
             setTimeout(() => {
@@ -165,25 +178,17 @@ function connectDialogListWebSocket() {
     };
 }
 
-// ✅ NEW: Обновление диалога в списке
 function updateDialogInList(dialogData) {
     const list = document.getElementById('dialogs-list');
     if (!list) return;
     
-    // Ищем существующий элемент
     let existingItem = list.querySelector(`[data-dialog-id="${dialogData.dialog_id}"]`);
-    
-    // Создаем новый элемент
     const newItem = createDialogItem(dialogData);
-    
-    // ✅ Устанавливаем текущее время для правильной сортировки
     newItem.dataset.updatedAt = Date.now();
     
     if (existingItem) {
-        // Заменяем существующий
         existingItem.replaceWith(newItem);
     } else {
-        // Добавляем новый в начало
         if (list.firstChild) {
             list.insertBefore(newItem, list.firstChild);
         } else {
@@ -191,11 +196,9 @@ function updateDialogInList(dialogData) {
         }
     }
     
-    // ✅ Пересортировываем список (теперь с учетом времени!)
     sortDialogList(list);
 }
 
-// ✅ NEW: Сортировка списка диалогов
 function sortDialogList(list) {
     const items = Array.from(list.querySelectorAll('.dialog-item'));
     
@@ -203,25 +206,22 @@ function sortDialogList(list) {
         const aPinned = a.classList.contains('pinned');
         const bPinned = b.classList.contains('pinned');
         
-        // Закрепленные всегда сверху
         if (aPinned && !bPinned) return -1;
         if (!aPinned && bPinned) return 1;
         
-        // ✅ Внутри группы сортируем по времени (новые сверху)
         const aTime = parseInt(a.dataset.updatedAt) || 0;
         const bTime = parseInt(b.dataset.updatedAt) || 0;
-        return bTime - aTime; // Новые первыми
+        return bTime - aTime;
     });
     
-    // Перестраиваем DOM
     items.forEach(item => list.appendChild(item));
 }
 
-// ✅ NEW: Контекстное меню для диалогов
+// ✅ FIXED: Контекстное меню для диалогов - убрано дублирование
 function setupDialogContextMenu() {
-    // ✅ Проверяем, уже ли настроено меню
+    // Проверяем, уже ли настроено меню
     if (document.body.dataset.dialogMenuInitialized === 'true') {
-        return; // Уже настроено, не создаем повторно
+        return;
     }
     document.body.dataset.dialogMenuInitialized = 'true';
     
@@ -229,7 +229,10 @@ function setupDialogContextMenu() {
     let currentDialogId = null;
     let currentIsPinned = false;
 
-    // Создаем меню
+    // ✅ Удаляем все старые элементы меню перед созданием новых
+    document.querySelectorAll('.dialog-menu, .dialog-menu-overlay').forEach(el => el.remove());
+
+    // Создаем единственное меню
     const menu = document.createElement('div');
     menu.className = 'dialog-menu';
     menu.innerHTML = `
@@ -261,7 +264,6 @@ function setupDialogContextMenu() {
         currentDialogId = dialogId;
         currentIsPinned = isPinned;
 
-        // Обновляем текст кнопки закрепления
         const pinText = menu.querySelector('.pin-text');
         const pinIcon = menu.querySelector('[data-action="pin"] i');
         if (isPinned) {
@@ -312,7 +314,6 @@ function setupDialogContextMenu() {
         if (action === 'pin') {
             await togglePinDialog(dialogId);
         } else if (action === 'delete') {
-            // Подтверждение удаления
             const confirmed = await tgConfirm('Удалить чат? Все сообщения будут удалены.');
             if (confirmed) {
                 await deleteDialog(dialogId);
@@ -320,7 +321,6 @@ function setupDialogContextMenu() {
         }
     });
 
-    // Долгое нажатие
     document.addEventListener('pointerdown', (e) => {
         const item = e.target.closest('.dialog-item');
         if (!item) return;
@@ -348,7 +348,6 @@ function setupDialogContextMenu() {
         }
     });
 
-    // Правая кнопка мыши
     document.addEventListener('contextmenu', (e) => {
         const item = e.target.closest('.dialog-item');
         if (!item) return;
@@ -362,7 +361,6 @@ function setupDialogContextMenu() {
     });
 }
 
-// ✅ NEW: Закрепить/открепить диалог
 async function togglePinDialog(dialogId) {
     try {
         const resp = await fetch(`/api/dialogs/${dialogId}/action/`, {
@@ -376,24 +374,20 @@ async function togglePinDialog(dialogId) {
         const data = await resp.json();
 
         if (data.status === 'ok') {
-            // Обновляем элемент в списке
             const item = document.querySelector(`[data-dialog-id="${dialogId}"]`);
             if (item) {
                 if (data.pinned) {
                     item.classList.add('pinned');
-                    // Добавляем иконку
                     const nameEl = item.querySelector('.dialog-name');
                     if (nameEl && !nameEl.querySelector('.dialog-pin-icon')) {
                         nameEl.insertAdjacentHTML('beforeend', '<i class="ri-pushpin-fill dialog-pin-icon"></i>');
                     }
                 } else {
                     item.classList.remove('pinned');
-                    // Убираем иконку
                     const icon = item.querySelector('.dialog-pin-icon');
                     if (icon) icon.remove();
                 }
                 
-                // Пересортировываем список
                 const list = document.getElementById('dialogs-list');
                 if (list) sortDialogList(list);
             }
@@ -403,7 +397,6 @@ async function togglePinDialog(dialogId) {
     }
 }
 
-// ✅ NEW: Удалить диалог
 async function deleteDialog(dialogId) {
     try {
         const resp = await fetch(`/api/dialogs/${dialogId}/action/`, {
@@ -417,12 +410,10 @@ async function deleteDialog(dialogId) {
         const data = await resp.json();
 
         if (data.status === 'ok') {
-            // Удаляем элемент из списка
             const item = document.querySelector(`[data-dialog-id="${dialogId}"]`);
             if (item) {
                 item.remove();
                 
-                // Проверяем, пустой ли список
                 const list = document.getElementById('dialogs-list');
                 if (list && !list.querySelector('.dialog-item')) {
                     list.innerHTML = `
@@ -464,6 +455,26 @@ function initChatPage() {
 
     const dialogId  = page.dataset.dialogId ? parseInt(page.dataset.dialogId) : null;
     const targetTelegramId = page.dataset.targetTelegramId ? parseInt(page.dataset.targetTelegramId) : null;
+
+    // ── Fix 1: tap chat header avatar → navigate to that user's profile ──────
+    const headerAvatar = document.querySelector('.chat-header-avatar');
+    if (headerAvatar && page.dataset.otherId) {
+        headerAvatar.style.cursor = 'pointer';
+        headerAvatar.addEventListener('click', () => {
+            const otherId = page.dataset.otherId;
+            _stopChatPolling();
+            loadPage(`/user/${otherId}/`);
+            history.pushState({}, '', `/user/${otherId}/`);
+        });
+    }
+
+    // ── Fix 3: tap anywhere outside chat-input-wrap → close keyboard (mobile) ─
+    page.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.chat-input-wrap')) {
+            const inp = document.getElementById('chat-input');
+            if (inp) inp.blur();
+        }
+    }, { passive: true });
     
     const msgArea   = document.getElementById('chat-messages');
     const input     = document.getElementById('chat-input');
@@ -499,7 +510,7 @@ function initChatPage() {
         loadMessages(dialogId, msgArea, true);
         connectWebSocket(dialogId, msgArea);
     } else {
-        msgArea.innerHTML = '<div style="text-align:center;padding:40px;color:#888">Начните переписку</div>';
+        msgArea.innerHTML = '<div class="chat-empty-state" style="text-align:center;padding:40px;color:#888">Начните переписку</div>';
     }
 
     const doSend = async () => {
@@ -556,10 +567,7 @@ function initChatPage() {
                 }
             } else {
                 if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
-                    
+                    msgArea.querySelector('.chat-empty-state')?.remove();
                     _chatSocket.send(JSON.stringify({
                         type: 'chat_message',
                         text: text,
@@ -567,10 +575,7 @@ function initChatPage() {
                     }));
                 } else {
                     console.warn('WebSocket not connected, falling back to HTTP');
-                    
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
+                    msgArea.querySelector('.chat-empty-state')?.remove();
                     
                     const resp = await fetch(`/api/dialogs/${actualDialogId}/messages/`, {
                         method: 'POST',
@@ -615,8 +620,6 @@ function initChatPage() {
     });
 }
 
-// ── WebSocket Connection ──────────────────────────────────────────────────────
-
 function connectWebSocket(dialogId, msgArea) {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws/chat/${dialogId}/`;
@@ -646,9 +649,7 @@ function connectWebSocket(dialogId, msgArea) {
                 break;
                 
             case 'chat_message':
-                if (msgArea.querySelector('[style*="Начните"]')) {
-                    msgArea.innerHTML = '';
-                }
+                msgArea.querySelector('.chat-empty-state')?.remove();
                 
                 const message = data.message;
                 if (message.is_mine === undefined) {
@@ -698,13 +699,21 @@ function connectWebSocket(dialogId, msgArea) {
     };
 }
 
-// ── Context Menu ──────────────────────────────────────────────────────────────
-
+// ✅ FIXED: Контекстное меню для сообщений - убрано дублирование
 function setupContextMenu(dialogId, input) {
+    // Проверяем, уже ли настроено меню
+    if (document.body.dataset.messageMenuInitialized === 'true') {
+        return;
+    }
+    document.body.dataset.messageMenuInitialized = 'true';
+    
     let longPressTimer = null;
     let currentMessageId = null;
     let currentMessageText = null;
     let currentIsMine = false;
+
+    // ✅ Удаляем все старые элементы меню перед созданием новых
+    document.querySelectorAll('.message-menu, .message-menu-overlay').forEach(el => el.remove());
 
     const menu = document.createElement('div');
     menu.className = 'message-menu';
@@ -868,8 +877,6 @@ function setupContextMenu(dialogId, input) {
     });
 }
 
-// ── Edit Functions ────────────────────────────────────────────────────────────
-
 function startEdit(messageId, text, input) {
     _editingMessageId = messageId;
     input.value = text;
@@ -904,8 +911,6 @@ function updateMessageInDOM(messageId, newText, edited) {
     }
 }
 
-// ── Delete Message ────────────────────────────────────────────────────────────
-
 async function deleteMessage(dialogId, messageId) {
     if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
         _chatSocket.send(JSON.stringify({
@@ -931,8 +936,6 @@ async function deleteMessage(dialogId, messageId) {
     }
 }
 
-// ── Load Messages (initial load only) ────────────────────────────────────────
-
 async function loadMessages(dialogId, msgArea, initial) {
     if (!initial) return;
 
@@ -946,7 +949,7 @@ async function loadMessages(dialogId, msgArea, initial) {
 
         msgArea.innerHTML = '';
         if (data.messages.length === 0) {
-            msgArea.innerHTML = `<div style="text-align:center;color:#ccc;padding:40px;font-size:14px">Начните переписку</div>`;
+            msgArea.innerHTML = `<div class="chat-empty-state" style="text-align:center;color:#ccc;padding:40px;font-size:14px">Начните переписку</div>`;
             return;
         }
 
@@ -961,16 +964,45 @@ function appendMessage(msgArea, msg) {
     const wrap = document.createElement('div');
     wrap.className = `chat-bubble-wrap ${msg.is_mine ? 'mine' : 'theirs'}`;
     wrap.setAttribute('data-id', String(msg.id));
-    
+
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble';
     if (msg.edited) bubble.classList.add('edited');
-    bubble.textContent = msg.text;
-    
+
+    // Shared post card
+    if (msg.text && msg.text.startsWith('[post:')) {
+        try {
+            const jsonStr = msg.text.slice(6, -1);
+            const pd = JSON.parse(jsonStr);
+            bubble.classList.add('msg-post-bubble');
+            bubble.innerHTML = `
+                <div class="msg-post-card" data-post-id="${pd.id}">
+                    ${pd.img ? `<img class="msg-post-img" src="${pd.img}" alt="">` : '<div class="msg-post-img-placeholder"><i class="ri-t-shirt-line"></i></div>'}
+                    <div class="msg-post-info">
+                        <div class="msg-post-author">${escHtml(pd.author || '')}</div>
+                        <div class="msg-post-desc">${escHtml((pd.desc || '').slice(0, 60))}</div>
+                    </div>
+                </div>`;
+            bubble.querySelector('.msg-post-card').addEventListener('click', async () => {
+                try {
+                    const resp = await fetch(`/api/outfit/${pd.id}/`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const data = await resp.json();
+                    if (data.post) openPostViewerWithPosts([data.post], 0);
+                } catch (err) { console.error(err); }
+            });
+        } catch (e) {
+            bubble.textContent = '📤 Поделились постом';
+        }
+    } else {
+        bubble.textContent = msg.text;
+    }
+
     const time = document.createElement('div');
     time.className = 'chat-bubble-time';
     time.textContent = msg.time;
-    
+
     wrap.appendChild(bubble);
     wrap.appendChild(time);
     msgArea.appendChild(wrap);

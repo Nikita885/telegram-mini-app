@@ -4,6 +4,7 @@ let _dialogsSocket = null;
 let _editingMessageId = null;
 let _currentDialogId = null;
 let _currentUserId = null;
+let _dialogsPollingInterval = null;
 
 function _stopChatPolling() {
     // Закрываем WebSocket соединения
@@ -15,8 +16,12 @@ function _stopChatPolling() {
         _dialogsSocket.close();
         _dialogsSocket = null;
     }
+    if (_dialogsPollingInterval) {
+        clearInterval(_dialogsPollingInterval);
+        _dialogsPollingInterval = null;
+    }
     _currentDialogId = null;
-    
+
     // ✅ Сбрасываем флаги инициализации меню
     document.body.dataset.dialogMenuInitialized = 'false';
     document.body.dataset.messageMenuInitialized = 'false';
@@ -32,9 +37,23 @@ function initMessagesPage() {
 
     _stopChatPolling();
     loadDialogs();
-    
+
     connectDialogListWebSocket();
+    _startDialogPolling();
     setupDialogContextMenu();
+}
+
+// Polling fallback so dialog list stays fresh even if WebSocket misses an event
+function _startDialogPolling() {
+    if (_dialogsPollingInterval) clearInterval(_dialogsPollingInterval);
+    _dialogsPollingInterval = setInterval(() => {
+        if (!document.querySelector('.messages-page')) {
+            clearInterval(_dialogsPollingInterval);
+            _dialogsPollingInterval = null;
+            return;
+        }
+        loadDialogs();
+    }, 10000);
 }
 
 async function loadDialogs() {
@@ -81,8 +100,11 @@ function createDialogItem(d) {
         ? `<img src="${u.avatar_url}" alt="">`
         : `<span>${(name[0] || '?').toUpperCase()}</span>`;
 
-    const lastMsgHtml = d.last_message
-        ? `<div class="dialog-last-msg${d.last_message.is_mine ? ' mine' : ''}">${escHtml(d.last_message.text)}</div>`
+    const lastText = d.last_message?.text?.startsWith('[post:')
+        ? '📤 Поделились постом'
+        : d.last_message?.text;
+    const lastMsgHtml = lastText
+        ? `<div class="dialog-last-msg${d.last_message.is_mine ? ' mine' : ''}">${escHtml(lastText)}</div>`
         : `<div class="dialog-last-msg" style="color:#ccc">Нет сообщений</div>`;
 
     const unreadHtml = d.unread_count > 0
@@ -433,8 +455,30 @@ function initChatPage() {
 
     const dialogId  = page.dataset.dialogId ? parseInt(page.dataset.dialogId) : null;
     const targetTelegramId = page.dataset.targetTelegramId ? parseInt(page.dataset.targetTelegramId) : null;
-    
+
+    // ── Fix 1: tap chat header avatar → navigate to that user's profile ──────
+    const headerAvatar = document.querySelector('.chat-header-avatar');
+    if (headerAvatar && page.dataset.otherId) {
+        headerAvatar.style.cursor = 'pointer';
+        headerAvatar.addEventListener('click', () => {
+            const otherId = page.dataset.otherId;
+            _stopChatPolling();
+            loadPage(`/user/${otherId}/`);
+            history.pushState({}, '', `/user/${otherId}/`);
+        });
+    }
+
     const msgArea   = document.getElementById('chat-messages');
+
+    // ── Fix 3: tap on messages scroll area → close keyboard (mobile) ──────────
+    // Scoped ONLY to the messages area so layout-shifts from keyboard close
+    // can never eat a subsequent tap on the send button.
+    if (msgArea) {
+        msgArea.addEventListener('touchstart', () => {
+            const inp = document.getElementById('chat-input');
+            if (inp && document.activeElement === inp) inp.blur();
+        }, { passive: true });
+    }
     const input     = document.getElementById('chat-input');
     const sendBtn   = document.getElementById('chat-send-btn');
     const backBtn   = document.getElementById('chat-back-btn');
@@ -468,7 +512,7 @@ function initChatPage() {
         loadMessages(dialogId, msgArea, true);
         connectWebSocket(dialogId, msgArea);
     } else {
-        msgArea.innerHTML = '<div style="text-align:center;padding:40px;color:#888">Начните переписку</div>';
+        msgArea.innerHTML = '<div class="chat-empty-state" style="text-align:center;padding:40px;color:#888">Начните переписку</div>';
     }
 
     const doSend = async () => {
@@ -525,10 +569,7 @@ function initChatPage() {
                 }
             } else {
                 if (_chatSocket && _chatSocket.readyState === WebSocket.OPEN) {
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
-                    
+                    msgArea.querySelector('.chat-empty-state')?.remove();
                     _chatSocket.send(JSON.stringify({
                         type: 'chat_message',
                         text: text,
@@ -536,10 +577,7 @@ function initChatPage() {
                     }));
                 } else {
                     console.warn('WebSocket not connected, falling back to HTTP');
-                    
-                    if (msgArea.querySelector('[style*="Начните"]')) {
-                        msgArea.innerHTML = '';
-                    }
+                    msgArea.querySelector('.chat-empty-state')?.remove();
                     
                     const resp = await fetch(`/api/dialogs/${actualDialogId}/messages/`, {
                         method: 'POST',
@@ -613,9 +651,7 @@ function connectWebSocket(dialogId, msgArea) {
                 break;
                 
             case 'chat_message':
-                if (msgArea.querySelector('[style*="Начните"]')) {
-                    msgArea.innerHTML = '';
-                }
+                msgArea.querySelector('.chat-empty-state')?.remove();
                 
                 const message = data.message;
                 if (message.is_mine === undefined) {
@@ -915,7 +951,7 @@ async function loadMessages(dialogId, msgArea, initial) {
 
         msgArea.innerHTML = '';
         if (data.messages.length === 0) {
-            msgArea.innerHTML = `<div style="text-align:center;color:#ccc;padding:40px;font-size:14px">Начните переписку</div>`;
+            msgArea.innerHTML = `<div class="chat-empty-state" style="text-align:center;color:#ccc;padding:40px;font-size:14px">Начните переписку</div>`;
             return;
         }
 
@@ -930,16 +966,45 @@ function appendMessage(msgArea, msg) {
     const wrap = document.createElement('div');
     wrap.className = `chat-bubble-wrap ${msg.is_mine ? 'mine' : 'theirs'}`;
     wrap.setAttribute('data-id', String(msg.id));
-    
+
     const bubble = document.createElement('div');
     bubble.className = 'chat-bubble';
     if (msg.edited) bubble.classList.add('edited');
-    bubble.textContent = msg.text;
-    
+
+    // Shared post card
+    if (msg.text && msg.text.startsWith('[post:')) {
+        try {
+            const jsonStr = msg.text.slice(6, -1);
+            const pd = JSON.parse(jsonStr);
+            bubble.classList.add('msg-post-bubble');
+            bubble.innerHTML = `
+                <div class="msg-post-card" data-post-id="${pd.id}">
+                    ${pd.img ? `<img class="msg-post-img" src="${pd.img}" alt="">` : '<div class="msg-post-img-placeholder"><i class="ri-t-shirt-line"></i></div>'}
+                    <div class="msg-post-info">
+                        <div class="msg-post-author">${escHtml(pd.author || '')}</div>
+                        <div class="msg-post-desc">${escHtml((pd.desc || '').slice(0, 60))}</div>
+                    </div>
+                </div>`;
+            bubble.querySelector('.msg-post-card').addEventListener('click', async () => {
+                try {
+                    const resp = await fetch(`/api/outfit/${pd.id}/`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const data = await resp.json();
+                    if (data.post) openPostViewerWithPosts([data.post], 0);
+                } catch (err) { console.error(err); }
+            });
+        } catch (e) {
+            bubble.textContent = '📤 Поделились постом';
+        }
+    } else {
+        bubble.textContent = msg.text;
+    }
+
     const time = document.createElement('div');
     time.className = 'chat-bubble-time';
     time.textContent = msg.time;
-    
+
     wrap.appendChild(bubble);
     wrap.appendChild(time);
     msgArea.appendChild(wrap);

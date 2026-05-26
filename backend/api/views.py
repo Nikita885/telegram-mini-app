@@ -14,7 +14,7 @@ from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.utils import timezone
 
-from .models import TelegramUser, Follow, Dialog, Message
+from .models import TelegramUser, Follow, Dialog, Message, Notification
 from .utils import verify_telegram_init_data
 import random
 
@@ -137,6 +137,11 @@ class FollowToggleView(APIView):
             qs.delete()
             return Response({'status': 'unfollowed'})
         Follow.objects.create(follower=current_user, following=target)
+        Notification.objects.create(
+            recipient=target,
+            sender=current_user,
+            notif_type='follow',
+        )
         return Response({'status': 'followed'})
 
 
@@ -573,7 +578,7 @@ def profile_view(request):
         'user': u,
         'following_count': u.following.count(),
         'followers_count': u.followers.count(),
-        'posts_count': u.posts.count(),
+        'posts_count': u.outfit_posts.count(),
     })
 
 def user_profile_view(request, telegram_id):
@@ -592,7 +597,7 @@ def user_profile_view(request, telegram_id):
         'profile_user': profile_user,
         'following_count': profile_user.following.count(),
         'followers_count': profile_user.followers.count(),
-        'posts_count': profile_user.posts.count(),
+        'posts_count': profile_user.outfit_posts.count(),
         'is_following': is_following,
     })
 

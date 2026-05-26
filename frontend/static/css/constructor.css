@@ -113,6 +113,28 @@
     z-index: 10;
 }
 
+/* ── Layer controls (second column, left of constructor-actions) ────────── */
+
+.layer-controls {
+    position: absolute;
+    top: 15px;
+    right: 52px; /* 32px button + 10px gap from constructor-actions */
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+    border-right: 1.5px solid #e0e0e0;
+    padding-right: 8px;
+}
+
+.layer-controls.visible {
+    display: flex;
+}
+
+.layer-delete-btn i {
+    color: #ff3b30 !important;
+}
+
 .action-btn {
     width: 32px;
     height: 32px;
@@ -137,6 +159,22 @@
 .action-btn:disabled {
     opacity: 0.3;
     pointer-events: none;
+}
+
+/* ── SVG category icon ───────────────────────────────────────────────────── */
+
+.category-icon-svg {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    transition: filter 0.25s;
+}
+
+/* Invert SVG to white when category is active */
+.category-btn.active .category-icon-svg {
+    filter: brightness(0) invert(1);
 }
 
 /* ── Canvas Scene ─────────────────────────────────────────────────────────── */
@@ -269,6 +307,7 @@
     order: 1;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    justify-content: safe center;
 }
 
 /* Только на desktop показываем grab cursor */

@@ -114,9 +114,10 @@ function initConstructorPage() {
                 obj.element.parentNode.removeChild(obj.element);
             }
         });
-        
+
         state.clothingObjects = [];
         state.selectedObject = null;
+        hideLayerControls();
         
         // Восстанавливаем объекты
         savedObjects.forEach(objData => {
@@ -149,9 +150,10 @@ function initConstructorPage() {
                 obj.element.parentNode.removeChild(obj.element);
             }
         });
-        
+
         state.clothingObjects = [];
         state.selectedObject = null;
+        hideLayerControls();
     }
 
     // ── Categories ───────────────────────────────────────────────────────
@@ -175,73 +177,55 @@ function initConstructorPage() {
         }
     }
 
-    // ✅ Drag-scroll для categories на ПК
+    // Drag-scroll для categories на ПК
     function setupDragScroll(element) {
         let isDown = false;
-        let isDragging = false;
         let startX;
         let scrollLeft;
-        let startScrollLeft;
 
         element.addEventListener('mousedown', (e) => {
-            // ✅ Если клик на кнопку - полностью игнорируем
-            if (e.target.closest('.category-btn')) {
-                return;
-            }
-            
             isDown = true;
-            isDragging = false;
+            element.dataset.dragging = 'false';
             element.style.cursor = 'grabbing';
             startX = e.pageX;
             scrollLeft = element.scrollLeft;
-            startScrollLeft = element.scrollLeft;
         });
 
         element.addEventListener('mouseleave', () => {
             isDown = false;
-            isDragging = false;
             element.style.cursor = 'grab';
         });
 
         element.addEventListener('mouseup', () => {
             isDown = false;
-            isDragging = false;
             element.style.cursor = 'grab';
         });
 
         element.addEventListener('mousemove', (e) => {
             if (!isDown) return;
-            
-            const x = e.pageX;
-            const walk = (x - startX) * 2;
-            
-            // ✅ Если начали двигаться - это drag
-            if (Math.abs(walk) > 3) {
-                isDragging = true;
+            const walk = (e.pageX - startX) * 2;
+            if (Math.abs(walk) > 5) {
+                element.dataset.dragging = 'true';
                 e.preventDefault();
                 element.scrollLeft = scrollLeft - walk;
             }
         });
-        
-        // ✅ Отключаем клик если был drag
-        element.addEventListener('click', (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        }, true);
     }
 
     function createCategoryButton(category) {
         const btn = document.createElement('button');
         btn.className = 'category-btn';
         btn.dataset.category = category.name;
-        btn.innerHTML = `<i class="${category.icon_class}"></i>`;
+        if (category.icon_svg_url) {
+            btn.innerHTML = `<img src="${category.icon_svg_url}" class="category-icon-svg" alt="">`;
+        } else {
+            btn.innerHTML = `<i class="${category.icon_class || 'ri-shirt-line'}"></i>`;
+        }
         
-        // ✅ Обработчик клика - работает и на ПК и на мобильном
         btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Останавливаем всплытие к scroll
-            
+            const scroll = e.target.closest('.categories-scroll');
+            if (scroll?.dataset.dragging === 'true') return;
+
             if (state.selectedCategory === category.name) {
                 closeGallery();
             } else {
@@ -445,15 +429,72 @@ function initConstructorPage() {
 
     function selectObject(obj) {
         state.selectedObject = obj;
-        
+
         document.querySelectorAll('.clothing-layer').forEach(el => {
             el.classList.remove('selected');
         });
-        
+
         if (obj && obj.element) {
             obj.element.classList.add('selected');
+            showLayerControls();
+        } else {
+            hideLayerControls();
         }
     }
+
+    // ── Layer Controls ────────────────────────────────────────────────────
+    function showLayerControls() {
+        document.getElementById('layer-controls')?.classList.add('visible');
+    }
+
+    function hideLayerControls() {
+        document.getElementById('layer-controls')?.classList.remove('visible');
+    }
+
+    function bringForward() {
+        const obj = state.selectedObject;
+        if (!obj || state.clothingObjects.length < 2) return;
+        const above = state.clothingObjects
+            .filter(o => o.zIndex > obj.zIndex)
+            .sort((a, b) => a.zIndex - b.zIndex)[0];
+        if (!above) return;
+        const tmp = obj.zIndex;
+        obj.zIndex = above.zIndex;
+        above.zIndex = tmp;
+        obj.element.style.zIndex = obj.zIndex;
+        above.element.style.zIndex = above.zIndex;
+        saveHistory();
+    }
+
+    function sendBackward() {
+        const obj = state.selectedObject;
+        if (!obj || state.clothingObjects.length < 2) return;
+        const below = state.clothingObjects
+            .filter(o => o.zIndex < obj.zIndex)
+            .sort((a, b) => b.zIndex - a.zIndex)[0];
+        if (!below) return;
+        const tmp = obj.zIndex;
+        obj.zIndex = below.zIndex;
+        below.zIndex = tmp;
+        obj.element.style.zIndex = obj.zIndex;
+        below.element.style.zIndex = below.zIndex;
+        saveHistory();
+    }
+
+    function deleteSelectedObject() {
+        const obj = state.selectedObject;
+        if (!obj) return;
+        const idx = state.clothingObjects.indexOf(obj);
+        if (idx !== -1) state.clothingObjects.splice(idx, 1);
+        obj.element?.remove();
+        state.selectedObject = null;
+        hideLayerControls();
+        saveHistory();
+    }
+
+    document.getElementById('layer-up-btn')?.addEventListener('click', bringForward);
+    document.getElementById('layer-down-btn')?.addEventListener('click', sendBackward);
+    document.getElementById('layer-delete-btn')?.addEventListener('click', deleteSelectedObject);
 
     // ── Drag & Drop (Touch + Mouse) ────────────────────────────────────
     function makeObjectDraggable(obj) {
@@ -477,8 +518,12 @@ function initConstructorPage() {
         function onStart(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
+            // If a DIFFERENT object is currently selected, just select this one — no drag
+            const prevSelected = state.selectedObject;
+            const wasAlreadySelected = prevSelected?.id === obj.id;
             selectObject(obj);
+            if (prevSelected && !wasAlreadySelected) return;
             
             // Проверяем, кликнули ли на resize handle
             const handle = e.target.closest('.resize-handle');
@@ -647,17 +692,28 @@ function initConstructorPage() {
     function openPublishScreen() {
         const publishScreen = document.getElementById('publish-screen');
         if (!publishScreen) return;
-        
-        // Генерируем превью
+
+        // Очищаем поля каждый раз
+        const descEl = document.getElementById('publish-description');
+        const tagsEl = document.getElementById('publish-hashtags');
+        if (descEl) descEl.value = '';
+        if (tagsEl) tagsEl.value = '';
+
+        // Блокируем canvas чтобы его обработчики не перехватывали фокус
+        if (canvas) canvas.style.pointerEvents = 'none';
+
         generatePreview();
-        
         publishScreen.classList.add('show');
+
+        // Фокус на textarea после небольшой задержки (анимация открытия)
+        setTimeout(() => { if (descEl) descEl.focus(); }, 100);
     }
 
     function closePublishScreen() {
         const publishScreen = document.getElementById('publish-screen');
         if (!publishScreen) return;
-        
+
+        if (canvas) canvas.style.pointerEvents = '';
         publishScreen.classList.remove('show');
     }
 
@@ -730,57 +786,81 @@ function initConstructorPage() {
     }
 
     document.getElementById('publish-submit')?.addEventListener('click', async () => {
+        const submitBtn = document.getElementById('publish-submit');
+        if (submitBtn?.disabled) return;
+
         const description = document.getElementById('publish-description')?.value.trim() || '';
         const hashtagsInput = document.getElementById('publish-hashtags')?.value.trim() || '';
-        
+
         if (!description) {
             alert('Добавьте описание');
             return;
         }
-        
+
+        // Disable immediately to prevent double-submit
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Публикация...';
+        }
+
         const hashtags = hashtagsInput
             .split(/[\s,]+/)
             .filter(t => t.startsWith('#'))
             .map(t => t.substring(1));
-        
+
+        const items = state.clothingObjects.map(obj => ({
+            clothing_id: obj.clothingId,
+            position_x: obj.x,
+            position_y: obj.y,
+            scale: obj.scale,
+            rotation: obj.rotation,
+            z_index: obj.zIndex,
+        }));
+
         try {
-            // Собираем данные
-            const postData = {
-                mannequin_type: state.gender,
-                description: description,
-                hashtags: hashtags,
-                items: state.clothingObjects.map(obj => ({
-                    clothing_id: obj.clothingId,
-                    position_x: obj.x,
-                    position_y: obj.y,
-                    scale: obj.scale,
-                    rotation: obj.rotation,
-                    z_index: obj.zIndex
-                }))
-            };
-            
+            const formData = new FormData();
+            formData.append('mannequin_type', state.gender);
+            formData.append('description', description);
+            formData.append('hashtags', JSON.stringify(hashtags));
+            formData.append('items', JSON.stringify(items));
+
+            // Прикладываем скриншот
+            const previewImg = document.getElementById('publish-preview-img');
+            if (previewImg && previewImg.src && previewImg.src.startsWith('data:')) {
+                formData.append('final_image', dataURLtoBlob(previewImg.src), 'outfit.png');
+            }
+
             const resp = await fetch('/api/outfit/create/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(postData)
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData,
             });
-            
+
             const result = await resp.json();
-            
+
             if (result.status === 'ok') {
                 loadPage('/profile/');
                 history.pushState({}, '', '/profile/');
             } else {
                 alert('Ошибка: ' + result.error);
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Опубликовать'; }
             }
         } catch (e) {
             console.error('Publish error:', e);
             alert('Ошибка при публикации');
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Опубликовать'; }
         }
     });
+
+    function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) u8arr[n] = bstr.charCodeAt(n);
+        return new Blob([u8arr], { type: mime });
+    }
 
     // ── Filters ──────────────────────────────────────────────────────────
     document.querySelectorAll('.filter-chip').forEach(chip => {
@@ -807,6 +887,33 @@ function initConstructorPage() {
         });
     });
 
+    // ── Swipe down on categories bar to close gallery ─────────────────────
+    let _swipeStartY = 0;
+    let _swipeTracking = false;
+
+    categoriesContainer?.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.categories-scroll') || e.target.closest('.gallery-filters')) {
+            _swipeStartY = e.touches[0].clientY;
+            _swipeTracking = true;
+        }
+    }, { passive: true });
+
+    categoriesContainer?.addEventListener('touchmove', (e) => {
+        if (!_swipeTracking || !categoriesContainer.classList.contains('open')) return;
+        const dy = e.touches[0].clientY - _swipeStartY;
+        if (dy > 10) {
+            categoriesContainer.style.transform = `translateY(${Math.min(dy * 0.4, 70)}px)`;
+        }
+    }, { passive: true });
+
+    categoriesContainer?.addEventListener('touchend', (e) => {
+        if (!_swipeTracking) return;
+        _swipeTracking = false;
+        const dy = e.changedTouches[0].clientY - _swipeStartY;
+        categoriesContainer.style.transform = '';
+        if (dy > 80) closeGallery();
+    }, { passive: true });
+
     // ── Click outside to close gallery ────────────────────────────────────
     document.addEventListener('click', (e) => {
         if (!categoriesContainer) return;
@@ -822,13 +929,24 @@ function initConstructorPage() {
         closeGallery();
     });
 
-    // ── Click on canvas to deselect ───────────────────────────────────────
-    canvas?.addEventListener('click', (e) => {
-        // Если кликнули на clothing-layer - не снимаем выделение
-        if (e.target.closest('.clothing-layer')) return;
-        
-        selectObject(null);
+    // ── Click anywhere on constructor page to deselect ────────────────────
+    const constructorPage = document.querySelector('.constructor-page');
+    function _shouldDeselect(e) {
+        if (e.target.closest('.clothing-layer')) return false;
+        if (e.target.closest('.categories-container')) return false;
+        if (e.target.closest('.constructor-actions')) return false;
+        if (e.target.closest('#layer-controls')) return false;
+        if (e.target.closest('.gender-toggle')) return false;
+        if (e.target.closest('.constructor-close')) return false;
+        if (e.target.closest('#publish-screen')) return false;
+        return true;
+    }
+    constructorPage?.addEventListener('mousedown', (e) => {
+        if (_shouldDeselect(e)) selectObject(null);
     });
+    constructorPage?.addEventListener('touchstart', (e) => {
+        if (_shouldDeselect(e)) selectObject(null);
+    }, { passive: true });
 
     // ── Initialization ──────────────────────────────────────────────────
     updateMannequin();

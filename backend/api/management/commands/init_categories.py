@@ -14,6 +14,7 @@ class Command(BaseCommand):
             {'name': 'skirt', 'icon_class': 'ri-user-smile-line', 'order': 5},
             {'name': 'shoes', 'icon_class': 'ri-footprint-line', 'order': 6},
             {'name': 'accessories', 'icon_class': 'ri-honour-line', 'order': 7},
+            {'name': 'hat', 'icon_class': 'ri-hat-line', 'order': 8},
         ]
 
         for cat_data in categories:

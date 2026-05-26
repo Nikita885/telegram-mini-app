@@ -1,3 +1,47 @@
+// ── Global badge polling (messages + notifications) ───────────────────────────
+
+var _globalBadgeInterval = null;
+
+function _startGlobalPolling() {
+    _pollGlobalBadges();
+    if (_globalBadgeInterval) clearInterval(_globalBadgeInterval);
+    _globalBadgeInterval = setInterval(_pollGlobalBadges, 20000);
+}
+
+async function _pollGlobalBadges() {
+    // 1. Messages unread count
+    try {
+        const resp = await fetch('/api/dialogs/', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await resp.json();
+        const total = (data.dialogs || []).reduce((sum, d) => sum + (d.unread_count || 0), 0);
+        _updateNavMsgBadge(total);
+    } catch (e) {}
+
+    // 2. Notification bell badge (home page)
+    try {
+        const resp2 = await fetch('/api/notifications/', {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data2 = await resp2.json();
+        if (typeof _updateNotifBadge === 'function') {
+            _updateNotifBadge(data2.unread_count || 0);
+        }
+    } catch (e) {}
+}
+
+function _updateNavMsgBadge(count) {
+    const badge = document.getElementById('nav-msg-badge');
+    if (!badge) return;
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : String(count);
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
 function detectPlatform() {
     if (/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())) {
         document.documentElement.classList.add('ios');
@@ -18,6 +62,7 @@ function initPage() {
     initChatPage();
     initConnectionsPage();
     initConstructorPage();
+    initHomePage();
 }
 
 // ── SPA navigation ────────────────────────────────────────────────────────────
@@ -102,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detectPlatform();
     setActiveButton();
     initPage();
+    _startGlobalPolling();
     
     // Navigation buttons
     document.querySelectorAll('.bottom-navigation__item').forEach(item => {

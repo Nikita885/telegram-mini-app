@@ -15,6 +15,34 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
+/* ── Tabs ── */
+.search-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px 16px 0;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.search-tab {
+    flex: 1;
+    height: 36px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.search-tab.active {
+    color: #000;
+    border-bottom-color: #000;
+}
+
+/* ── Search bar ── */
 .search-bar-wrap {
     position: relative;
     display: flex;

@@ -1,10 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/constructor.css' %}?v={% now 'U' %}">
-{% endblock %}
-
 {% block content %}
 <div class="constructor-page">
     <!-- Close button -->
@@ -36,6 +32,19 @@
         </button>
         <button class="action-btn" id="clear-btn" title="Очистить">
             <i class="ri-delete-bin-line"></i>
+        </button>
+    </div>
+
+    <!-- Layer controls (shown when object selected) -->
+    <div class="layer-controls" id="layer-controls">
+        <button class="action-btn" id="layer-up-btn" title="Поднять слой">
+            <i class="ri-bring-forward"></i>
+        </button>
+        <button class="action-btn" id="layer-down-btn" title="Опустить слой">
+            <i class="ri-send-backward"></i>
+        </button>
+        <button class="action-btn layer-delete-btn" id="layer-delete-btn" title="Удалить объект">
+            <i class="ri-close-circle-line"></i>
         </button>
     </div>
 
@@ -108,11 +117,15 @@
 
             <div class="publish-field">
                 <label class="publish-field-label" for="publish-hashtags">Хештеги</label>
-                <input 
-                    type="text" 
-                    id="publish-hashtags" 
-                    class="publish-input" 
+                <input
+                    type="text"
+                    id="publish-hashtags"
+                    class="publish-input"
                     placeholder="#мода #стиль #образ"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
                 >
                 <div class="hashtag-preview" id="hashtag-preview"></div>
             </div>
@@ -121,6 +134,3 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/constructor.js' %}?v={% now 'U' %}"></script>
-{% endblock %}

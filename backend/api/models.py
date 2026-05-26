@@ -87,10 +87,12 @@ class ClothingCategory(models.Model):
         ('skirt', 'Юбки'),
         ('shoes', 'Обувь'),
         ('accessories', 'Аксессуары'),
+        ('hat', 'Головные уборы'),
     ]
     
     name = models.CharField(max_length=50, choices=CATEGORY_CHOICES, unique=True)
-    icon_class = models.CharField(max_length=50, default='ri-shirt-line')
+    icon_class = models.CharField(max_length=50, default='ri-shirt-line', blank=True)
+    icon_svg = models.FileField(upload_to='category_icons/', blank=True, null=True, verbose_name='SVG иконка')
     order = models.IntegerField(default=0)
     
     class Meta:
@@ -119,12 +121,14 @@ class ClothingItem(models.Model):
     category = models.ForeignKey(ClothingCategory, on_delete=models.CASCADE, related_name='items')
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='clothing/')
-    
+
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True)
     color = models.CharField(max_length=50, blank=True)
     tags = models.CharField(max_length=500, blank=True)
-    
+    item_description = models.TextField(blank=True, verbose_name='Описание')
+    buy_link = models.URLField(max_length=500, blank=True, null=True, verbose_name='Где купить (ссылка)')
+
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -170,15 +174,84 @@ class PostClothingItem(models.Model):
     """Одежда в посте с трансформацией"""
     post = models.ForeignKey(OutfitPost, on_delete=models.CASCADE, related_name='items')
     clothing = models.ForeignKey(ClothingItem, on_delete=models.CASCADE)
-    
+
     position_x = models.FloatField(default=0)
     position_y = models.FloatField(default=0)
     scale = models.FloatField(default=1.0)
     rotation = models.FloatField(default=0)
     z_index = models.IntegerField(default=0)
-    
+
     class Meta:
         ordering = ['z_index']
-    
+
     def __str__(self):
         return f"{self.clothing.name} in {self.post}"
+
+
+class PostLike(models.Model):
+    post = models.ForeignKey(OutfitPost, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='liked_posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'user')
+
+    def __str__(self):
+        return f"{self.user} liked {self.post}"
+
+
+class PostComment(models.Model):
+    post = models.ForeignKey(OutfitPost, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='post_comments')
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    likes_count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.user}: {self.text[:40]}"
+
+
+class CommentLike(models.Model):
+    comment = models.ForeignKey(PostComment, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='comment_likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('comment', 'user')
+
+    def __str__(self):
+        return f"{self.user} liked comment {self.comment_id}"
+
+
+class Notification(models.Model):
+    NOTIF_TYPES = [
+        ('like', 'Лайк'),
+        ('comment', 'Комментарий'),
+        ('follow', 'Подписка'),
+    ]
+    recipient = models.ForeignKey(
+        TelegramUser, on_delete=models.CASCADE, related_name='notifications'
+    )
+    sender = models.ForeignKey(
+        TelegramUser, on_delete=models.CASCADE, related_name='sent_notifications'
+    )
+    notif_type = models.CharField(max_length=20, choices=NOTIF_TYPES)
+    post = models.ForeignKey(
+        'OutfitPost', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='notifications'
+    )
+    comment = models.ForeignKey(
+        'PostComment', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='notifications'
+    )
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notif[{self.notif_type}] → {self.recipient}"

@@ -51,5 +51,14 @@
             <i class="ri-message-2-line"></i>
         </button>
     </div>
+
+    <div class="profile-posts">
+        <div class="posts-grid" id="posts-grid" data-user-id="{{ profile_user.telegram_id }}">
+            <div class="posts-empty">
+                <i class="ri-t-shirt-line"></i>
+                <p>Загрузка...</p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
