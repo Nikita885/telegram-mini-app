@@ -198,7 +198,7 @@ class DialogListView(APIView):
 
         dialogs = Dialog.objects.filter(
             Q(user1=current_user) | Q(user2=current_user)
-        ).select_related('user1', 'user2').order_by('-updated_at')
+        ).select_related('user1', 'user2').order_by('-pinned', '-updated_at')
 
         result = []
         for d in dialogs:
@@ -214,6 +214,8 @@ class DialogListView(APIView):
                     'is_mine': last_msg.sender == current_user,
                 } if last_msg else None,
                 'unread_count': unread,
+                'pinned': d.pinned,
+                'updated_at': int(d.updated_at.timestamp() * 1000),
             })
         return Response({'dialogs': result})
 

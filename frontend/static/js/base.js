@@ -1,11 +1,36 @@
 // ── Global badge polling (messages + notifications) ───────────────────────────
 
 var _globalBadgeInterval = null;
+var _globalDialogsSocket = null;
 
 function _startGlobalPolling() {
     _pollGlobalBadges();
     if (_globalBadgeInterval) clearInterval(_globalBadgeInterval);
-    _globalBadgeInterval = setInterval(_pollGlobalBadges, 20000);
+    _globalBadgeInterval = setInterval(_pollGlobalBadges, 5000);
+    _connectGlobalDialogsSocket();
+}
+
+function _connectGlobalDialogsSocket() {
+    if (_globalDialogsSocket && _globalDialogsSocket.readyState <= 1) return;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    _globalDialogsSocket = new WebSocket(`${protocol}//${window.location.host}/ws/dialogs/`);
+
+    _globalDialogsSocket.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        if (data.type === 'dialog_updated') {
+            // Мгновенно обновляем badge
+            _pollGlobalBadges();
+            // Если открыта страница сообщений — обновляем список
+            if (document.querySelector('.messages-page') && typeof updateDialogInList === 'function') {
+                updateDialogInList(data.dialog);
+            }
+        }
+    };
+
+    _globalDialogsSocket.onclose = () => {
+        setTimeout(_connectGlobalDialogsSocket, 3000);
+    };
 }
 
 async function _pollGlobalBadges() {

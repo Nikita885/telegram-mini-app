@@ -38,7 +38,8 @@ function initMessagesPage() {
     _stopChatPolling();
     loadDialogs();
 
-    connectDialogListWebSocket();
+    // Глобальный WebSocket из base.js уже подключен и обновляет список
+    // Оставляем только polling как запасной вариант
     _startDialogPolling();
     setupDialogContextMenu();
 }
@@ -88,7 +89,7 @@ function createDialogItem(d) {
     const el = document.createElement('div');
     el.className = 'dialog-item';
     el.dataset.dialogId = d.dialog_id;
-    el.dataset.updatedAt = Date.now();
+    el.dataset.updatedAt = d.updated_at || Date.now();
 
     if (d.pinned) {
         el.classList.add('pinned');
@@ -181,22 +182,29 @@ function connectDialogListWebSocket() {
 function updateDialogInList(dialogData) {
     const list = document.getElementById('dialogs-list');
     if (!list) return;
-    
-    let existingItem = list.querySelector(`[data-dialog-id="${dialogData.dialog_id}"]`);
+
+    // Убираем пустое состояние если появился первый диалог
+    list.querySelector('.dialogs-empty')?.remove();
+
     const newItem = createDialogItem(dialogData);
-    newItem.dataset.updatedAt = Date.now();
-    
+    newItem.dataset.updatedAt = dialogData.updated_at || Date.now();
+
+    const existingItem = list.querySelector(`[data-dialog-id="${dialogData.dialog_id}"]`);
     if (existingItem) {
         existingItem.replaceWith(newItem);
     } else {
-        if (list.firstChild) {
-            list.insertBefore(newItem, list.firstChild);
-        } else {
-            list.appendChild(newItem);
-        }
+        list.insertBefore(newItem, list.firstChild || null);
     }
-    
+
     sortDialogList(list);
+
+    // Обновляем badge сразу
+    const total = Array.from(list.querySelectorAll('.dialog-item'))
+        .reduce((sum, el) => {
+            const badge = el.querySelector('.dialog-unread');
+            return sum + (badge ? parseInt(badge.textContent) || 0 : 0);
+        }, 0);
+    _updateNavMsgBadge(total);
 }
 
 function sortDialogList(list) {

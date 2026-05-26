@@ -13,3 +13,7 @@ daphne==4.0.0
 
 # Static files for ASGI
 whitenoise==6.6.0
+
+# Cloud media storage
+cloudinary==1.40.0
+django-cloudinary-storage==0.3.0

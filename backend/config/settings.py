@@ -17,6 +17,8 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'daphne',  # Должен быть первым для WebSocket
+    'cloudinary_storage',
+    'cloudinary',
     'api',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -154,5 +156,17 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 TG_BOT_TOKEN = "8644654149:AAG4xfWRe1Z67Ilfi_P0K2HBoqa1FwsBBBs"
 
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = '/app/media'
+
+# ── Cloudinary (persistent media storage for Railway) ────────────────────────
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY    = os.environ.get('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+
+if CLOUDINARY_CLOUD_NAME:
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY':    CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
