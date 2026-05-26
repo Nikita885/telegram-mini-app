@@ -68,9 +68,26 @@ function initConstructorPage() {
         closeGallery();
     });
 
+    // Кэш URL манекенов из API
+    const mannequinUrls = { male: null, female: null };
+
+    async function loadMannequinUrls() {
+        try {
+            const res = await fetch('/api/mannequins/');
+            const data = await res.json();
+            data.mannequins.forEach(m => {
+                mannequinUrls[m.gender] = m.image_url;
+            });
+        } catch (e) {
+            console.warn('Mannequin API unavailable, using static fallback');
+        }
+        updateMannequin();
+    }
+
     function updateMannequin() {
         if (!mannequinImg) return;
-        mannequinImg.src = `/static/images/mannequin_${state.gender}.png`;
+        mannequinImg.src = mannequinUrls[state.gender]
+            || `/static/images/mannequin_${state.gender}.png`;
     }
 
     // ── History (Undo/Redo) ──────────────────────────────────────────────
@@ -949,7 +966,7 @@ function initConstructorPage() {
     }, { passive: true });
 
     // ── Initialization ──────────────────────────────────────────────────
-    updateMannequin();
+    loadMannequinUrls(); // загружает URL из API и вызывает updateMannequin()
     loadCategories();
     updateHistoryButtons();
     saveHistory(); // Начальное состояние
