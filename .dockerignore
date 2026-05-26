@@ -1,0 +1,20 @@
+# Generated static files — collectstatic creates these fresh on every deploy
+backend/staticfiles/
+
+# Media uploads — stored in Cloudinary on production
+media/
+backend/media/
+
+# Python cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Datasets
+fashion-product-images-dataset/
+
+# Node modules
+node_modules/
+
+# Local env files
+**/.env
