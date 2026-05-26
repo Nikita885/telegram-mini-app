@@ -15,7 +15,7 @@ from .views_constructor import (
     ClothingCategoriesView, ClothingItemsView, CreateOutfitView,
     UserOutfitsView, PostLikeView, PostCommentsView, CommentLikeView,
     SearchPostsView, DeleteOutfitView, HomeFeedView, NotificationListView,
-    PostDetailView,
+    PostDetailView, MannequinView,
 )
 
 urlpatterns = [
@@ -37,6 +37,7 @@ urlpatterns = [
     path('dialogs/<int:dialog_id>/messages/<int:message_id>/', MessageDetailView.as_view(), name='api-message-detail'),
 
     # Clothing Constructor
+    path('mannequins/', MannequinView.as_view(), name='api-mannequins'),
     path('clothing/categories/', ClothingCategoriesView.as_view(), name='api-clothing-categories'),
     path('clothing/items/', ClothingItemsView.as_view(), name='api-clothing-items'),
     path('outfit/create/', CreateOutfitView.as_view(), name='api-outfit-create'),

@@ -77,6 +77,21 @@ class Message(models.Model):
     
 # Добавить в конец файла models.py после класса Message:
 
+class Mannequin(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Мужской'),
+        ('female', 'Женский'),
+    ]
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, unique=True)
+    image = models.ImageField(upload_to='mannequins/')
+
+    class Meta:
+        ordering = ['gender']
+
+    def __str__(self):
+        return self.get_gender_display()
+
+
 class ClothingCategory(models.Model):
     """Категории одежды"""
     CATEGORY_CHOICES = [

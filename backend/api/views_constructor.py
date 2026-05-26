@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from .models import (
     ClothingCategory, ClothingItem, OutfitPost, PostClothingItem,
     Hashtag, TelegramUser, PostLike, PostComment, Notification, CommentLike,
+    Mannequin,
 )
 
 
@@ -19,6 +20,25 @@ def get_current_user(request):
 # ═══════════════════════════════════════════════════════════════════════════════
 #  CLOTHING CONSTRUCTOR API
 # ═══════════════════════════════════════════════════════════════════════════════
+
+@method_decorator(csrf_exempt, name='dispatch')
+class MannequinView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        mannequins = Mannequin.objects.all()
+        return Response({
+            'mannequins': [
+                {
+                    'gender': m.gender,
+                    'display_name': m.get_gender_display(),
+                    'image_url': request.build_absolute_uri(m.image.url) if m.image else None,
+                }
+                for m in mannequins
+            ]
+        })
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ClothingCategoriesView(APIView):
