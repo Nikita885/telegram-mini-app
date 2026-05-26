@@ -10,8 +10,14 @@ admin.site.register(Message)
 
 from .models import (
     ClothingCategory, ClothingItem, OutfitPost, PostClothingItem, Hashtag,
-    PostLike, PostComment, CommentLike, Notification,
+    PostLike, PostComment, CommentLike, Notification, Mannequin,
 )
+
+
+@admin.register(Mannequin)
+class MannequinAdmin(admin.ModelAdmin):
+    list_display = ('get_gender_display', 'image')
+    fields = ('gender', 'image')
 
 
 @admin.register(ClothingItem)
