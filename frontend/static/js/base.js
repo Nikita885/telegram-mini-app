@@ -92,7 +92,18 @@ function initPage() {
 
 // ── SPA navigation ────────────────────────────────────────────────────────────
 
+function _showLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) loader.style.display = 'flex';
+}
+
+function _hideLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) loader.style.display = 'none';
+}
+
 async function loadPage(url) {
+    _showLoader();
     try {
         const response = await fetch(url, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -117,6 +128,8 @@ async function loadPage(url) {
     } catch (error) {
         console.error('Ошибка загрузки:', error);
         window.location.href = url;
+    } finally {
+        _hideLoader();
     }
 }
 

@@ -736,69 +736,68 @@ function initConstructorPage() {
 
     document.getElementById('publish-back')?.addEventListener('click', closePublishScreen);
 
+    // Загружает изображение с crossOrigin чтобы canvas не был tainted
+    function loadImageForCanvas(src) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            // Добавляем timestamp чтобы обойти кэш без CORS заголовков
+            img.src = src + (src.includes('?') ? '&' : '?') + '_cors=1';
+        });
+    }
+
     async function generatePreview() {
         const previewImg = document.getElementById('publish-preview-img');
         if (!previewImg) return;
-        
+
         try {
-            // ✅ Создаём canvas для рендера
             const renderCanvas = document.createElement('canvas');
             const ctx = renderCanvas.getContext('2d');
-            
-            // Размеры canvas
-            const rect = canvas.getBoundingClientRect();
             renderCanvas.width = canvas.offsetWidth;
             renderCanvas.height = canvas.offsetHeight;
-            
-            // Белый фон
+
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
-            
-            // Рисуем mannequin
-            const mannequinImgEl = document.getElementById('mannequin-img');
-            if (mannequinImgEl && mannequinImgEl.complete) {
-                const mw = mannequinImgEl.naturalWidth;
-                const mh = mannequinImgEl.naturalHeight;
+
+            // Манекен — берём из static (same-origin, нет CORS проблем с canvas)
+            const staticSrc = `/static/images/mannequin_${state.gender}.png`;
+            const mannequinDraw = await loadImageForCanvas(staticSrc);
+            if (mannequinDraw) {
+                const mw = mannequinDraw.naturalWidth;
+                const mh = mannequinDraw.naturalHeight;
                 const scale = Math.min(
                     (renderCanvas.width * 0.9) / mw,
                     (renderCanvas.height * 0.9) / mh
                 );
-                const w = mw * scale;
-                const h = mh * scale;
+                const w = mw * scale, h = mh * scale;
                 const x = (renderCanvas.width - w) / 2;
                 const y = (renderCanvas.height - h) / 2;
-                
-                ctx.drawImage(mannequinImgEl, x, y, w, h);
+                ctx.drawImage(mannequinDraw, x, y, w, h);
             }
-            
-            // Рисуем все clothing objects (сортируем по zIndex)
+
+            // Одежда — загружаем с crossOrigin для canvas
             const sortedObjects = [...state.clothingObjects].sort((a, b) => a.zIndex - b.zIndex);
-            
             for (const obj of sortedObjects) {
-                const img = obj.element?.querySelector('img');
-                if (!img || !img.complete) continue;
-                
+                const srcImg = obj.element?.querySelector('img');
+                if (!srcImg?.src) continue;
+                const drawImg = await loadImageForCanvas(srcImg.src);
+                if (!drawImg) continue;
                 ctx.save();
-                
-                // Применяем трансформации
                 ctx.translate(obj.x, obj.y);
                 ctx.rotate(obj.rotation * Math.PI / 180);
                 ctx.scale(obj.scale, obj.scale);
-                
-                // Рисуем с центром в (0, 0)
-                ctx.drawImage(img, -obj.width / 2, -obj.height / 2, obj.width, obj.height);
-                
+                ctx.drawImage(drawImg, -obj.width / 2, -obj.height / 2, obj.width, obj.height);
                 ctx.restore();
             }
-            
-            // Конвертируем в dataURL
+
             const dataUrl = renderCanvas.toDataURL('image/png');
             previewImg.src = dataUrl;
-            
+
         } catch (e) {
             console.error('Generate preview error:', e);
-            // Fallback - показываем mannequin
-            previewImg.src = mannequinImg.src;
+            previewImg.src = `/static/images/mannequin_${state.gender}.png`;
         }
     }
 

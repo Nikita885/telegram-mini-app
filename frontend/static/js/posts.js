@@ -439,19 +439,21 @@ function createPostSlide(post, index) {
         }
     }
 
-    // ── Double-tap to like on outfit page ──
+    // ── Double-tap to like on any carousel page ──
     let lastTapTime = 0;
-    slide.querySelector('.carousel-outfit-page').addEventListener('click', e => {
-        if (carousel && carousel.dataset.dragging === 'true') {
-            carousel.dataset.dragging = 'false';
-            return;
-        }
-        const now = Date.now();
-        if (now - lastTapTime < 350) {
-            toggleSlideLike(slide, post);
-            showHeartPop(e.clientX, e.clientY, slide);
-        }
-        lastTapTime = now;
+    slide.querySelectorAll('.carousel-page').forEach(page => {
+        page.addEventListener('click', e => {
+            if (carousel && carousel.dataset.dragging === 'true') {
+                carousel.dataset.dragging = 'false';
+                return;
+            }
+            const now = Date.now();
+            if (now - lastTapTime < 350) {
+                toggleSlideLike(slide, post);
+                showHeartPop(e.clientX, e.clientY, slide);
+            }
+            lastTapTime = now;
+        });
     });
 
     // Profile button
