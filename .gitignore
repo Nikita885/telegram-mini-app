@@ -1,12 +1,13 @@
 ﻿# Datasets
 fashion-product-images-dataset/
 
-# Media files
+# Media files (загрузки пользователей — хранятся в Cloudinary, не в репо)
 media/
-*.jpg
-*.jpeg
-*.png
-*.webp
+backend/media/
+
+# Большие датасеты картинок — уже покрыты fashion-product-images-dataset/
+# НЕ игнорируем *.png/*.svg глобально: маленькие статик-ассеты (манекены и иконки)
+# должны быть в репо чтобы попасть в Docker-образ и collectstatic
 
 # Static files (они генерируются автоматически)
 backend/staticfiles/

@@ -771,9 +771,13 @@ function initConstructorPage() {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
 
-            // Манекен — same-origin static файл, не нужен crossOrigin
+            // Манекен: Cloudinary URL (из API) — crossOrigin загрузка с cache-bust
+            // Fallback: статичный файл (same-origin, без crossOrigin) для dev-среды
+            const cloudinarySrc = mannequinUrls[state.gender];
             const staticSrc = `/static/images/mannequin_${state.gender}.png`;
-            const mannequinDraw = await loadSameOriginImage(staticSrc);
+            const mannequinDraw = cloudinarySrc
+                ? await loadImageForCanvas(cloudinarySrc)
+                : await loadSameOriginImage(staticSrc);
             if (mannequinDraw) {
                 const mw = mannequinDraw.naturalWidth;
                 const mh = mannequinDraw.naturalHeight;
