@@ -51,7 +51,10 @@
       "Bash(C:/msys64/usr/bin/pacman -S mingw-w64-x86_64-python-pillow --noconfirm)",
       "Bash(mkdir -p \"C:/Users/nic84/vkr_diagrams\" 2>&1; echo \"OK\")",
       "Bash(node -e \"require\\('docx'\\); console.log\\('docx OK'\\)\")",
-      "Bash(node build_vkr.js)"
+      "Bash(node build_vkr.js)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   }
 }
