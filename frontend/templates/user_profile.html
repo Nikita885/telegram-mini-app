@@ -9,7 +9,7 @@
                 <img src="{{ profile_user.avatar.url }}" class="avatar-img">
             {% else %}
                 <div class="avatar-letter">
-                    {{ profile_user.username|first|default:'U' }}
+                    {{ profile_user.username|default:'U'|first }}
                 </div>
             {% endif %}
         </div>
