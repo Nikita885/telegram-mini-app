@@ -157,22 +157,23 @@ class ClothingItem(models.Model):
                 from PIL import Image
                 img = Image.open(self.image)
                 img_format = img.format or 'JPEG'
-                # Конвертируем RGBA/P → RGB для JPEG
-                if img.mode in ('RGBA', 'P'):
-                    img = img.convert('RGB')
-                    img_format = 'JPEG'
                 # Уменьшаем до максимум 1800px по большей стороне
                 max_size = 1800
                 if max(img.size) > max_size:
                     img.thumbnail((max_size, max_size), Image.LANCZOS)
                 output = io.BytesIO()
-                save_kwargs = {'format': img_format}
-                if img_format == 'JPEG':
-                    save_kwargs['quality'] = 85
-                    save_kwargs['optimize'] = True
-                img.save(output, **save_kwargs)
+                # PNG сохраняем как PNG (сохраняем прозрачность), остальное — JPEG
+                if img_format == 'PNG' or img.mode in ('RGBA', 'LA', 'P'):
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    img.save(output, format='PNG', optimize=True)
+                    ext = 'png'
+                else:
+                    if img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    img.save(output, format='JPEG', quality=85, optimize=True)
+                    ext = 'jpg'
                 output.seek(0)
-                ext = 'jpg' if img_format == 'JPEG' else img_format.lower()
                 original_name = self.image.name.rsplit('.', 1)[0]
                 self.image.save(f"{original_name}.{ext}", ContentFile(output.read()), save=False)
             except Exception:
