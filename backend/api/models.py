@@ -137,7 +137,7 @@ class ClothingItem(models.Model):
     
     category = models.ForeignKey(ClothingCategory, on_delete=models.CASCADE, related_name='items')
     name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='clothing/')
+    image = models.ImageField(upload_to='clothing/', max_length=500)
 
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     style = models.CharField(max_length=20, choices=STYLE_CHOICES, blank=True)
