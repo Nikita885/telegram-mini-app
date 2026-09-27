@@ -45,3 +45,6 @@ android/keystore.properties
 dist/
 .venv/
 backend/wait-for-it/
+
+# Local databases
+*.sqlite3
