@@ -1,0 +1,57 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <color name="ds_color_background">@color/ds_dark_background</color>
+    <color name="ds_color_on_background">@color/ds_dark_on_background</color>
+    <color name="ds_color_surface">@color/ds_dark_surface</color>
+    <color name="ds_color_on_surface">@color/ds_dark_on_surface</color>
+    <color name="ds_color_on_surface_variant">@color/ds_dark_on_surface_variant</color>
+    <color name="ds_color_surface_sunken">@color/ds_dark_surface_sunken</color>
+    <color name="ds_color_surface_container_lowest">@color/ds_dark_surface_container_lowest</color>
+    <color name="ds_color_surface_container_low">@color/ds_dark_surface_container_low</color>
+    <color name="ds_color_surface_container">@color/ds_dark_surface_container</color>
+    <color name="ds_color_surface_container_high">@color/ds_dark_surface_container_high</color>
+    <color name="ds_color_surface_container_highest">@color/ds_dark_surface_container_highest</color>
+    <color name="ds_color_outline">@color/ds_dark_outline</color>
+    <color name="ds_color_outline_variant">@color/ds_dark_outline_variant</color>
+    <color name="ds_color_primary">@color/ds_dark_primary</color>
+    <color name="ds_color_on_primary">@color/ds_dark_on_primary</color>
+    <color name="ds_color_accent">@color/ds_dark_accent</color>
+    <color name="ds_color_on_accent">@color/ds_dark_on_accent</color>
+    <color name="ds_color_accent_container">@color/ds_dark_accent_container</color>
+    <color name="ds_color_on_accent_container">@color/ds_dark_on_accent_container</color>
+    <color name="ds_color_danger">@color/ds_dark_danger</color>
+    <color name="ds_color_on_danger">@color/ds_dark_on_danger</color>
+    <color name="ds_color_danger_container">@color/ds_dark_danger_container</color>
+    <color name="ds_color_on_danger_container">@color/ds_dark_on_danger_container</color>
+    <color name="ds_color_success">@color/ds_dark_success</color>
+    <color name="ds_color_success_container">@color/ds_dark_success_container</color>
+    <color name="ds_color_on_success_container">@color/ds_dark_on_success_container</color>
+    <color name="ds_color_warning">@color/ds_dark_warning</color>
+    <color name="ds_color_warning_container">@color/ds_dark_warning_container</color>
+    <color name="ds_color_on_warning_container">@color/ds_dark_on_warning_container</color>
+    <color name="ds_color_inverse_surface">@color/ds_dark_inverse_surface</color>
+    <color name="ds_color_inverse_on_surface">@color/ds_dark_inverse_on_surface</color>
+    <color name="ds_color_inverse_accent">@color/ds_dark_inverse_accent</color>
+    <color name="ds_color_like">@color/ds_dark_like</color>
+    <color name="ds_color_focus_ring">@color/ds_dark_focus_ring</color>
+    <color name="ds_color_scrim">@color/ds_dark_scrim</color>
+    <color name="ds_color_photo_scrim">@color/ds_dark_photo_scrim</color>
+    <color name="ds_color_on_photo">@color/ds_dark_on_photo</color>
+    <color name="ds_color_skeleton_base">@color/ds_dark_skeleton_base</color>
+    <color name="ds_color_skeleton_highlight">@color/ds_dark_skeleton_highlight</color>
+    <color name="ds_color_canvas">@color/ds_dark_canvas</color>
+    <color name="ds_color_mannequin">@color/ds_dark_mannequin</color>
+    <color name="ds_color_snap_guide">@color/ds_dark_snap_guide</color>
+    <color name="ds_color_selection">@color/ds_dark_selection</color>
+    <color name="ds_color_camera_background">@color/ds_dark_camera_background</color>
+    <color name="ds_color_on_camera">@color/ds_dark_on_camera</color>
+    <color name="ds_color_avatar_sand">@color/ds_dark_avatar_sand</color>
+    <color name="ds_color_avatar_sage">@color/ds_dark_avatar_sage</color>
+    <color name="ds_color_avatar_mist">@color/ds_dark_avatar_mist</color>
+    <color name="ds_color_avatar_blush">@color/ds_dark_avatar_blush</color>
+    <color name="ds_color_avatar_lavender">@color/ds_dark_avatar_lavender</color>
+    <color name="ds_color_avatar_ochre">@color/ds_dark_avatar_ochre</color>
+    <color name="ds_color_avatar_stone">@color/ds_dark_avatar_stone</color>
+    <color name="ds_color_on_avatar">@color/ds_dark_on_avatar</color>
+</resources>

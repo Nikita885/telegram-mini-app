@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:layout_width="@dimen/ds_size_icon_medium"
+        android:layout_height="@dimen/ds_size_icon_medium"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ds_ic_cloud_off"
+        app:tint="?attr/dsColorOnWarningContainer" />
+
+    <TextView
+        android:id="@+id/ds_banner_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_space_3"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:layout_marginBottom="@dimen/ds_space_2"
+        android:layout_weight="1"
+        android:text="@string/ds_offline_banner"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/dsColorOnWarningContainer" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ds_banner_action"
+        style="@style/Widget.Ds.Button.Ghost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ds_action_retry"
+        android:textColor="?attr/dsColorOnWarningContainer"
+        android:visibility="gone" />
+</merge>

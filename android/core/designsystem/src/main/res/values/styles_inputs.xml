@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Поле ввода: утопленная плашка, линия 2 dp при фокусе, ошибка — текстом и цветом. -->
+    <style name="Widget.Ds.TextInputLayout" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">?attr/dsColorSurfaceSunken</item>
+        <item name="boxStrokeColor">@color/ds_text_field_stroke</item>
+        <item name="boxStrokeErrorColor">?attr/dsColorDanger</item>
+        <item name="boxStrokeWidth">@dimen/ds_space_0</item>
+        <item name="boxStrokeWidthFocused">@dimen/ds_size_stroke_thick</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Input</item>
+        <item name="hintTextColor">?attr/dsColorOnSurfaceVariant</item>
+        <item name="android:textColorHint">?attr/dsColorOnSurfaceVariant</item>
+        <item name="hintTextAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="helperTextTextColor">?attr/dsColorOnSurfaceVariant</item>
+        <item name="errorTextAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="errorTextColor">?attr/dsColorDanger</item>
+        <item name="errorIconTint">?attr/dsColorDanger</item>
+        <item name="counterTextAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="counterTextColor">?attr/dsColorOnSurfaceVariant</item>
+        <item name="counterOverflowTextColor">?attr/dsColorDanger</item>
+        <item name="startIconTint">?attr/dsColorOnSurfaceVariant</item>
+        <item name="endIconTint">?attr/dsColorOnSurfaceVariant</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Ds.TextInputEditText</item>
+    </style>
+
+    <!-- Поиск: пилюля, лупа слева, очистка справа. -->
+    <style name="Widget.Ds.TextInputLayout.Search">
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Corner.Full</item>
+        <item name="boxStrokeWidthFocused">@dimen/ds_space_0</item>
+        <item name="startIconDrawable">@drawable/ds_ic_search</item>
+        <item name="endIconMode">clear_text</item>
+        <item name="hintEnabled">false</item>
+    </style>
+
+    <!-- Поле ввода сообщения в чате и комментариях. -->
+    <style name="Widget.Ds.TextInputLayout.Composer">
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Corner.Large</item>
+        <item name="boxStrokeWidthFocused">@dimen/ds_space_0</item>
+        <item name="hintEnabled">false</item>
+    </style>
+
+    <style name="ThemeOverlay.Ds.TextInputEditText" parent="">
+        <item name="editTextStyle">@style/Widget.Ds.TextInputEditText</item>
+    </style>
+
+    <style name="Widget.Ds.TextInputEditText" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:minHeight">@dimen/ds_size_input_height</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyLarge</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:paddingStart">@dimen/ds_space_4</item>
+        <item name="android:paddingEnd">@dimen/ds_space_4</item>
+    </style>
+
+    <!-- Переключатель: монохромный, строка настроек задаёт высоту 56+ dp. -->
+    <style name="Widget.Ds.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:minHeight">@dimen/ds_size_touch_target</item>
+        <item name="android:minWidth">@dimen/ds_size_touch_target</item>
+    </style>
+
+    <style name="Widget.Ds.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:minHeight">@dimen/ds_size_touch_target</item>
+        <item name="android:minWidth">@dimen/ds_size_touch_target</item>
+        <item name="buttonTint">@color/ds_content_on_surface</item>
+    </style>
+</resources>

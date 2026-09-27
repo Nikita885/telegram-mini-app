@@ -1,0 +1,95 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Фон экрана. Молочный днём, почти чёрный графит ночью. -->
+    <attr name="dsColorBackground" format="color" />
+    <!-- Основной текст и иконки на фоне. -->
+    <attr name="dsColorOnBackground" format="color" />
+    <!-- Поднятые поверхности: bottom sheet, диалоги, меню. -->
+    <attr name="dsColorSurface" format="color" />
+    <!-- Основной текст на поверхностях. -->
+    <attr name="dsColorOnSurface" format="color" />
+    <!-- Вторичный текст: подписи, мета, плейсхолдеры, неактивные иконки. -->
+    <attr name="dsColorOnSurfaceVariant" format="color" />
+    <!-- Утопленные зоны: плейсхолдер фото, поля ввода, плитка вещи. -->
+    <attr name="dsColorSurfaceSunken" format="color" />
+    <!-- M3 surfaceContainerLowest. -->
+    <attr name="dsColorSurfaceContainerLowest" format="color" />
+    <!-- M3 surfaceContainerLow. -->
+    <attr name="dsColorSurfaceContainerLow" format="color" />
+    <!-- M3 surfaceContainer: навбар, карточки настроек. -->
+    <attr name="dsColorSurfaceContainer" format="color" />
+    <!-- M3 surfaceContainerHigh: выбранный элемент навигации, тональные зоны. -->
+    <attr name="dsColorSurfaceContainerHigh" format="color" />
+    <!-- M3 surfaceContainerHighest: трек слайдера, разделители-плашки. -->
+    <attr name="dsColorSurfaceContainerHighest" format="color" />
+    <!-- Контур значимых элементов (поля, secondary-кнопка, чип). Контраст ≥ 3:1. -->
+    <attr name="dsColorOutline" format="color" />
+    <!-- Декоративные разделители. Контраст не нормируется. -->
+    <attr name="dsColorOutlineVariant" format="color" />
+    <!-- Главное действие (primary-кнопка). Графит днём, молочный ночью — монохром как в журнале. -->
+    <attr name="dsColorPrimary" format="color" />
+    <!-- Текст/иконка на primary. -->
+    <attr name="dsColorOnPrimary" format="color" />
+    <!-- Фирменный ультрамарин. Только «моменты»: лайк, непрочитанное, ссылки, фокус, snap-подсветка, прогресс. -->
+    <attr name="dsColorAccent" format="color" />
+    <!-- Контент на accent. -->
+    <attr name="dsColorOnAccent" format="color" />
+    <!-- Мягкая подложка акцента: выбранный фильтр-чип «Новое», инфо-баннер. -->
+    <attr name="dsColorAccentContainer" format="color" />
+    <!-- Контент на accentContainer. -->
+    <attr name="dsColorOnAccentContainer" format="color" />
+    <!-- Ошибки и разрушающие действия (удалить, выйти, заблокировать). -->
+    <attr name="dsColorDanger" format="color" />
+    <!-- Контент на danger. -->
+    <attr name="dsColorOnDanger" format="color" />
+    <!-- Подложка ошибки (баннер, поле с ошибкой). -->
+    <attr name="dsColorDangerContainer" format="color" />
+    <!-- Контент на dangerContainer. -->
+    <attr name="dsColorOnDangerContainer" format="color" />
+    <!-- Успех: вещь опубликована, качество кадра ок, онлайн. -->
+    <attr name="dsColorSuccess" format="color" />
+    <!-- Подложка успеха. -->
+    <attr name="dsColorSuccessContainer" format="color" />
+    <!-- Контент на successContainer. -->
+    <attr name="dsColorOnSuccessContainer" format="color" />
+    <!-- Предупреждение: слабый свет, низкий fit score, офлайн. -->
+    <attr name="dsColorWarning" format="color" />
+    <!-- Подложка предупреждения (офлайн-баннер). -->
+    <attr name="dsColorWarningContainer" format="color" />
+    <!-- Контент на warningContainer. -->
+    <attr name="dsColorOnWarningContainer" format="color" />
+    <!-- Снекбар, тултип. -->
+    <attr name="dsColorInverseSurface" format="color" />
+    <!-- Текст на inverseSurface. -->
+    <attr name="dsColorInverseOnSurface" format="color" />
+    <!-- Действие в снекбаре («Отменить»). -->
+    <attr name="dsColorInverseAccent" format="color" />
+    <!-- Заливка сердца. Совпадает с accent: лайк — главный эмоциональный момент бренда. -->
+    <attr name="dsColorLike" format="color" />
+    <!-- Кольцо клавиатурного/switch-фокуса. -->
+    <attr name="dsColorFocusRing" format="color" />
+    <!-- Затемнение под bottom sheet и диалогами. -->
+    <attr name="dsColorScrim" format="color" />
+    <!-- Нижний градиент на фото для подписи поверх изображения. -->
+    <attr name="dsColorPhotoScrim" format="color" />
+    <!-- Текст/иконки поверх фото (всегда на photoScrim). -->
+    <attr name="dsColorOnPhoto" format="color" />
+    <!-- Основа скелетона: заметно темнее фона, чтобы форма контента читалась. -->
+    <attr name="dsColorSkeletonBase" format="color" />
+    <!-- Блик шиммера. -->
+    <attr name="dsColorSkeletonHighlight" format="color" />
+    <!-- Фон холста конструктора (студийная «бумага»). -->
+    <attr name="dsColorCanvas" format="color" />
+    <!-- Заливка манекена. -->
+    <attr name="dsColorMannequin" format="color" />
+    <!-- Подсветка зоны примагничивания на манекене. -->
+    <attr name="dsColorSnapGuide" format="color" />
+    <!-- Рамка выбранного слоя / доводимой точки. -->
+    <attr name="dsColorSelection" format="color" />
+    <!-- Фон камеры Студии — всегда тёмный, чтобы не засвечивать кадр. -->
+    <attr name="dsColorCameraBackground" format="color" />
+    <!-- Контролы поверх камеры. -->
+    <attr name="dsColorOnCamera" format="color" />
+    <attr name="dsColorOnAvatar" format="color" />
+</resources>

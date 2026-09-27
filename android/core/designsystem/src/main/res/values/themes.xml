@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Иерархия темы:
+        Theme.Material3.DayNight.NoActionBar
+          └ Base.V0.Theme.Ds      — цвета из токенов (сгенерировано, ds_tokens_themes.xml)
+            └ Platform.Theme.Ds   — системные бары по API (themes_platform.xml)
+              └ Base.Theme.Ds     — типографика, формы, стили компонентов
+                └ Theme.Ds        — тема приложения
+    -->
+    <style name="Base.Theme.Ds" parent="Platform.Theme.Ds">
+        <item name="android:windowBackground">?attr/dsColorBackground</item>
+
+        <!-- Типографика -->
+        <item name="fontFamily">@font/ds_text_regular</item>
+        <item name="android:fontFamily">@font/ds_text_regular</item>
+        <item name="textAppearanceDisplayLarge">@style/TextAppearance.Ds.DisplayLarge</item>
+        <item name="textAppearanceDisplayMedium">@style/TextAppearance.Ds.DisplayMedium</item>
+        <item name="textAppearanceDisplaySmall">@style/TextAppearance.Ds.DisplaySmall</item>
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.Ds.HeadlineLarge</item>
+        <item name="textAppearanceHeadlineMedium">@style/TextAppearance.Ds.HeadlineMedium</item>
+        <item name="textAppearanceHeadlineSmall">@style/TextAppearance.Ds.HeadlineSmall</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Ds.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.Ds.TitleMedium</item>
+        <item name="textAppearanceTitleSmall">@style/TextAppearance.Ds.TitleSmall</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Ds.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Ds.BodyMedium</item>
+        <item name="textAppearanceBodySmall">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="textAppearanceLabelMedium">@style/TextAppearance.Ds.LabelMedium</item>
+        <item name="textAppearanceLabelSmall">@style/TextAppearance.Ds.LabelSmall</item>
+
+        <!-- Формы -->
+        <item name="shapeAppearanceCornerExtraSmall">@style/ShapeAppearance.Ds.Corner.ExtraSmall</item>
+        <item name="shapeAppearanceCornerSmall">@style/ShapeAppearance.Ds.Corner.Small</item>
+        <item name="shapeAppearanceCornerMedium">@style/ShapeAppearance.Ds.Corner.Medium</item>
+        <item name="shapeAppearanceCornerLarge">@style/ShapeAppearance.Ds.Corner.Large</item>
+        <item name="shapeAppearanceCornerExtraLarge">@style/ShapeAppearance.Ds.Corner.ExtraLarge</item>
+
+        <!-- Стили Material-компонентов по умолчанию -->
+        <item name="materialButtonStyle">@style/Widget.Ds.Button.Primary</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Ds.Button.Secondary</item>
+        <item name="borderlessButtonStyle">@style/Widget.Ds.Button.Ghost</item>
+        <item name="materialIconButtonStyle">@style/Widget.Ds.Button.Icon</item>
+        <item name="chipStyle">@style/Widget.Ds.Chip.Filter</item>
+        <item name="chipGroupStyle">@style/Widget.Ds.ChipGroup</item>
+        <item name="toolbarStyle">@style/Widget.Ds.Toolbar</item>
+        <item name="appBarLayoutStyle">@style/Widget.Ds.AppBarLayout</item>
+        <item name="collapsingToolbarLayoutLargeStyle">@style/Widget.Ds.CollapsingToolbar.Large</item>
+        <item name="bottomNavigationStyle">@style/Widget.Ds.BottomNavigation</item>
+        <item name="tabStyle">@style/Widget.Ds.TabLayout</item>
+        <item name="textInputStyle">@style/Widget.Ds.TextInputLayout</item>
+        <item name="materialSwitchStyle">@style/Widget.Ds.Switch</item>
+        <item name="checkboxStyle">@style/Widget.Ds.CheckBox</item>
+        <item name="snackbarStyle">@style/Widget.Ds.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/Widget.Ds.Snackbar.TextView</item>
+        <item name="snackbarButtonStyle">@style/Widget.Ds.Snackbar.Button</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Ds.MaterialAlertDialog</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Ds.BottomSheetDialog</item>
+        <item name="bottomSheetDragHandleStyle">@style/Widget.Ds.BottomSheet.DragHandle</item>
+        <item name="linearProgressIndicatorStyle">@style/Widget.Ds.LinearProgress</item>
+        <item name="circularProgressIndicatorStyle">@style/Widget.Ds.CircularProgress</item>
+        <item name="badgeStyle">@style/Widget.Ds.Badge</item>
+        <item name="materialDividerStyle">@style/Widget.Ds.Divider</item>
+        <item name="materialCardViewStyle">@style/Widget.Ds.Card</item>
+
+        <!-- Собственные компоненты -->
+        <item name="dsPhotoStyle">@style/Widget.Ds.Photo</item>
+        <item name="dsOutfitCardStyle">@style/Widget.Ds.OutfitCard</item>
+        <item name="dsItemCardStyle">@style/Widget.Ds.ItemCard</item>
+        <item name="dsAvatarStyle">@style/Widget.Ds.Avatar</item>
+        <item name="dsLikeButtonStyle">@style/Widget.Ds.LikeButton</item>
+        <item name="dsStateViewStyle">@style/Widget.Ds.StateView</item>
+        <item name="dsListRowStyle">@style/Widget.Ds.ListRow</item>
+        <item name="dsSkeletonStyle">@style/Widget.Ds.Skeleton</item>
+        <item name="dsOfflineBannerStyle">@style/Widget.Ds.OfflineBanner</item>
+        <item name="dsFilterChipGroupStyle">@style/Widget.Ds.FilterChipGroup</item>
+
+        <!-- Переходы между экранами (fragment-переходы используют эти длительности) -->
+        <item name="motionDurationLong1">@integer/ds_motion_duration_long</item>
+        <item name="motionDurationMedium2">@integer/ds_motion_duration_medium</item>
+        <item name="motionDurationShort2">@integer/ds_motion_duration_short</item>
+        <item name="motionEasingStandardInterpolator">@interpolator/ds_easing_standard</item>
+        <item name="motionEasingEmphasizedDecelerateInterpolator">@interpolator/ds_easing_emphasized_decelerate</item>
+        <item name="motionEasingEmphasizedAccelerateInterpolator">@interpolator/ds_easing_emphasized_accelerate</item>
+    </style>
+
+    <!-- Тема приложения. -->
+    <style name="Theme.Ds" parent="Base.Theme.Ds" />
+
+    <!--
+        Экраны Студии с камерой: окно всегда тёмное. Корню разметки камеры задайте
+        android:theme="@style/ThemeOverlay.Ds.Dark", чтобы компоненты взяли тёмную палитру.
+    -->
+    <style name="Theme.Ds.Camera" parent="Theme.Ds">
+        <item name="android:windowBackground">?attr/dsColorCameraBackground</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Системный сплэш (androidx.core:core-splashscreen): фон — молочный/графит, знак — вешалка. -->
+    <style name="Theme.Ds.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ds_color_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ds_splash_mark</item>
+        <item name="windowSplashScreenAnimationDuration">@integer/ds_motion_duration_splash_min</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ds</item>
+    </style>
+</resources>

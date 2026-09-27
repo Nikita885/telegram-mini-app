@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Каркас bottom sheet: ручка (доступна TalkBack), заголовок-антиква, контент. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:id="@+id/ds_sheet_handle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/ds_sheet_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_space_4"
+        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+        android:textColor="?attr/dsColorOnSurface"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/ds_sheet_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

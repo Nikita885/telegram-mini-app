@@ -1,0 +1,191 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Сплэш, онбординг, обложки коллекций. -->
+    <style name="TextAppearance.Ds.DisplayLarge" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_regular</item>
+        <item name="android:fontFamily">@font/ds_display_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_display_large_size</item>
+        <item name="lineHeight">@dimen/ds_type_display_large_line_height</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Заголовок экрана в hero-зоне (профиль, Студия). -->
+    <style name="TextAppearance.Ds.DisplayMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_regular</item>
+        <item name="android:fontFamily">@font/ds_display_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_display_medium_size</item>
+        <item name="lineHeight">@dimen/ds_type_display_medium_line_height</item>
+        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Большой заголовок экрана (large top app bar). -->
+    <style name="TextAppearance.Ds.DisplaySmall" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_regular</item>
+        <item name="android:fontFamily">@font/ds_display_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_display_small_size</item>
+        <item name="lineHeight">@dimen/ds_type_display_small_line_height</item>
+        <item name="android:letterSpacing">-0.005</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Заголовок раздела, пустые состояния. -->
+    <style name="TextAppearance.Ds.HeadlineLarge" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_regular</item>
+        <item name="android:fontFamily">@font/ds_display_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_headline_large_size</item>
+        <item name="lineHeight">@dimen/ds_type_headline_large_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Заголовок диалога, bottom sheet. -->
+    <style name="TextAppearance.Ds.HeadlineMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_medium</item>
+        <item name="android:fontFamily">@font/ds_display_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_headline_medium_size</item>
+        <item name="lineHeight">@dimen/ds_type_headline_medium_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Имя в профиле, заголовок карточки коллекции. -->
+    <style name="TextAppearance.Ds.HeadlineSmall" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_medium</item>
+        <item name="android:fontFamily">@font/ds_display_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_headline_small_size</item>
+        <item name="lineHeight">@dimen/ds_type_headline_small_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Курсивная подпись к образу, цитата. -->
+    <style name="TextAppearance.Ds.EditorialQuote" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_italic</item>
+        <item name="android:fontFamily">@font/ds_display_italic</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_editorial_quote_size</item>
+        <item name="lineHeight">@dimen/ds_type_editorial_quote_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Счётчики профиля (образы, подписчики). -->
+    <style name="TextAppearance.Ds.Numeral" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_display_medium</item>
+        <item name="android:fontFamily">@font/ds_display_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_numeral_size</item>
+        <item name="lineHeight">@dimen/ds_type_numeral_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Заголовок top app bar, заголовок строки. -->
+    <style name="TextAppearance.Ds.TitleLarge" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_semibold</item>
+        <item name="android:fontFamily">@font/ds_text_semibold</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_title_large_size</item>
+        <item name="lineHeight">@dimen/ds_type_title_large_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Имя автора, название вещи. -->
+    <style name="TextAppearance.Ds.TitleMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_semibold</item>
+        <item name="android:fontFamily">@font/ds_text_semibold</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_title_medium_size</item>
+        <item name="lineHeight">@dimen/ds_type_title_medium_line_height</item>
+        <item name="android:letterSpacing">0.005</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Подзаголовки списков. -->
+    <style name="TextAppearance.Ds.TitleSmall" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_medium</item>
+        <item name="android:fontFamily">@font/ds_text_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_title_small_size</item>
+        <item name="lineHeight">@dimen/ds_type_title_small_line_height</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Основной текст, сообщения чата, поля ввода. -->
+    <style name="TextAppearance.Ds.BodyLarge" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_regular</item>
+        <item name="android:fontFamily">@font/ds_text_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_body_large_size</item>
+        <item name="lineHeight">@dimen/ds_type_body_large_line_height</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Комментарии, описания, строки списков. -->
+    <style name="TextAppearance.Ds.BodyMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_regular</item>
+        <item name="android:fontFamily">@font/ds_text_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_body_medium_size</item>
+        <item name="lineHeight">@dimen/ds_type_body_medium_line_height</item>
+        <item name="android:letterSpacing">0.005</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Мета: время, счётчики, подсказки. -->
+    <style name="TextAppearance.Ds.BodySmall" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_regular</item>
+        <item name="android:fontFamily">@font/ds_text_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_body_small_size</item>
+        <item name="lineHeight">@dimen/ds_type_body_small_line_height</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Кнопки, табы. -->
+    <style name="TextAppearance.Ds.LabelLarge" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_medium</item>
+        <item name="android:fontFamily">@font/ds_text_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_label_large_size</item>
+        <item name="lineHeight">@dimen/ds_type_label_large_line_height</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Чипы, бейджи-текст, подписи иконок навбара. -->
+    <style name="TextAppearance.Ds.LabelMedium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_medium</item>
+        <item name="android:fontFamily">@font/ds_text_medium</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_label_medium_size</item>
+        <item name="lineHeight">@dimen/ds_type_label_medium_line_height</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="textAllCaps">false</item>
+    </style>
+    <!-- Кикер/надзаголовок в журнальном стиле: «НОВОЕ», «СТУДИЯ». -->
+    <style name="TextAppearance.Ds.LabelSmall" parent="TextAppearance.Material3.BodyMedium">
+        <item name="fontFamily">@font/ds_text_semibold</item>
+        <item name="android:fontFamily">@font/ds_text_semibold</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/ds_type_label_small_size</item>
+        <item name="lineHeight">@dimen/ds_type_label_small_line_height</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="textAllCaps">true</item>
+    </style>
+</resources>

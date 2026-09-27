@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Лёгкое «вдавливание» карточек при нажатии (touch и клавиатура). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <set>
+            <objectAnimator
+                android:duration="@integer/ds_motion_duration_micro"
+                android:interpolator="@interpolator/ds_easing_standard"
+                android:propertyName="scaleX"
+                android:valueTo="@dimen/ds_motion_press_scale"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:duration="@integer/ds_motion_duration_micro"
+                android:interpolator="@interpolator/ds_easing_standard"
+                android:propertyName="scaleY"
+                android:valueTo="@dimen/ds_motion_press_scale"
+                android:valueType="floatType" />
+        </set>
+    </item>
+    <item>
+        <set>
+            <objectAnimator
+                android:duration="@integer/ds_motion_duration_short"
+                android:interpolator="@interpolator/ds_easing_emphasized_decelerate"
+                android:propertyName="scaleX"
+                android:valueTo="1"
+                android:valueType="floatType" />
+            <objectAnimator
+                android:duration="@integer/ds_motion_duration_short"
+                android:interpolator="@interpolator/ds_easing_emphasized_decelerate"
+                android:propertyName="scaleY"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </set>
+    </item>
+</selector>

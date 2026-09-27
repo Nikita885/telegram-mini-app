@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ошибка загрузки: распущенная нить. СГЕНЕРИРОВАНО tools/designsystem/illustrations.py -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ds_size_illustration"
+    android:height="@dimen/ds_size_illustration"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <path
+        android:fillColor="?attr/dsColorSurface"
+        android:pathData="M42,40 H78 A2,2 0 0,1 80,42 V46 A2,2 0 0,1 78,48 H42 A2,2 0 0,1 40,46 V42 A2,2 0 0,1 42,40 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M46,48 H74 V88 H46 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M48,55 H72"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M48,62 H72"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M48,69 H72"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M48,76 H72"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M48,83 H72"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.5" />
+    <path
+        android:fillColor="?attr/dsColorSurface"
+        android:pathData="M42,88 H78 A2,2 0 0,1 80,90 V94 A2,2 0 0,1 78,96 H42 A2,2 0 0,1 40,94 V90 A2,2 0 0,1 42,88 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M74,60 C96,56 104,72 96,82 C88,92 104,100 114,92 C124,84 116,72 108,80 C100,88 112,108 124,112 C132,114 136,120 132,128"
+        android:strokeColor="?attr/dsColorAccent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+</vector>

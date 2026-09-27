@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Знак на системном сплэше (Android 12+): вешалка — наследие логотипа Outfit Share.
+    Холст 240×240 dp, содержимое внутри круга 160 dp. Цвет — ресурс, а не атрибут:
+    тема сплэша не содержит атрибутов дизайн-системы.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+    <path
+        android:pathData="M110,84 A10,10 0 1,1 126,92 Q120,96 120,104 M120,104 L66,146 L174,146 Z"
+        android:strokeWidth="5"
+        android:strokeColor="@color/ds_color_on_background"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="@color/ds_color_accent"
+        android:pathData="M120,160 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+</vector>

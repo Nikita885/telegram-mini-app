@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Сгенерированные токены и иконки не должны давать ложных срабатываний. -->
+    <issue id="UnusedResources" severity="ignore" />
+    <!-- Строки интерфейса на русском — основной язык продукта; перевод появится вместе с values-en. -->
+    <issue id="MissingTranslation" severity="warning" />
+    <!-- Нарушения доступности — ошибки, а не предупреждения. -->
+    <issue id="ContentDescription" severity="error" />
+    <issue id="ClickableViewAccessibility" severity="error" />
+    <issue id="KeyboardInaccessibleWidget" severity="error" />
+    <issue id="SpUsage" severity="error" />
+    <issue id="SmallSp" severity="error" />
+    <issue id="HardcodedText" severity="error" />
+    <issue id="RtlHardcoded" severity="error" />
+</lint>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Нет подписчиков / подписок. СГЕНЕРИРОВАНО tools/designsystem/illustrations.py -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ds_size_illustration"
+    android:height="@dimen/ds_size_illustration"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M50,56 A14,14 0 1,0 78,56 A14,14 0 1,0 50,56 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M36,112 C36,90 48,80 64,80 C80,80 92,90 92,112 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurface"
+        android:pathData="M84,66 A14,14 0 1,0 112,66 A14,14 0 1,0 84,66 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurface"
+        android:pathData="M70,122 C70,100 82,90 98,90 C114,90 126,100 126,122 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M115,44 A9,9 0 1,0 133,44 A9,9 0 1,0 115,44 Z" />
+    <path
+        android:pathData="M124,39.5 V48.5 M119.5,44 H128.5"
+        android:strokeColor="?attr/dsColorSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+</vector>

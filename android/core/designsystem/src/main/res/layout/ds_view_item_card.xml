@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Карточка вещи: вырезанная вещь на «бумажной» плитке 1:1, название и подпись. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:id="@+id/ds_item_tile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ds_bg_item_tile">
+
+        <app.outfitshare.core.designsystem.component.image.AspectRatioImageView
+            android:id="@+id/ds_item_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:importantForAccessibility="no"
+            android:padding="@dimen/ds_space_3"
+            android:scaleType="fitCenter"
+            app:dsAspectRatio="@string/ds_aspect_item"
+            app:shapeAppearance="@style/ShapeAppearance.Ds.ItemTile" />
+
+        <View
+            android:id="@+id/ds_item_selection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ds_bg_item_tile_selected"
+            android:duplicateParentState="true"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ds_item_check"
+            android:layout_width="@dimen/ds_size_icon"
+            android:layout_height="@dimen/ds_size_icon"
+            android:layout_gravity="top|end"
+            android:layout_margin="@dimen/ds_space_2"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ds_ic_check_circle"
+            android:visibility="gone"
+            app:tint="?attr/dsColorSelection" />
+
+        <TextView
+            android:id="@+id/ds_item_badge"
+            style="@style/Widget.Ds.TextBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/ds_space_2"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/ds_item_action"
+            style="@style/Widget.Ds.Button.Icon.Tonal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:contentDescription="@string/ds_a11y_add_item"
+            android:visibility="gone"
+            app:icon="@drawable/ds_ic_add" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/ds_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textColor="?attr/dsColorOnSurface" />
+
+    <TextView
+        android:id="@+id/ds_item_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/dsColorOnSurfaceVariant" />
+</merge>

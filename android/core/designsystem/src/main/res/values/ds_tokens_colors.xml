@@ -1,0 +1,215 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Семантические цвета, светлая тема -->
+    <color name="ds_light_background">#FFF6F2EB</color>
+    <color name="ds_light_on_background">#FF1C1B19</color>
+    <color name="ds_light_surface">#FFFCFAF6</color>
+    <color name="ds_light_on_surface">#FF1C1B19</color>
+    <color name="ds_light_on_surface_variant">#FF6B6358</color>
+    <color name="ds_light_surface_sunken">#FFEFE9DF</color>
+    <color name="ds_light_surface_container_lowest">#FFFCFAF6</color>
+    <color name="ds_light_surface_container_low">#FFF6F2EB</color>
+    <color name="ds_light_surface_container">#FFF1ECE4</color>
+    <color name="ds_light_surface_container_high">#FFEAE3D8</color>
+    <color name="ds_light_surface_container_highest">#FFE4DCCF</color>
+    <color name="ds_light_outline">#FF857C70</color>
+    <color name="ds_light_outline_variant">#FFE4DCCF</color>
+    <color name="ds_light_primary">#FF1C1B19</color>
+    <color name="ds_light_on_primary">#FFFCFAF6</color>
+    <color name="ds_light_accent">#FF2F3BD6</color>
+    <color name="ds_light_on_accent">#FFFFFFFF</color>
+    <color name="ds_light_accent_container">#FFE6E8FF</color>
+    <color name="ds_light_on_accent_container">#FF1A2080</color>
+    <color name="ds_light_danger">#FFB42318</color>
+    <color name="ds_light_on_danger">#FFFCFAF6</color>
+    <color name="ds_light_danger_container">#FFFBE3DF</color>
+    <color name="ds_light_on_danger_container">#FF6E140D</color>
+    <color name="ds_light_success">#FF1A6E3E</color>
+    <color name="ds_light_success_container">#FFDDF1E4</color>
+    <color name="ds_light_on_success_container">#FF0B3A20</color>
+    <color name="ds_light_warning">#FF8A5300</color>
+    <color name="ds_light_warning_container">#FFFBEFD5</color>
+    <color name="ds_light_on_warning_container">#FF3A2400</color>
+    <color name="ds_light_inverse_surface">#FF1C1B19</color>
+    <color name="ds_light_inverse_on_surface">#FFF6F2EB</color>
+    <color name="ds_light_inverse_accent">#FFA3ABFF</color>
+    <color name="ds_light_like">#FF2F3BD6</color>
+    <color name="ds_light_focus_ring">#FF2F3BD6</color>
+    <color name="ds_light_scrim">#7A1C1B19</color>
+    <color name="ds_light_photo_scrim">#8C000000</color>
+    <color name="ds_light_on_photo">#FFFFFFFF</color>
+    <color name="ds_light_skeleton_base">#FFE4DCCF</color>
+    <color name="ds_light_skeleton_highlight">#FFFCFAF6</color>
+    <color name="ds_light_canvas">#FFEFE9DF</color>
+    <color name="ds_light_mannequin">#FFD8D2C9</color>
+    <color name="ds_light_snap_guide">#662F3BD6</color>
+    <color name="ds_light_selection">#FF2F3BD6</color>
+    <color name="ds_light_camera_background">#FF0B0B0A</color>
+    <color name="ds_light_on_camera">#FFF6F2EB</color>
+
+    <!-- Семантические цвета, тёмная тема -->
+    <color name="ds_dark_background">#FF131211</color>
+    <color name="ds_dark_on_background">#FFF6F2EB</color>
+    <color name="ds_dark_surface">#FF1C1B19</color>
+    <color name="ds_dark_on_surface">#FFF6F2EB</color>
+    <color name="ds_dark_on_surface_variant">#FFB8AEA1</color>
+    <color name="ds_dark_surface_sunken">#FF221F1D</color>
+    <color name="ds_dark_surface_container_lowest">#FF131211</color>
+    <color name="ds_dark_surface_container_low">#FF1C1B19</color>
+    <color name="ds_dark_surface_container">#FF262422</color>
+    <color name="ds_dark_surface_container_high">#FF2F2D2A</color>
+    <color name="ds_dark_surface_container_highest">#FF3A3733</color>
+    <color name="ds_dark_outline">#FF8A8175</color>
+    <color name="ds_dark_outline_variant">#FF3A3733</color>
+    <color name="ds_dark_primary">#FFF6F2EB</color>
+    <color name="ds_dark_on_primary">#FF1C1B19</color>
+    <color name="ds_dark_accent">#FFA3ABFF</color>
+    <color name="ds_dark_on_accent">#FF10144F</color>
+    <color name="ds_dark_accent_container">#FF262C8A</color>
+    <color name="ds_dark_on_accent_container">#FFE6E8FF</color>
+    <color name="ds_dark_danger">#FFFFB4A9</color>
+    <color name="ds_dark_on_danger">#FF410A05</color>
+    <color name="ds_dark_danger_container">#FF6E140D</color>
+    <color name="ds_dark_on_danger_container">#FFFBE3DF</color>
+    <color name="ds_dark_success">#FF86D0A2</color>
+    <color name="ds_dark_success_container">#FF123D25</color>
+    <color name="ds_dark_on_success_container">#FFDDF1E4</color>
+    <color name="ds_dark_warning">#FFF1C267</color>
+    <color name="ds_dark_warning_container">#FF3F2A06</color>
+    <color name="ds_dark_on_warning_container">#FFFBEFD5</color>
+    <color name="ds_dark_inverse_surface">#FFF6F2EB</color>
+    <color name="ds_dark_inverse_on_surface">#FF1C1B19</color>
+    <color name="ds_dark_inverse_accent">#FF2F3BD6</color>
+    <color name="ds_dark_like">#FFA3ABFF</color>
+    <color name="ds_dark_focus_ring">#FFA3ABFF</color>
+    <color name="ds_dark_scrim">#A3000000</color>
+    <color name="ds_dark_photo_scrim">#99000000</color>
+    <color name="ds_dark_on_photo">#FFFFFFFF</color>
+    <color name="ds_dark_skeleton_base">#FF262422</color>
+    <color name="ds_dark_skeleton_highlight">#FF2F2D2A</color>
+    <color name="ds_dark_canvas">#FF221F1D</color>
+    <color name="ds_dark_mannequin">#FF3A3733</color>
+    <color name="ds_dark_snap_guide">#80A3ABFF</color>
+    <color name="ds_dark_selection">#FFA3ABFF</color>
+    <color name="ds_dark_camera_background">#FF0B0B0A</color>
+    <color name="ds_dark_on_camera">#FFF6F2EB</color>
+
+    <!-- Палитра аватаров-инициалов -->
+    <color name="ds_light_avatar_sand">#FFE5D3BC</color>
+    <color name="ds_dark_avatar_sand">#FF5A4A38</color>
+    <color name="ds_light_avatar_sage">#FFCCD5C0</color>
+    <color name="ds_dark_avatar_sage">#FF3F4A3A</color>
+    <color name="ds_light_avatar_mist">#FFC9D3DC</color>
+    <color name="ds_dark_avatar_mist">#FF3A4652</color>
+    <color name="ds_light_avatar_blush">#FFE6CFCB</color>
+    <color name="ds_dark_avatar_blush">#FF5A3F3C</color>
+    <color name="ds_light_avatar_lavender">#FFD6D1E6</color>
+    <color name="ds_dark_avatar_lavender">#FF45405A</color>
+    <color name="ds_light_avatar_ochre">#FFE4CE9C</color>
+    <color name="ds_dark_avatar_ochre">#FF5A4A22</color>
+    <color name="ds_light_avatar_stone">#FFD8D2C9</color>
+    <color name="ds_dark_avatar_stone">#FF4A4540</color>
+    <color name="ds_light_on_avatar">#FF1C1B19</color>
+    <color name="ds_dark_on_avatar">#FFF6F2EB</color>
+
+    <!-- Семантические алиасы: переключаются квалификатором -night -->
+    <!-- Фон экрана. Молочный днём, почти чёрный графит ночью. -->
+    <color name="ds_color_background">@color/ds_light_background</color>
+    <!-- Основной текст и иконки на фоне. -->
+    <color name="ds_color_on_background">@color/ds_light_on_background</color>
+    <!-- Поднятые поверхности: bottom sheet, диалоги, меню. -->
+    <color name="ds_color_surface">@color/ds_light_surface</color>
+    <!-- Основной текст на поверхностях. -->
+    <color name="ds_color_on_surface">@color/ds_light_on_surface</color>
+    <!-- Вторичный текст: подписи, мета, плейсхолдеры, неактивные иконки. -->
+    <color name="ds_color_on_surface_variant">@color/ds_light_on_surface_variant</color>
+    <!-- Утопленные зоны: плейсхолдер фото, поля ввода, плитка вещи. -->
+    <color name="ds_color_surface_sunken">@color/ds_light_surface_sunken</color>
+    <!-- M3 surfaceContainerLowest. -->
+    <color name="ds_color_surface_container_lowest">@color/ds_light_surface_container_lowest</color>
+    <!-- M3 surfaceContainerLow. -->
+    <color name="ds_color_surface_container_low">@color/ds_light_surface_container_low</color>
+    <!-- M3 surfaceContainer: навбар, карточки настроек. -->
+    <color name="ds_color_surface_container">@color/ds_light_surface_container</color>
+    <!-- M3 surfaceContainerHigh: выбранный элемент навигации, тональные зоны. -->
+    <color name="ds_color_surface_container_high">@color/ds_light_surface_container_high</color>
+    <!-- M3 surfaceContainerHighest: трек слайдера, разделители-плашки. -->
+    <color name="ds_color_surface_container_highest">@color/ds_light_surface_container_highest</color>
+    <!-- Контур значимых элементов (поля, secondary-кнопка, чип). Контраст ≥ 3:1. -->
+    <color name="ds_color_outline">@color/ds_light_outline</color>
+    <!-- Декоративные разделители. Контраст не нормируется. -->
+    <color name="ds_color_outline_variant">@color/ds_light_outline_variant</color>
+    <!-- Главное действие (primary-кнопка). Графит днём, молочный ночью — монохром как в журнале. -->
+    <color name="ds_color_primary">@color/ds_light_primary</color>
+    <!-- Текст/иконка на primary. -->
+    <color name="ds_color_on_primary">@color/ds_light_on_primary</color>
+    <!-- Фирменный ультрамарин. Только «моменты»: лайк, непрочитанное, ссылки, фокус, snap-подсветка, прогресс. -->
+    <color name="ds_color_accent">@color/ds_light_accent</color>
+    <!-- Контент на accent. -->
+    <color name="ds_color_on_accent">@color/ds_light_on_accent</color>
+    <!-- Мягкая подложка акцента: выбранный фильтр-чип «Новое», инфо-баннер. -->
+    <color name="ds_color_accent_container">@color/ds_light_accent_container</color>
+    <!-- Контент на accentContainer. -->
+    <color name="ds_color_on_accent_container">@color/ds_light_on_accent_container</color>
+    <!-- Ошибки и разрушающие действия (удалить, выйти, заблокировать). -->
+    <color name="ds_color_danger">@color/ds_light_danger</color>
+    <!-- Контент на danger. -->
+    <color name="ds_color_on_danger">@color/ds_light_on_danger</color>
+    <!-- Подложка ошибки (баннер, поле с ошибкой). -->
+    <color name="ds_color_danger_container">@color/ds_light_danger_container</color>
+    <!-- Контент на dangerContainer. -->
+    <color name="ds_color_on_danger_container">@color/ds_light_on_danger_container</color>
+    <!-- Успех: вещь опубликована, качество кадра ок, онлайн. -->
+    <color name="ds_color_success">@color/ds_light_success</color>
+    <!-- Подложка успеха. -->
+    <color name="ds_color_success_container">@color/ds_light_success_container</color>
+    <!-- Контент на successContainer. -->
+    <color name="ds_color_on_success_container">@color/ds_light_on_success_container</color>
+    <!-- Предупреждение: слабый свет, низкий fit score, офлайн. -->
+    <color name="ds_color_warning">@color/ds_light_warning</color>
+    <!-- Подложка предупреждения (офлайн-баннер). -->
+    <color name="ds_color_warning_container">@color/ds_light_warning_container</color>
+    <!-- Контент на warningContainer. -->
+    <color name="ds_color_on_warning_container">@color/ds_light_on_warning_container</color>
+    <!-- Снекбар, тултип. -->
+    <color name="ds_color_inverse_surface">@color/ds_light_inverse_surface</color>
+    <!-- Текст на inverseSurface. -->
+    <color name="ds_color_inverse_on_surface">@color/ds_light_inverse_on_surface</color>
+    <!-- Действие в снекбаре («Отменить»). -->
+    <color name="ds_color_inverse_accent">@color/ds_light_inverse_accent</color>
+    <!-- Заливка сердца. Совпадает с accent: лайк — главный эмоциональный момент бренда. -->
+    <color name="ds_color_like">@color/ds_light_like</color>
+    <!-- Кольцо клавиатурного/switch-фокуса. -->
+    <color name="ds_color_focus_ring">@color/ds_light_focus_ring</color>
+    <!-- Затемнение под bottom sheet и диалогами. -->
+    <color name="ds_color_scrim">@color/ds_light_scrim</color>
+    <!-- Нижний градиент на фото для подписи поверх изображения. -->
+    <color name="ds_color_photo_scrim">@color/ds_light_photo_scrim</color>
+    <!-- Текст/иконки поверх фото (всегда на photoScrim). -->
+    <color name="ds_color_on_photo">@color/ds_light_on_photo</color>
+    <!-- Основа скелетона: заметно темнее фона, чтобы форма контента читалась. -->
+    <color name="ds_color_skeleton_base">@color/ds_light_skeleton_base</color>
+    <!-- Блик шиммера. -->
+    <color name="ds_color_skeleton_highlight">@color/ds_light_skeleton_highlight</color>
+    <!-- Фон холста конструктора (студийная «бумага»). -->
+    <color name="ds_color_canvas">@color/ds_light_canvas</color>
+    <!-- Заливка манекена. -->
+    <color name="ds_color_mannequin">@color/ds_light_mannequin</color>
+    <!-- Подсветка зоны примагничивания на манекене. -->
+    <color name="ds_color_snap_guide">@color/ds_light_snap_guide</color>
+    <!-- Рамка выбранного слоя / доводимой точки. -->
+    <color name="ds_color_selection">@color/ds_light_selection</color>
+    <!-- Фон камеры Студии — всегда тёмный, чтобы не засвечивать кадр. -->
+    <color name="ds_color_camera_background">@color/ds_light_camera_background</color>
+    <!-- Контролы поверх камеры. -->
+    <color name="ds_color_on_camera">@color/ds_light_on_camera</color>
+    <color name="ds_color_avatar_sand">@color/ds_light_avatar_sand</color>
+    <color name="ds_color_avatar_sage">@color/ds_light_avatar_sage</color>
+    <color name="ds_color_avatar_mist">@color/ds_light_avatar_mist</color>
+    <color name="ds_color_avatar_blush">@color/ds_light_avatar_blush</color>
+    <color name="ds_color_avatar_lavender">@color/ds_light_avatar_lavender</color>
+    <color name="ds_color_avatar_ochre">@color/ds_light_avatar_ochre</color>
+    <color name="ds_color_avatar_stone">@color/ds_light_avatar_stone</color>
+    <color name="ds_color_on_avatar">@color/ds_light_on_avatar</color>
+</resources>

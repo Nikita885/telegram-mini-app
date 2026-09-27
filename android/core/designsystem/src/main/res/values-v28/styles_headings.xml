@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.Ds.Text.ScreenTitle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.DisplaySmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+        <item name="android:accessibilityHeading">true</item>
+    </style>
+
+    <style name="Widget.Ds.Text.SectionTitle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.HeadlineSmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+        <item name="android:accessibilityHeading">true</item>
+    </style>
+</resources>

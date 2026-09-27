@@ -1,0 +1,6 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <integer name="ds_feed_columns">3</integer>
+    <integer name="ds_grid_columns">4</integer>
+</resources>

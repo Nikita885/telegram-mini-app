@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Стили компонентов по умолчанию, задаются темой Theme.Ds. -->
+    <attr name="dsOutfitCardStyle" format="reference" />
+    <attr name="dsItemCardStyle" format="reference" />
+    <attr name="dsAvatarStyle" format="reference" />
+    <attr name="dsLikeButtonStyle" format="reference" />
+    <attr name="dsStateViewStyle" format="reference" />
+    <attr name="dsListRowStyle" format="reference" />
+    <attr name="dsSkeletonStyle" format="reference" />
+    <attr name="dsOfflineBannerStyle" format="reference" />
+    <attr name="dsPhotoStyle" format="reference" />
+    <attr name="dsFilterChipGroupStyle" format="reference" />
+
+    <declare-styleable name="AspectRatioImageView">
+        <!-- Пропорции «ширина:высота», например 4:5 для образа, 1:1 для вещи. -->
+        <attr name="dsAspectRatio" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="AvatarView">
+        <attr name="dsAvatarSize" format="enum">
+            <enum name="xs" value="0" />
+            <enum name="s" value="1" />
+            <enum name="m" value="2" />
+            <enum name="l" value="3" />
+            <enum name="xl" value="4" />
+            <enum name="xxl" value="5" />
+        </attr>
+        <!-- true — аватар рядом с именем: TalkBack его пропускает, чтобы не читать имя дважды. -->
+        <attr name="dsAvatarDecorative" format="boolean" />
+        <attr name="dsAvatarShowOnline" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="OutfitCardView">
+        <attr name="dsShowCaption" format="boolean" />
+        <attr name="dsShowAuthor" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ItemCardView">
+        <attr name="dsItemShowAction" format="boolean" />
+        <attr name="dsItemTitle" format="string" />
+        <attr name="dsItemSubtitle" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="LikeButton">
+        <attr name="dsLikeShowCount" format="boolean" />
+        <!-- Вариант поверх фото: белая иконка на полупрозрачной подложке. -->
+        <attr name="dsLikeOnPhoto" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="StateView">
+        <!-- Разметка скелетона, которую StateView показывает в состоянии загрузки. -->
+        <attr name="dsLoadingLayout" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="SkeletonLayout">
+        <attr name="dsShimmer" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ListRowView">
+        <attr name="dsRowIcon" format="reference" />
+        <attr name="dsRowTitle" format="string" />
+        <attr name="dsRowSubtitle" format="string" />
+        <attr name="dsRowValue" format="string" />
+        <attr name="dsRowShowChevron" format="boolean" />
+        <attr name="dsRowDestructive" format="boolean" />
+    </declare-styleable>
+</resources>

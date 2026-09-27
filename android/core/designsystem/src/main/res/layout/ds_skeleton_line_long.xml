@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Строка текста скелетона: 70 % ширины, высота — кегль bodyMedium. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="10">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ds_space_3"
+        android:layout_weight="7"
+        android:background="@drawable/ds_bg_skeleton_line" />
+</LinearLayout>

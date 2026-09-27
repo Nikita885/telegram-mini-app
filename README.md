@@ -34,3 +34,9 @@ Backend поднимется на `http://localhost:8000` (ASGI-сервер Dap
 | `SECRET_KEY` | Секретный ключ Django |
 | `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | Доступ к БД |
 | `POSTGRES_HOST` / `POSTGRES_PORT` | Хост и порт БД |
+
+## Дизайн-система
+
+Редакционная дизайн-система Android-клиента (токены, компоненты, движение, доступность, макеты всех
+экранов со всеми состояниями) — в [`docs/design`](docs/design/README.md); Android-модуль —
+[`android/core/designsystem`](android/core/designsystem/README.md).

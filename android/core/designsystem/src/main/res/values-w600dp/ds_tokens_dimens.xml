@@ -1,0 +1,6 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Планшет / раскрытый складной: шире поля -->
+    <dimen name="ds_layout_gutter">32dp</dimen>
+</resources>

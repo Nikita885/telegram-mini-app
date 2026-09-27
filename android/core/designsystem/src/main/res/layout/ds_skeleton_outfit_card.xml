@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Скелетон карточки образа: фото 4:5, аватар, две строки, подпись. -->
+<app.outfitshare.core.designsystem.component.skeleton.SkeletonLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <app.outfitshare.core.designsystem.component.image.AspectRatioImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ds_bg_skeleton_block"
+            android:importantForAccessibility="no"
+            app:dsAspectRatio="@string/ds_aspect_outfit" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ds_space_2"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/ds_size_touch_target"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="@dimen/ds_size_avatar_s"
+                android:layout_height="@dimen/ds_size_avatar_s"
+                android:background="@drawable/ds_bg_skeleton_circle" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_space_3"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <include layout="@layout/ds_skeleton_line_long" />
+
+                <include
+                    layout="@layout/ds_skeleton_line_short"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ds_space_2" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</app.outfitshare.core.designsystem.component.skeleton.SkeletonLayout>

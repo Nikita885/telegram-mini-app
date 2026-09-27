@@ -1,0 +1,10 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Пропорции медиа для AspectRatioImageView (app:dsAspectRatio) -->
+    <string name="ds_aspect_outfit" translatable="false">4:5</string>
+    <string name="ds_aspect_item" translatable="false">1:1</string>
+    <string name="ds_aspect_collection_cover" translatable="false">3:4</string>
+    <string name="ds_aspect_onboarding_hero" translatable="false">3:4</string>
+    <string name="ds_aspect_studio_capture" translatable="false">3:4</string>
+</resources>

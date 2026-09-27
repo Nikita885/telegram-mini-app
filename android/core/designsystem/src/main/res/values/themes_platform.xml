@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Системные бары: прозрачные (edge-to-edge), иконки тёмные днём и светлые ночью. -->
+    <style name="Platform.Theme.Ds" parent="Base.V0.Theme.Ds">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/ds_light_system_bars</item>
+    </style>
+</resources>

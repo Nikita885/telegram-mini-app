@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Выбранный фильтр — инверсия (графит днём / молочный ночью), не только цвет: меняется заливка. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="@dimen/ds_opacity_disabled_container" android:color="?attr/dsColorOnSurface" android:state_checked="true" android:state_enabled="false" />
+    <item android:color="?attr/dsColorPrimary" android:state_checked="true" />
+    <item android:color="@android:color/transparent" />
+</selector>

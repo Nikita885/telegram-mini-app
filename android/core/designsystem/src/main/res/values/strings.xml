@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_brand_name" translatable="false">Outfit Share</string>
+
+    <!-- Общие действия -->
+    <string name="ds_action_retry">Повторить</string>
+    <string name="ds_action_undo">Отменить</string>
+    <string name="ds_action_cancel">Отмена</string>
+    <string name="ds_action_close">Закрыть</string>
+    <string name="ds_action_open_settings">Открыть настройки</string>
+    <string name="ds_action_allow">Разрешить</string>
+
+    <!-- Состояния экранов -->
+    <string name="ds_state_loading">Загрузка…</string>
+    <string name="ds_state_error_title">Не получилось загрузить</string>
+    <string name="ds_state_error_message">Проверьте подключение и попробуйте ещё раз.</string>
+    <string name="ds_state_offline_title">Нет подключения</string>
+    <string name="ds_state_offline_message">Как только сеть появится, всё обновится само.</string>
+    <string name="ds_state_no_permission_title">Нет доступа</string>
+    <string name="ds_offline_banner">Офлайн — показываем сохранённое</string>
+    <string name="ds_offline_banner_back_online">Снова в сети</string>
+
+    <!-- Доступность -->
+    <string name="ds_a11y_avatar">Аватар: %1$s</string>
+    <string name="ds_a11y_avatar_unknown">Аватар</string>
+    <string name="ds_a11y_online">в сети</string>
+    <string name="ds_a11y_with_online">%1$s, в сети</string>
+    <string name="ds_a11y_like">Нравится</string>
+    <string name="ds_a11y_unlike">Убрать отметку «Нравится»</string>
+    <string name="ds_a11y_label_with_count">%1$s. %2$s</string>
+    <string name="ds_a11y_liked">отмечено</string>
+    <string name="ds_a11y_not_liked">не отмечено</string>
+    <string name="ds_a11y_outfit_by">Образ от %1$s</string>
+    <string name="ds_a11y_open_comments">Комментарии</string>
+    <string name="ds_a11y_selected">выбрано</string>
+    <string name="ds_a11y_not_selected">не выбрано</string>
+    <string name="ds_a11y_add_item">Добавить в образ</string>
+    <string name="ds_a11y_more">Ещё</string>
+    <plurals name="ds_a11y_likes_count">
+        <item quantity="one">%d отметка «Нравится»</item>
+        <item quantity="few">%d отметки «Нравится»</item>
+        <item quantity="many">%d отметок «Нравится»</item>
+        <item quantity="other">%d отметки «Нравится»</item>
+    </plurals>
+    <plurals name="ds_a11y_unread_count">
+        <item quantity="one">%d непрочитанное</item>
+        <item quantity="few">%d непрочитанных</item>
+        <item quantity="many">%d непрочитанных</item>
+        <item quantity="other">%d непрочитанного</item>
+    </plurals>
+
+    <!-- Компактные числа: 1,2 тыс., 12 тыс., 1,2 млн -->
+    <string name="ds_count_thousands">%1$s тыс.</string>
+    <string name="ds_count_millions">%1$s млн</string>
+</resources>

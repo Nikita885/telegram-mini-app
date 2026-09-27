@@ -1,0 +1,5 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <item name="ds_scrim_alpha" format="float" type="dimen">0.64</item>
+</resources>

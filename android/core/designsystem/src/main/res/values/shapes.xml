@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Шкала форм Material 3 → радиусы токенов. -->
+    <style name="ShapeAppearance.Ds.Corner.ExtraSmall" parent="ShapeAppearance.Material3.Corner.ExtraSmall">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_radius_xs</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Corner.Small" parent="ShapeAppearance.Material3.Corner.Small">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_radius_s</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Corner.Medium" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_radius_m</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Corner.Large" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_radius_l</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Corner.ExtraLarge" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_radius_xl</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Corner.Full" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Семантические формы -->
+    <style name="ShapeAppearance.Ds.Photo" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_shape_photo</item>
+    </style>
+    <style name="ShapeAppearance.Ds.ItemTile" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_shape_item_tile</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Button" parent="ShapeAppearance.Ds.Corner.Full" />
+    <style name="ShapeAppearance.Ds.Chip" parent="ShapeAppearance.Ds.Corner.Full" />
+    <style name="ShapeAppearance.Ds.Avatar" parent="ShapeAppearance.Ds.Corner.Full" />
+    <style name="ShapeAppearance.Ds.Input" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_shape_input</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Snackbar" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_shape_snackbar</item>
+    </style>
+    <style name="ShapeAppearance.Ds.Dialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/ds_shape_dialog</item>
+    </style>
+    <!-- Bottom sheet: скруглены только верхние углы. -->
+    <style name="ShapeAppearance.Ds.Sheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/ds_shape_sheet</item>
+        <item name="cornerSizeTopRight">@dimen/ds_shape_sheet</item>
+        <item name="cornerSizeBottomLeft">@dimen/ds_radius_none</item>
+        <item name="cornerSizeBottomRight">@dimen/ds_radius_none</item>
+    </style>
+</resources>

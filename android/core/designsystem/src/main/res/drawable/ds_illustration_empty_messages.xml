@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Нет диалогов. СГЕНЕРИРОВАНО tools/designsystem/illustrations.py -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ds_size_illustration"
+    android:height="@dimen/ds_size_illustration"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M40,36 H88 A14,14 0 0,1 102,50 V72 A14,14 0 0,1 88,86 H52 L34,98 L40,86 A14,14 0 0,1 26,72 V50 A14,14 0 0,1 40,36 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurface"
+        android:pathData="M72,64 H120 A14,14 0 0,1 134,78 V96 A14,14 0 0,1 120,110 L126,122 L108,110 H72 A14,14 0 0,1 58,96 V78 A14,14 0 0,1 72,64 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M79,87 A3,3 0 1,0 85,87 A3,3 0 1,0 79,87 Z" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M93,87 A3,3 0 1,0 99,87 A3,3 0 1,0 93,87 Z" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M107,87 A3,3 0 1,0 113,87 A3,3 0 1,0 107,87 Z" />
+</vector>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <ImageView
+        android:id="@+id/ds_row_icon"
+        android:layout_width="@dimen/ds_size_icon"
+        android:layout_height="@dimen/ds_size_icon"
+        android:layout_marginEnd="@dimen/ds_space_4"
+        android:importantForAccessibility="no"
+        android:visibility="gone"
+        app:tint="?attr/dsColorOnSurfaceVariant" />
+
+    <FrameLayout
+        android:id="@+id/ds_row_leading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/ds_space_4"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:importantForAccessibility="no"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ds_row_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?attr/dsColorOnSurface" />
+
+        <TextView
+            android:id="@+id/ds_row_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/ds_space_0_5"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/dsColorOnSurfaceVariant"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/ds_row_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_space_3"
+        android:importantForAccessibility="no"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/dsColorOnSurfaceVariant"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/ds_row_trailing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_space_3"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/ds_row_chevron"
+        android:layout_width="@dimen/ds_size_icon_medium"
+        android:layout_height="@dimen/ds_size_icon_medium"
+        android:layout_marginStart="@dimen/ds_space_2"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ds_ic_chevron_right"
+        android:visibility="gone"
+        app:tint="?attr/dsColorOnSurfaceVariant" />
+</merge>

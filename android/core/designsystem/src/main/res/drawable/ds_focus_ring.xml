@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Кольцо фокуса для клавиатуры/switch access: foreground карточек. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/ds_shape_card" />
+            <stroke android:width="@dimen/ds_size_focus_ring_width" android:color="?attr/dsColorFocusRing" />
+        </shape>
+    </item>
+    <item android:drawable="@android:color/transparent" />
+</selector>

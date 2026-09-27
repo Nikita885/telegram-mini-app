@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Карточка образа: фото 4:5 — главный герой, под ним автор, лайк и подпись. -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:id="@+id/ds_outfit_photo_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <app.outfitshare.core.designsystem.component.image.AspectRatioImageView
+            android:id="@+id/ds_outfit_photo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            app:dsAspectRatio="@string/ds_aspect_outfit" />
+
+        <TextView
+            android:id="@+id/ds_outfit_badge"
+            style="@style/Widget.Ds.TextBadge.Inverse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ds_outfit_heart_burst"
+            android:layout_width="@dimen/ds_size_heart_burst"
+            android:layout_height="@dimen/ds_size_heart_burst"
+            android:layout_gravity="center"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ds_ic_favorite_filled"
+            android:visibility="invisible"
+            app:tint="?attr/dsColorOnPhoto" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ds_outfit_meta_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/ds_size_touch_target"
+        android:orientation="horizontal">
+
+        <app.outfitshare.core.designsystem.component.avatar.AvatarView
+            android:id="@+id/ds_outfit_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dsAvatarDecorative="true"
+            app:dsAvatarSize="s" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/ds_space_3"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/ds_outfit_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/dsColorOnSurface" />
+
+            <TextView
+                android:id="@+id/ds_outfit_meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <app.outfitshare.core.designsystem.component.like.LikeButton
+            android:id="@+id/ds_outfit_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/ds_outfit_caption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/dsColorOnSurface"
+        android:visibility="gone" />
+</merge>

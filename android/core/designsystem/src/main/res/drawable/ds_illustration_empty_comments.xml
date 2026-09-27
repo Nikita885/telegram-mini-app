@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Нет комментариев. СГЕНЕРИРОВАНО tools/designsystem/illustrations.py -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ds_size_illustration"
+    android:height="@dimen/ds_size_illustration"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M48,34 H112 A18,18 0 0,1 130,52 V88 A18,18 0 0,1 112,106 H60 L38,118 L48,106 A18,18 0 0,1 30,88 V52 A18,18 0 0,1 48,34 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M63,64 A5,5 0 1,0 73,64 A5,5 0 1,0 63,64 Z" />
+    <path
+        android:pathData="M73,64 C73,72 69,77 63,79"
+        android:strokeColor="?attr/dsColorAccent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2.5" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M85,64 A5,5 0 1,0 95,64 A5,5 0 1,0 85,64 Z" />
+    <path
+        android:pathData="M95,64 C95,72 91,77 85,79"
+        android:strokeColor="?attr/dsColorAccent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2.5" />
+</vector>

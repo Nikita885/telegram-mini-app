@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- На фото сердце всегда белое: акцент на произвольном снимке не гарантирует контраст. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/dsColorOnPhoto" />
+</selector>

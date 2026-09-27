@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Снекбар: инверсная поверхность, действие «Отменить» — инверсный акцент. -->
+    <style name="Widget.Ds.Snackbar" parent="Widget.Material3.Snackbar">
+        <item name="backgroundTint">?attr/dsColorInverseSurface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Snackbar</item>
+        <item name="android:maxWidth">@dimen/ds_layout_max_dialog_width</item>
+        <item name="android:layout_margin">@dimen/ds_space_3</item>
+        <item name="elevation">@dimen/ds_elevation_snackbar</item>
+    </style>
+
+    <style name="Widget.Ds.Snackbar.TextView" parent="Widget.Material3.Snackbar.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyMedium</item>
+        <item name="android:textColor">?attr/dsColorInverseOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.Snackbar.Button" parent="Widget.Material3.Button.TextButton.Snackbar">
+        <item name="android:minHeight">@dimen/ds_size_touch_target</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="android:textColor">?attr/dsColorInverseAccent</item>
+    </style>
+
+    <!-- Диалог подтверждения: заголовок антиквой, текст вторичным цветом. -->
+    <style name="ThemeOverlay.Ds.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/MaterialAlertDialog.Ds</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.Ds.Title.Text</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialog.Ds.Body.Text</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Ds.Button.Dialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Ds.Button.Dialog</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.Ds.Button.Dialog</item>
+        <item name="android:backgroundDimAmount">@dimen/ds_scrim_alpha</item>
+    </style>
+
+    <!-- Разрушающее действие («Удалить», «Выйти»): кнопка подтверждения цвета danger. -->
+    <style name="ThemeOverlay.Ds.MaterialAlertDialog.Destructive">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Ds.Button.Dialog.Danger</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Ds" parent="MaterialAlertDialog.Material3">
+        <item name="backgroundTint">?attr/dsColorSurface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Dialog</item>
+        <item name="elevation">@dimen/ds_elevation_dialog</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Ds.Title.Text" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.HeadlineMedium</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Ds.Body.Text" parent="MaterialAlertDialog.Material3.Body.Text">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyMedium</item>
+        <item name="android:textColor">?attr/dsColorOnSurfaceVariant</item>
+    </style>
+
+    <!-- Bottom sheet: молочная поверхность, скругление 20 dp сверху, ручка перетаскивания. -->
+    <style name="ThemeOverlay.Ds.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.Ds.BottomSheet</item>
+        <item name="android:backgroundDimAmount">@dimen/ds_scrim_alpha</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="enableEdgeToEdge">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.Ds.BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="backgroundTint">?attr/dsColorSurface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Sheet</item>
+        <item name="android:maxWidth">@dimen/ds_layout_max_content_width</item>
+        <item name="android:elevation">@dimen/ds_elevation_sheet</item>
+        <item name="behavior_skipCollapsed">false</item>
+        <item name="behavior_fitToContents">true</item>
+    </style>
+
+    <style name="Widget.Ds.BottomSheet.DragHandle" parent="Widget.Material3.BottomSheet.DragHandle">
+        <item name="tint">?attr/dsColorOutline</item>
+    </style>
+
+    <!-- Прогресс. Линейный — загрузка вещи в Студии, круговой — ожидание в кнопке и списках. -->
+    <style name="Widget.Ds.LinearProgress" parent="Widget.Material3.LinearProgressIndicator">
+        <item name="indicatorColor">?attr/dsColorAccent</item>
+        <item name="trackColor">?attr/dsColorSurfaceContainerHighest</item>
+        <item name="trackThickness">@dimen/ds_size_progress_track</item>
+        <item name="trackCornerRadius">@dimen/ds_radius_xs</item>
+        <item name="showAnimationBehavior">outward</item>
+        <item name="hideAnimationBehavior">inward</item>
+    </style>
+
+    <style name="Widget.Ds.CircularProgress" parent="Widget.Material3.CircularProgressIndicator">
+        <item name="indicatorColor">?attr/dsColorOnSurface</item>
+        <item name="trackColor">@android:color/transparent</item>
+        <item name="indicatorSize">@dimen/ds_size_avatar_m</item>
+        <item name="trackThickness">@dimen/ds_size_stroke_thick</item>
+    </style>
+
+    <!-- Индикатор внутри кнопки в состоянии загрузки (DsButton). -->
+    <style name="Widget.Ds.CircularProgress.InButton">
+        <item name="indicatorSize">@dimen/ds_size_icon_medium</item>
+        <item name="trackThickness">@dimen/ds_size_stroke_thick</item>
+    </style>
+
+    <!-- Счётчик на иконке навигации: акцент, до «99+». -->
+    <style name="Widget.Ds.Badge" parent="Widget.Material3.Badge">
+        <item name="backgroundColor">?attr/dsColorAccent</item>
+        <item name="badgeTextColor">?attr/dsColorOnAccent</item>
+        <item name="maxCharacterCount">3</item>
+    </style>
+
+    <!-- Текстовые бейджи: «Новое», «Ремикс», «Черновик», «Админ», статусы очереди Студии. -->
+    <style name="Widget.Ds.TextBadge" parent="Widget.MaterialComponents.TextView">
+        <item name="android:background">@drawable/ds_bg_badge</item>
+        <item name="android:minHeight">@dimen/ds_size_badge_height</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingStart">@dimen/ds_space_2</item>
+        <item name="android:paddingEnd">@dimen/ds_space_2</item>
+        <item name="android:paddingTop">@dimen/ds_space_0_5</item>
+        <item name="android:paddingBottom">@dimen/ds_space_0_5</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelSmall</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:backgroundTint">?attr/dsColorSurfaceContainerHigh</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.TextBadge.Accent">
+        <item name="android:backgroundTint">?attr/dsColorAccentContainer</item>
+        <item name="android:textColor">?attr/dsColorOnAccentContainer</item>
+    </style>
+
+    <style name="Widget.Ds.TextBadge.Inverse">
+        <item name="android:backgroundTint">?attr/dsColorInverseSurface</item>
+        <item name="android:textColor">?attr/dsColorInverseOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.TextBadge.Success">
+        <item name="android:backgroundTint">?attr/dsColorSuccessContainer</item>
+        <item name="android:textColor">?attr/dsColorOnSuccessContainer</item>
+    </style>
+
+    <style name="Widget.Ds.TextBadge.Warning">
+        <item name="android:backgroundTint">?attr/dsColorWarningContainer</item>
+        <item name="android:textColor">?attr/dsColorOnWarningContainer</item>
+    </style>
+
+    <style name="Widget.Ds.TextBadge.Danger">
+        <item name="android:backgroundTint">?attr/dsColorDangerContainer</item>
+        <item name="android:textColor">?attr/dsColorOnDangerContainer</item>
+    </style>
+
+    <style name="Widget.Ds.Divider" parent="Widget.Material3.MaterialDivider">
+        <item name="dividerColor">?attr/dsColorOutlineVariant</item>
+        <item name="dividerThickness">@dimen/ds_size_stroke_hairline</item>
+    </style>
+
+    <style name="Widget.Ds.Divider.Inset">
+        <item name="dividerInsetStart">@dimen/ds_layout_gutter</item>
+        <item name="dividerInsetEnd">@dimen/ds_layout_gutter</item>
+    </style>
+
+    <!-- Карточка-контейнер (группа настроек, обложка коллекции): плоская, тональная. -->
+    <style name="Widget.Ds.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/dsColorSurfaceContainer</item>
+        <item name="cardElevation">@dimen/ds_elevation_card</item>
+        <item name="strokeWidth">@dimen/ds_space_0</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Corner.Medium</item>
+        <item name="rippleColor">@color/ds_ripple_on_surface</item>
+    </style>
+</resources>

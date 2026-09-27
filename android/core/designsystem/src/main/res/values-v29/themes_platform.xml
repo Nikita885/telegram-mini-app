@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Platform.Theme.Ds" parent="Base.V0.Theme.Ds">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">@bool/ds_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/ds_light_system_bars</item>
+        <!-- Фон ленты и так контрастен; системная подложка навбара ломает журнальную вёрстку. -->
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <!-- Тёмная тема своя, автоматическое затемнение запрещено. -->
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

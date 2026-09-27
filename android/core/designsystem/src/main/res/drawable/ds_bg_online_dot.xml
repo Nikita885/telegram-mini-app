@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Индикатор «в сети»: успех с кольцом цвета фона, чтобы отделить от фото. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="?attr/dsColorSuccess" />
+    <stroke android:width="@dimen/ds_size_stroke_thick" android:color="?attr/dsColorBackground" />
+</shape>

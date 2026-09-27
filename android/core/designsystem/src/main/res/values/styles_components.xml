@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Стили собственных компонентов (app.outfitshare.core.designsystem.component.*). -->
+
+    <style name="Widget.Ds.Photo" parent="">
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Photo</item>
+        <item name="android:background">?attr/dsColorSurfaceSunken</item>
+        <item name="android:scaleType">centerCrop</item>
+    </style>
+
+    <style name="Widget.Ds.OutfitCard" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:foreground">@drawable/ds_focus_ring</item>
+        <item name="dsShowCaption">true</item>
+        <item name="dsShowAuthor">true</item>
+    </style>
+
+    <style name="Widget.Ds.ItemCard" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:foreground">@drawable/ds_focus_ring</item>
+        <item name="dsItemShowAction">false</item>
+    </style>
+
+    <style name="Widget.Ds.Avatar" parent="">
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Avatar</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="dsAvatarSize">m</item>
+        <item name="dsAvatarDecorative">false</item>
+        <item name="dsAvatarShowOnline">false</item>
+    </style>
+
+    <style name="Widget.Ds.LikeButton" parent="">
+        <item name="android:minHeight">@dimen/ds_size_touch_target</item>
+        <item name="android:minWidth">@dimen/ds_size_touch_target</item>
+        <item name="android:paddingStart">@dimen/ds_space_3</item>
+        <item name="android:paddingEnd">@dimen/ds_space_3</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="dsLikeShowCount">true</item>
+        <item name="dsLikeOnPhoto">false</item>
+    </style>
+
+    <style name="Widget.Ds.StateView" parent="">
+        <item name="android:paddingStart">@dimen/ds_layout_gutter</item>
+        <item name="android:paddingEnd">@dimen/ds_layout_gutter</item>
+        <item name="android:paddingTop">@dimen/ds_layout_section_gap</item>
+        <item name="android:paddingBottom">@dimen/ds_layout_section_gap</item>
+    </style>
+
+    <style name="Widget.Ds.ListRow" parent="">
+        <item name="android:minHeight">@dimen/ds_size_list_item_min_height</item>
+        <item name="android:paddingStart">@dimen/ds_layout_gutter</item>
+        <item name="android:paddingEnd">@dimen/ds_layout_gutter</item>
+        <item name="android:paddingTop">@dimen/ds_layout_list_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/ds_layout_list_item_padding_vertical</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="dsRowShowChevron">false</item>
+        <item name="dsRowDestructive">false</item>
+    </style>
+
+    <style name="Widget.Ds.Skeleton" parent="">
+        <item name="dsShimmer">true</item>
+    </style>
+
+    <style name="Widget.Ds.OfflineBanner" parent="">
+        <item name="android:background">@drawable/ds_bg_banner</item>
+        <item name="android:minHeight">@dimen/ds_size_touch_target</item>
+        <item name="android:paddingStart">@dimen/ds_layout_gutter</item>
+        <item name="android:paddingEnd">@dimen/ds_space_2</item>
+    </style>
+
+    <style name="Widget.Ds.FilterChipGroup" parent="Widget.Ds.ChipGroup.Filter" />
+
+    <!-- Текстовые роли, часто повторяющиеся в разметке экранов. -->
+    <style name="Widget.Ds.Text.Kicker" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelSmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurfaceVariant</item>
+    </style>
+
+    <!-- Заголовки: на API 28+ помечаются как heading для навигации TalkBack (values-v28). -->
+    <style name="Widget.Ds.Text.ScreenTitle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.DisplaySmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.Text.SectionTitle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.HeadlineSmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.Text.Body" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyMedium</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+    </style>
+
+    <style name="Widget.Ds.Text.Meta" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="android:textColor">?attr/dsColorOnSurfaceVariant</item>
+    </style>
+</resources>

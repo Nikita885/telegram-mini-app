@@ -1,0 +1,29 @@
+# Версии зафиксированы вручную: Google Maven был недоступен при создании каталога,
+# при первой синхронизации проверьте, что AGP и AndroidX резолвятся (Android Studio → Sync).
+[versions]
+agp = "8.11.1"
+compileSdk = "36"
+targetSdk = "36"
+minSdk = "26"
+androidxAppcompat = "1.7.0"
+androidxCore = "1.13.1"
+androidxCoreSplashscreen = "1.0.1"
+androidxDynamicanimation = "1.0.0"
+material = "1.12.0"
+junit = "4.13.2"
+spotless = "7.2.1"
+googleJavaFormat = "1.28.0"
+checkstyle = "10.21.1"
+
+[libraries]
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidxAppcompat" }
+androidx-core = { module = "androidx.core:core", version.ref = "androidxCore" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidxCoreSplashscreen" }
+androidx-dynamicanimation = { module = "androidx.dynamicanimation:dynamicanimation", version.ref = "androidxDynamicanimation" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

@@ -1,0 +1,13 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <array name="ds_avatar_palette">
+        <item>@color/ds_color_avatar_sand</item>
+        <item>@color/ds_color_avatar_sage</item>
+        <item>@color/ds_color_avatar_mist</item>
+        <item>@color/ds_color_avatar_blush</item>
+        <item>@color/ds_color_avatar_lavender</item>
+        <item>@color/ds_color_avatar_ochre</item>
+        <item>@color/ds_color_avatar_stone</item>
+    </array>
+</resources>

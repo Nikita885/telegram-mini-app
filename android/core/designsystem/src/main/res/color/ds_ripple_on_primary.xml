@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:alpha="@dimen/ds_opacity_pressed_overlay" android:color="?attr/dsColorOnPrimary" android:state_pressed="true" />
+    <item android:alpha="@dimen/ds_opacity_focus_overlay" android:color="?attr/dsColorOnPrimary" android:state_focused="true" />
+    <item android:alpha="@dimen/ds_opacity_hover_overlay" android:color="?attr/dsColorOnPrimary" />
+</selector>

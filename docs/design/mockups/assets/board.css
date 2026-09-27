@@ -1,0 +1,18 @@
+/* Раскладка досок со скриншотами (не часть дизайн-системы). */
+html, body { margin: 0; background: #E7E4DE; color: #1C1B19; font-family: 'Inter', system-ui, sans-serif; }
+.board { display: inline-block; padding: 40px 48px 48px; background: #E7E4DE; }
+.board__head { max-width: 1100px; margin-bottom: 28px; }
+.board__section { font: 600 11px/16px 'Inter', sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #6B6358; }
+.board__title { font: 400 40px/44px 'OutfitShare Display', Georgia, serif; margin-top: 6px; }
+.board__desc { font: 400 15px/22px 'Inter', sans-serif; color: #4A4640; margin-top: 10px; max-width: 900px; }
+.board__row { display: flex; gap: 32px; align-items: flex-start; }
+.board__cell { display: flex; flex-direction: column; gap: 12px; }
+.board__cap { font: 500 13px/18px 'Inter', sans-serif; color: #3A3733; display: flex; gap: 8px; align-items: center; }
+.board__cap span { font-weight: 400; color: #6B6358; }
+.board__pill { font: 600 10px/16px 'Inter', sans-serif; letter-spacing: .06em; text-transform: uppercase; padding: 1px 8px; border-radius: 10px; background: #D8D2C9; color: #1C1B19; }
+.board__pill--dark { background: #1C1B19; color: #F6F2EB; }
+.board__pill--scale { background: #2F3BD6; color: #fff; }
+.index { padding: 40px 48px; }
+.index h1 { font: 400 48px/52px 'OutfitShare Display', Georgia, serif; margin: 0 0 8px; }
+.index a { color: #2F3BD6; }
+.index li { margin: 4px 0; font: 400 15px/22px 'Inter', sans-serif; }

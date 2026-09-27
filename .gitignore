@@ -18,3 +18,8 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+
+# Сырые PNG рендера макетов (упаковываются в WebP/GIF tools/designsystem/pack_screenshots.py)
+docs/design/screenshots/.raw/
+# Кэш скачанных исходников шрифтов
+.cache/

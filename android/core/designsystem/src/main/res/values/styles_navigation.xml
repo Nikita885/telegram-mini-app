@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Верхняя панель: плоская, на фоне экрана, заголовок — Inter SemiBold. -->
+    <style name="Widget.Ds.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:minHeight">@dimen/ds_size_app_bar_height</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="titleTextAppearance">@style/TextAppearance.Ds.TitleLarge</item>
+        <item name="titleTextColor">?attr/dsColorOnSurface</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.Ds.BodySmall</item>
+        <item name="subtitleTextColor">?attr/dsColorOnSurfaceVariant</item>
+        <item name="navigationIconTint">?attr/dsColorOnSurface</item>
+        <item name="contentInsetStartWithNavigation">@dimen/ds_space_0</item>
+    </style>
+
+    <!-- Журнальный заголовок экрана (Лента, Студия): антиква в панели. -->
+    <style name="Widget.Ds.Toolbar.Editorial">
+        <item name="titleTextAppearance">@style/TextAppearance.Ds.HeadlineMedium</item>
+    </style>
+
+    <style name="Widget.Ds.AppBarLayout" parent="Widget.Material3.AppBarLayout">
+        <item name="android:background">?attr/dsColorBackground</item>
+        <item name="liftOnScroll">true</item>
+    </style>
+
+    <!-- Большой заголовок, схлопывающийся в панель: 32 sp антиквы → 18 sp гротеска. -->
+    <style name="Widget.Ds.CollapsingToolbar.Large" parent="Widget.Material3.CollapsingToolbar.Large">
+        <item name="android:minHeight">@dimen/ds_size_app_bar_height</item>
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.Ds.DisplaySmall</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.Ds.TitleLarge</item>
+        <item name="expandedTitleTextColor">?attr/dsColorOnSurface</item>
+        <item name="collapsedTitleTextColor">?attr/dsColorOnSurface</item>
+        <item name="expandedTitleMarginStart">@dimen/ds_layout_gutter</item>
+        <item name="expandedTitleMarginEnd">@dimen/ds_layout_gutter</item>
+        <item name="expandedTitleMarginBottom">@dimen/ds_space_4</item>
+        <item name="contentScrim">?attr/dsColorBackground</item>
+        <item name="statusBarScrim">?attr/dsColorBackground</item>
+    </style>
+
+    <!-- Нижняя навигация: подписи всегда видны, выбранная иконка — залитая. -->
+    <style name="Widget.Ds.BottomNavigation" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:minHeight">@dimen/ds_size_bottom_nav_height</item>
+        <item name="backgroundTint">?attr/dsColorBackground</item>
+        <item name="elevation">@dimen/ds_elevation_level0</item>
+        <item name="itemIconTint">@color/ds_nav_item</item>
+        <item name="itemTextColor">@color/ds_nav_item</item>
+        <item name="itemIconSize">@dimen/ds_size_icon</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Ds.LabelMedium</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Ds.LabelMedium</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Ds.BottomNavigation.ActiveIndicator</item>
+        <item name="itemRippleColor">@color/ds_ripple_on_surface</item>
+    </style>
+
+    <style name="Widget.Ds.BottomNavigation.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/dsColorSurfaceContainerHigh</item>
+    </style>
+
+    <!-- Табы: текстовые, индикатор 2 dp цвета текста. -->
+    <style name="Widget.Ds.TabLayout" parent="Widget.Material3.TabLayout">
+        <item name="android:minHeight">@dimen/ds_size_tab_height</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="tabTextAppearance">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="tabTextColor">@color/ds_tab_text</item>
+        <item name="tabIconTint">@color/ds_tab_text</item>
+        <item name="tabIndicator">@drawable/ds_tab_indicator</item>
+        <item name="tabIndicatorColor">?attr/dsColorOnSurface</item>
+        <item name="tabIndicatorHeight">@dimen/ds_size_stroke_thick</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="tabIndicatorAnimationMode">elastic</item>
+        <item name="tabIndicatorAnimationDuration">@integer/ds_motion_duration_medium</item>
+        <item name="tabRippleColor">@color/ds_ripple_on_surface</item>
+        <item name="tabPaddingStart">@dimen/ds_space_4</item>
+        <item name="tabPaddingEnd">@dimen/ds_space_4</item>
+        <!-- auto: вкладки на всю ширину, а при крупном шрифте — прокрутка вместо обрезки. -->
+        <item name="tabMode">auto</item>
+        <item name="tabGravity">fill</item>
+    </style>
+
+    <style name="Widget.Ds.TabLayout.Scrollable">
+        <item name="tabMode">scrollable</item>
+        <item name="tabGravity">start</item>
+        <item name="tabIndicatorFullWidth">false</item>
+        <item name="tabContentStart">@dimen/ds_layout_gutter</item>
+    </style>
+</resources>

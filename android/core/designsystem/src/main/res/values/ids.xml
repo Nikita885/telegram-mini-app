@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ключи View#setTag для анимаций дизайн-системы. -->
+    <item name="ds_tag_spring_translation_x" type="id" />
+    <item name="ds_tag_spring_translation_y" type="id" />
+    <item name="ds_tag_spring_scale_x" type="id" />
+    <item name="ds_tag_spring_scale_y" type="id" />
+    <item name="ds_tag_heart_burst_fade" type="id" />
+</resources>

@@ -1,0 +1,189 @@
+<!-- СГЕНЕРИРОВАНО tools/designsystem/generate_tokens.py из docs/design/tokens/tokens.json.
+     Не редактировать вручную: правьте tokens.json и перезапустите генератор. -->
+<resources>
+    <!-- Отступы: сетка 4/8 dp -->
+    <dimen name="ds_space_0">0dp</dimen>
+    <dimen name="ds_space_0_5">2dp</dimen>
+    <dimen name="ds_space_1">4dp</dimen>
+    <dimen name="ds_space_2">8dp</dimen>
+    <dimen name="ds_space_3">12dp</dimen>
+    <dimen name="ds_space_4">16dp</dimen>
+    <dimen name="ds_space_5">20dp</dimen>
+    <dimen name="ds_space_6">24dp</dimen>
+    <dimen name="ds_space_8">32dp</dimen>
+    <dimen name="ds_space_10">40dp</dimen>
+    <dimen name="ds_space_12">48dp</dimen>
+    <dimen name="ds_space_16">64dp</dimen>
+    <dimen name="ds_space_20">80dp</dimen>
+    <dimen name="ds_space_24">96dp</dimen>
+
+    <!-- Раскладка -->
+    <!-- Боковые поля экрана (compact). -->
+    <dimen name="ds_layout_gutter">20dp</dimen>
+    <!-- Боковые поля на планшете (medium/expanded). -->
+    <dimen name="ds_layout_gutter_medium">32dp</dimen>
+    <!-- Вертикальный воздух между журнальными секциями. -->
+    <dimen name="ds_layout_section_gap">40dp</dimen>
+    <!-- Зазор между блоками в стеке. -->
+    <dimen name="ds_layout_stack_gap">16dp</dimen>
+    <!-- Зазор между элементами в строке. -->
+    <dimen name="ds_layout_inline_gap">8dp</dimen>
+    <!-- Зазор сетки карточек. -->
+    <dimen name="ds_layout_grid_gap">12dp</dimen>
+    <!-- Вертикальный паддинг строки списка. -->
+    <dimen name="ds_layout_list_item_padding_vertical">12dp</dimen>
+    <!-- Максимальная ширина читаемой колонки на планшете. -->
+    <dimen name="ds_layout_max_content_width">640dp</dimen>
+    <!-- Максимальная ширина диалога/снекбара. -->
+    <dimen name="ds_layout_max_dialog_width">560dp</dimen>
+
+    <!-- Размеры -->
+    <!-- Минимальная зона касания (WCAG 2.5.8 / Material). -->
+    <dimen name="ds_size_touch_target">48dp</dimen>
+    <dimen name="ds_size_icon_small">16dp</dimen>
+    <dimen name="ds_size_icon_medium">20dp</dimen>
+    <dimen name="ds_size_icon">24dp</dimen>
+    <dimen name="ds_size_icon_large">32dp</dimen>
+    <dimen name="ds_size_avatar_xs">24dp</dimen>
+    <dimen name="ds_size_avatar_s">32dp</dimen>
+    <dimen name="ds_size_avatar_m">40dp</dimen>
+    <dimen name="ds_size_avatar_l">56dp</dimen>
+    <dimen name="ds_size_avatar_xl">88dp</dimen>
+    <dimen name="ds_size_avatar_xxl">120dp</dimen>
+    <!-- Визуальная высота; зона касания добирается инсетами space.1 до 48. -->
+    <dimen name="ds_size_button_height_small">40dp</dimen>
+    <dimen name="ds_size_button_height">48dp</dimen>
+    <dimen name="ds_size_button_height_large">56dp</dimen>
+    <dimen name="ds_size_icon_button">48dp</dimen>
+    <dimen name="ds_size_chip_height">36dp</dimen>
+    <dimen name="ds_size_input_height">56dp</dimen>
+    <dimen name="ds_size_app_bar_height">56dp</dimen>
+    <dimen name="ds_size_app_bar_large_height">120dp</dimen>
+    <dimen name="ds_size_bottom_nav_height">72dp</dimen>
+    <dimen name="ds_size_tab_height">48dp</dimen>
+    <dimen name="ds_size_list_item_min_height">56dp</dimen>
+    <dimen name="ds_size_list_item_two_line_min_height">72dp</dimen>
+    <dimen name="ds_size_thumbnail_small">48dp</dimen>
+    <dimen name="ds_size_thumbnail">64dp</dimen>
+    <dimen name="ds_size_illustration">160dp</dimen>
+    <dimen name="ds_size_sheet_handle_width">32dp</dimen>
+    <dimen name="ds_size_sheet_handle_height">4dp</dimen>
+    <dimen name="ds_size_badge_dot">8dp</dimen>
+    <dimen name="ds_size_badge_height">20dp</dimen>
+    <dimen name="ds_size_stroke_hairline">1dp</dimen>
+    <dimen name="ds_size_stroke_thin">1.5dp</dimen>
+    <dimen name="ds_size_stroke_thick">2dp</dimen>
+    <dimen name="ds_size_focus_ring_width">2dp</dimen>
+    <!-- Визуальный маркер опорной точки (зона касания 48). -->
+    <dimen name="ds_size_keypoint_handle">28dp</dimen>
+    <dimen name="ds_size_shutter_button">72dp</dimen>
+    <!-- Сердце, всплывающее по двойному тапу на фото. -->
+    <dimen name="ds_size_heart_burst">96dp</dimen>
+    <dimen name="ds_size_progress_track">4dp</dimen>
+
+    <!-- Радиусы -->
+    <dimen name="ds_radius_none">0dp</dimen>
+    <dimen name="ds_radius_xs">2dp</dimen>
+    <dimen name="ds_radius_s">6dp</dimen>
+    <dimen name="ds_radius_m">12dp</dimen>
+    <dimen name="ds_radius_l">20dp</dimen>
+    <dimen name="ds_radius_xl">28dp</dimen>
+    <dimen name="ds_radius_pill">999dp</dimen>
+
+    <!-- Семантические формы -->
+    <dimen name="ds_shape_photo">@dimen/ds_radius_xs</dimen>
+    <dimen name="ds_shape_card">@dimen/ds_radius_xs</dimen>
+    <dimen name="ds_shape_item_tile">@dimen/ds_radius_s</dimen>
+    <dimen name="ds_shape_button">@dimen/ds_radius_pill</dimen>
+    <dimen name="ds_shape_chip">@dimen/ds_radius_pill</dimen>
+    <dimen name="ds_shape_input">@dimen/ds_radius_s</dimen>
+    <dimen name="ds_shape_badge">@dimen/ds_radius_pill</dimen>
+    <dimen name="ds_shape_snackbar">@dimen/ds_radius_s</dimen>
+    <dimen name="ds_shape_dialog">@dimen/ds_radius_m</dimen>
+    <dimen name="ds_shape_sheet">@dimen/ds_radius_l</dimen>
+    <dimen name="ds_shape_bubble">@dimen/ds_radius_l</dimen>
+    <dimen name="ds_shape_bubble_tail">@dimen/ds_radius_s</dimen>
+    <dimen name="ds_shape_avatar">@dimen/ds_radius_pill</dimen>
+    <dimen name="ds_shape_thumbnail">@dimen/ds_radius_s</dimen>
+
+    <!-- Elevation -->
+    <dimen name="ds_elevation_level0">0dp</dimen>
+    <dimen name="ds_elevation_level1">1dp</dimen>
+    <dimen name="ds_elevation_level2">3dp</dimen>
+    <dimen name="ds_elevation_level3">6dp</dimen>
+    <dimen name="ds_elevation_level4">8dp</dimen>
+    <dimen name="ds_elevation_level5">12dp</dimen>
+    <dimen name="ds_elevation_card">@dimen/ds_elevation_level0</dimen>
+    <dimen name="ds_elevation_app_bar_scrolled">@dimen/ds_elevation_level1</dimen>
+    <dimen name="ds_elevation_dragged_layer">@dimen/ds_elevation_level4</dimen>
+    <dimen name="ds_elevation_fab">@dimen/ds_elevation_level3</dimen>
+    <dimen name="ds_elevation_snackbar">@dimen/ds_elevation_level3</dimen>
+    <dimen name="ds_elevation_sheet">@dimen/ds_elevation_level4</dimen>
+    <dimen name="ds_elevation_dialog">@dimen/ds_elevation_level5</dimen>
+    <dimen name="ds_elevation_menu">@dimen/ds_elevation_level3</dimen>
+
+    <!-- Движение: расстояния -->
+    <dimen name="ds_motion_enter_offset">24dp</dimen>
+    <dimen name="ds_motion_drop_offset">56dp</dimen>
+
+    <!-- Типографика: размеры и интерлиньяж в sp -->
+    <dimen name="ds_type_display_large_size">48sp</dimen>
+    <dimen name="ds_type_display_large_line_height">52sp</dimen>
+    <dimen name="ds_type_display_medium_size">40sp</dimen>
+    <dimen name="ds_type_display_medium_line_height">44sp</dimen>
+    <dimen name="ds_type_display_small_size">32sp</dimen>
+    <dimen name="ds_type_display_small_line_height">38sp</dimen>
+    <dimen name="ds_type_headline_large_size">28sp</dimen>
+    <dimen name="ds_type_headline_large_line_height">34sp</dimen>
+    <dimen name="ds_type_headline_medium_size">24sp</dimen>
+    <dimen name="ds_type_headline_medium_line_height">30sp</dimen>
+    <dimen name="ds_type_headline_small_size">20sp</dimen>
+    <dimen name="ds_type_headline_small_line_height">26sp</dimen>
+    <dimen name="ds_type_editorial_quote_size">20sp</dimen>
+    <dimen name="ds_type_editorial_quote_line_height">28sp</dimen>
+    <dimen name="ds_type_numeral_size">22sp</dimen>
+    <dimen name="ds_type_numeral_line_height">26sp</dimen>
+    <dimen name="ds_type_title_large_size">18sp</dimen>
+    <dimen name="ds_type_title_large_line_height">24sp</dimen>
+    <dimen name="ds_type_title_medium_size">16sp</dimen>
+    <dimen name="ds_type_title_medium_line_height">22sp</dimen>
+    <dimen name="ds_type_title_small_size">14sp</dimen>
+    <dimen name="ds_type_title_small_line_height">20sp</dimen>
+    <dimen name="ds_type_body_large_size">16sp</dimen>
+    <dimen name="ds_type_body_large_line_height">24sp</dimen>
+    <dimen name="ds_type_body_medium_size">14sp</dimen>
+    <dimen name="ds_type_body_medium_line_height">20sp</dimen>
+    <dimen name="ds_type_body_small_size">12sp</dimen>
+    <dimen name="ds_type_body_small_line_height">16sp</dimen>
+    <dimen name="ds_type_label_large_size">14sp</dimen>
+    <dimen name="ds_type_label_large_line_height">20sp</dimen>
+    <dimen name="ds_type_label_medium_size">12sp</dimen>
+    <dimen name="ds_type_label_medium_line_height">16sp</dimen>
+    <dimen name="ds_type_label_small_size">11sp</dimen>
+    <dimen name="ds_type_label_small_line_height">16sp</dimen>
+
+    <!-- Безразмерные значения: читать через ResourcesCompat.getFloat() -->
+    <item name="ds_opacity_disabled_content" format="float" type="dimen">0.38</item>
+    <item name="ds_opacity_disabled_container" format="float" type="dimen">0.12</item>
+    <item name="ds_opacity_hover_overlay" format="float" type="dimen">0.08</item>
+    <item name="ds_opacity_focus_overlay" format="float" type="dimen">0.12</item>
+    <item name="ds_opacity_pressed_overlay" format="float" type="dimen">0.12</item>
+    <item name="ds_opacity_dragged_overlay" format="float" type="dimen">0.16</item>
+    <item name="ds_opacity_ghost_layer" format="float" type="dimen">0.6</item>
+    <item name="ds_motion_press_scale" format="float" type="dimen">0.97</item>
+    <item name="ds_motion_heart_peak_scale" format="float" type="dimen">1.25</item>
+    <item name="ds_motion_heart_burst_scale" format="float" type="dimen">1.6</item>
+    <item name="ds_motion_drop_start_scale" format="float" type="dimen">1.04</item>
+    <item name="ds_spring_drop_stiffness" format="float" type="dimen">450</item>
+    <item name="ds_spring_drop_damping_ratio" format="float" type="dimen">0.55</item>
+    <item name="ds_spring_snap_stiffness" format="float" type="dimen">800</item>
+    <item name="ds_spring_snap_damping_ratio" format="float" type="dimen">0.7</item>
+    <item name="ds_spring_heart_stiffness" format="float" type="dimen">1200</item>
+    <item name="ds_spring_heart_damping_ratio" format="float" type="dimen">0.4</item>
+    <item name="ds_spring_press_stiffness" format="float" type="dimen">1500</item>
+    <item name="ds_spring_press_damping_ratio" format="float" type="dimen">1</item>
+    <item name="ds_spring_sheet_stiffness" format="float" type="dimen">600</item>
+    <item name="ds_spring_sheet_damping_ratio" format="float" type="dimen">0.9</item>
+    <!-- Затемнение окна под диалогами и bottom sheet (= alpha токена scrim) -->
+    <item name="ds_scrim_alpha" format="float" type="dimen">0.48</item>
+</resources>

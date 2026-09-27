@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Фильтр-чип: контур в покое, инверсная заливка при выборе. Видимая высота 36, касание 48. -->
+    <style name="Widget.Ds.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+        <item name="chipMinHeight">@dimen/ds_size_chip_height</item>
+        <item name="chipMinTouchTargetSize">@dimen/ds_size_touch_target</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+        <item name="chipBackgroundColor">@color/ds_chip_filter_bg</item>
+        <item name="chipStrokeColor">@color/ds_chip_filter_stroke</item>
+        <item name="chipStrokeWidth">@dimen/ds_size_stroke_hairline</item>
+        <item name="android:textColor">@color/ds_chip_filter_fg</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="chipIconTint">@color/ds_chip_filter_fg</item>
+        <item name="chipIconSize">@dimen/ds_size_icon_small</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="closeIconVisible">false</item>
+        <item name="chipStartPadding">@dimen/ds_space_2</item>
+        <item name="chipEndPadding">@dimen/ds_space_2</item>
+        <item name="textStartPadding">@dimen/ds_space_1</item>
+        <item name="textEndPadding">@dimen/ds_space_1</item>
+        <item name="rippleColor">@color/ds_ripple_on_surface</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Chip</item>
+    </style>
+
+    <!-- Чип-хэштег в публикации: с крестиком удаления. -->
+    <style name="Widget.Ds.Chip.Input" parent="Widget.Material3.Chip.Input">
+        <item name="chipMinHeight">@dimen/ds_size_chip_height</item>
+        <item name="chipMinTouchTargetSize">@dimen/ds_size_touch_target</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+        <item name="chipBackgroundColor">?attr/dsColorSurfaceSunken</item>
+        <item name="chipStrokeWidth">@dimen/ds_space_0</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="closeIconTint">?attr/dsColorOnSurfaceVariant</item>
+        <item name="closeIconSize">@dimen/ds_size_icon_small</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Chip</item>
+    </style>
+
+    <!-- Подсказка (рекомендованный тег, быстрый ответ). -->
+    <style name="Widget.Ds.Chip.Suggestion" parent="Widget.Material3.Chip.Suggestion">
+        <item name="chipMinHeight">@dimen/ds_size_chip_height</item>
+        <item name="chipMinTouchTargetSize">@dimen/ds_size_touch_target</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+        <item name="chipBackgroundColor">@android:color/transparent</item>
+        <item name="chipStrokeColor">?attr/dsColorOutlineVariant</item>
+        <item name="chipStrokeWidth">@dimen/ds_size_stroke_hairline</item>
+        <item name="android:textColor">?attr/dsColorOnSurface</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelLarge</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Ds.Chip</item>
+    </style>
+
+    <style name="Widget.Ds.ChipGroup" parent="Widget.Material3.ChipGroup">
+        <item name="chipSpacingHorizontal">@dimen/ds_space_2</item>
+        <item name="chipSpacingVertical">@dimen/ds_space_0</item>
+    </style>
+
+    <style name="Widget.Ds.ChipGroup.Filter">
+        <item name="singleLine">true</item>
+        <item name="singleSelection">true</item>
+        <item name="selectionRequired">true</item>
+    </style>
+</resources>

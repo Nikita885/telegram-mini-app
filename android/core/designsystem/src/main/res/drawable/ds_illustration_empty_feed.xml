@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Пустая лента: вешалки на рейле. СГЕНЕРИРОВАНО tools/designsystem/illustrations.py -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/ds_size_illustration"
+    android:height="@dimen/ds_size_illustration"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+    <path
+        android:pathData="M24,40 H136 M32,40 V128 M128,40 V128 M24,128 H40 M120,128 H136"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M16,136 H144"
+        android:strokeColor="?attr/dsColorOnSurfaceVariant"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M50,44 A4,4 0 1,1 56.83,46.83 Q54,48.83 54,52"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M54,52 L41,63.05 L67,63.05 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M76,44 A4,4 0 1,1 82.83,46.83 Q80,48.83 80,52"
+        android:strokeColor="?attr/dsColorAccent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M80,52 L67,63.05 L93,63.05 Z"
+        android:strokeColor="?attr/dsColorAccent"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:pathData="M102,44 A4,4 0 1,1 108.83,46.83 Q106,48.83 106,52"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorSurfaceSunken"
+        android:pathData="M106,52 L93,63.05 L119,63.05 Z"
+        android:strokeColor="?attr/dsColorOnSurface"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <path
+        android:fillColor="?attr/dsColorAccent"
+        android:pathData="M108,89 L109.96,94.04 L115,96 L109.96,97.96 L108,103 L106.04,97.96 L101,96 L106.04,94.04 Z" />
+    <path
+        android:fillColor="?attr/dsColorOnSurfaceVariant"
+        android:pathData="M52,100 L53.12,102.88 L56,104 L53.12,105.12 L52,108 L50.88,105.12 L48,104 L50.88,102.88 Z" />
+</vector>
