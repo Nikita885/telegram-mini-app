@@ -1,43 +1,94 @@
+# Outfit Share — production stack.
+#   cp .env.example .env   # fill it in
+#   docker compose up -d --build
+# The app listens on 127.0.0.1:${APP_PORT:-8010}; put your HTTPS proxy in front of it
+# (see DEPLOY.md), or start the bundled Caddy with:  docker compose --profile caddy up -d
+name: outfitshare
+
+x-app: &app
+  build: .
+  image: outfitshare-backend:latest
+  env_file: .env
+  environment:
+    POSTGRES_HOST: db
+    REDIS_URL: redis://redis:6379/0
+  volumes:
+    - media:/app/media
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_started
+  restart: unless-stopped
+
 services:
   db:
-    image: postgres:16
-    env_file:
-      - ./backend/.env
-    ports:
-      - "5432:5432"
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-outfits}
+      POSTGRES_USER: ${POSTGRES_USER:-outfits}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
 
   redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
+    image: redis:7-alpine
     command: redis-server --appendonly yes
-
-  backend:
-    build: ./backend
-    env_file:
-      - ./backend/.env
-    environment:
-      - REDIS_HOST=redis
-    command: >
-      sh -c "./scripts/wait-for-it.sh db:5432 --strict --timeout=60 &&
-            ./scripts/wait-for-it.sh redis:6379 --strict --timeout=60 &&
-            python manage.py migrate &&
-            python manage.py collectstatic --noinput &&
-            exec daphne -b 0.0.0.0 -p 8000 config.asgi:application"
     volumes:
-      - ./backend:/app
-      - ./frontend:/frontend
-      - ./media:/app/media
+      - redisdata:/data
+    restart: unless-stopped
+
+  web:
+    <<: *app
+    command: web
     ports:
-      - "8000:8000"
+      - "127.0.0.1:${APP_PORT:-8010}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  worker:
+    <<: *app
+    command: worker
+    deploy:
+      resources:
+        limits:
+          memory: ${WORKER_MEMORY:-3g}
+
+  bot:
+    <<: *app
+    command: bot
+
+  # Optional HTTPS proxy with automatic Let's Encrypt certificates.
+  # Use only if ports 80/443 on the server are free.
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["caddy"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
     depends_on:
-      - db
-      - redis
+      - web
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  redis_data:
+  pgdata:
+  redisdata:
+  media:
+  caddydata:
+  caddyconfig:

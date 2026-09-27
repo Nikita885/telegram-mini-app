@@ -1,8 +1,9 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
-from django.conf.urls.static import static
+from django.http import JsonResponse
 from django.shortcuts import redirect
+from django.views.static import serve as serve_media
 from api.views import (
     authorize_view, home_view, search_view, messages_view, 
     chat_view, chat_with_user_view,  # ✅ NEW
@@ -13,6 +14,8 @@ from api.views import (
 urlpatterns = [
     path('', lambda request: redirect('authorize')),
     path('admin/', admin.site.urls),
+    path('health/', lambda request: JsonResponse({'status': 'ok'})),
+    path('api/v1/', include('mobile.urls')),
     path('api/', include('api.urls')),
 
     path('authorize/', authorize_view, name='authorize'),
@@ -32,4 +35,7 @@ urlpatterns = [
     path('avatar/', avatar_view, name='avatar'),
     path('connections/<str:connection_type>/', connections_view, name='connections'),
     path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # Media is served by Django itself so the deployment needs no extra proxy rules;
+    # a front proxy may still serve /media/ directly from the shared volume.
+    re_path(r'^media/(?P<path>.*)$', serve_media, {'document_root': settings.MEDIA_ROOT}),
+]

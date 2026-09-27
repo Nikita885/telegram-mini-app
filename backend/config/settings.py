@@ -1,172 +1,240 @@
-from pathlib import Path
+"""Django settings. Everything environment-specific comes from environment variables (see .env.example)."""
+
 import os
+from datetime import timedelta
+from pathlib import Path
+from urllib.parse import urlparse
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from dotenv import load_dotenv
 
-TEMPLATES_DIR = os.path.join(BASE_DIR, '..', 'frontend', 'templates')
-
-SECRET_KEY = 'django-insecure-4r#u8=^_av+-hl%76u2pq*oplfv9$$+ghr2^o2rh4$4al184zl'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
-# Application definition
+def env(name, default=None):
+    return os.environ.get(name, default)
+
+
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def env_list(name, default=""):
+    return [item.strip() for item in os.environ.get(name, default).split(",") if item.strip()]
+
+
+DEBUG = env_bool("DEBUG", False)
+
+SECRET_KEY = env("SECRET_KEY") or ("dev-insecure-key" if DEBUG else None)
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set when DEBUG is off")
+
+DOMAIN = env("DOMAIN", "localhost")
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", f"{DOMAIN},www.{DOMAIN},localhost,127.0.0.1,backend")
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", f"https://{DOMAIN},https://www.{DOMAIN}")
+
+# Public base URL used to build absolute media links for the mobile app.
+PUBLIC_BASE_URL = env("PUBLIC_BASE_URL", f"https://{DOMAIN}").rstrip("/")
+
+TG_BOT_TOKEN = env("TG_BOT_TOKEN", "")
+TG_BOT_USERNAME = env("TG_BOT_USERNAME", "").lstrip("@")
 
 INSTALLED_APPS = [
-    'daphne',  # Должен быть первым для WebSocket
-    'cloudinary_storage',
-    'cloudinary',
-    'api',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'channels',  # Django Channels
+    "daphne",
+    "api",
+    "mobile",
+    "studio",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "channels",
 ]
+
+CLOUDINARY_CLOUD_NAME = env("CLOUDINARY_CLOUD_NAME")
+if CLOUDINARY_CLOUD_NAME:
+    INSTALLED_APPS[1:1] = ["cloudinary_storage", "cloudinary"]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← Для статики через ASGI
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
+
+FRONTEND_DIR = Path(env("FRONTEND_DIR", str(BASE_DIR.parent / "frontend")))
+if not FRONTEND_DIR.exists() and Path("/frontend").exists():
+    FRONTEND_DIR = Path("/frontend")
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '..', 'frontend', 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [FRONTEND_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
-# ── Django Channels Configuration ────────────────────────────────────────────
-ASGI_APPLICATION = 'config.asgi.application'
+# ── Redis / Channels / Celery ────────────────────────────────────────────────
+REDIS_URL = env("REDIS_URL") or f"redis://{env('REDIS_HOST', 'redis')}:{env('REDIS_PORT', '6379')}/0"
 
-_redis_url = os.environ.get('REDIS_URL')
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [_redis_url] if _redis_url else [(os.environ.get('REDIS_HOST', 'redis'), 6379)],
-        },
-    },
-}
+if env_bool("CHANNELS_IN_MEMORY", False):
+    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [REDIS_URL]},
+        }
+    }
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = None
+CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER", False)
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_ROUTES = {"studio.tasks.*": {"queue": "ml"}}
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
-_database_url = os.environ.get('DATABASE_URL')
-if _database_url:
-    from urllib.parse import urlparse as _urlparse
-    _db = _urlparse(_database_url)
+# ── Database ─────────────────────────────────────────────────────────────────
+_database_url = env("DATABASE_URL")
+if _database_url and _database_url.startswith("sqlite"):
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': _db.path[1:],
-            'USER': _db.username,
-            'PASSWORD': _db.password,
-            'HOST': _db.hostname,
-            'PORT': _db.port or 5432,
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _database_url.split("///", 1)[1] or ":memory:",
+        }
+    }
+elif _database_url:
+    _db = urlparse(_database_url)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _db.path[1:],
+            "USER": _db.username,
+            "PASSWORD": _db.password,
+            "HOST": _db.hostname,
+            "PORT": _db.port or 5432,
+            "CONN_MAX_AGE": 60,
         }
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get('POSTGRES_DB', 'database-tg-app'),
-            'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-            'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'Qiwe1419as'),
-            'HOST': os.environ.get('POSTGRES_HOST', 'db'),
-            'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("POSTGRES_DB", "outfits"),
+            "USER": env("POSTGRES_USER", "outfits"),
+            "PASSWORD": env("POSTGRES_PASSWORD", ""),
+            "HOST": env("POSTGRES_HOST", "db"),
+            "PORT": env("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": 60,
         }
     }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = "ru-ru"
+TIME_ZONE = env("TIME_ZONE", "Asia/Yekaterinburg")
 USE_I18N = True
-
 USE_TZ = True
 
+# ── Static & media ───────────────────────────────────────────────────────────
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [FRONTEND_DIR / "static"] if (FRONTEND_DIR / "static").exists() else []
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path(env("MEDIA_ROOT", str(BASE_DIR / "media")))
 
-STATIC_URL = '/static/'
-
-_frontend_static = os.path.join(BASE_DIR, '..', 'frontend', 'static')
-STATICFILES_DIRS = [_frontend_static] if os.path.exists(_frontend_static) else []
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# WhiteNoise configuration
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTH_USER_MODEL = 'api.CustomUser'
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-TG_BOT_TOKEN = "8644654149:AAG4xfWRe1Z67Ilfi_P0K2HBoqa1FwsBBBs"
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = '/app/media'
-
-# ── Cloudinary (persistent media storage for Railway) ────────────────────────
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY    = os.environ.get('CLOUDINARY_API_KEY')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
 
 if CLOUDINARY_CLOUD_NAME:
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-        'API_KEY':    CLOUDINARY_API_KEY,
-        'API_SECRET': CLOUDINARY_API_SECRET,
+        "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+        "API_KEY": env("CLOUDINARY_API_KEY"),
+        "API_SECRET": env("CLOUDINARY_API_SECRET"),
     }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "api.CustomUser"
+
+# ── Security ─────────────────────────────────────────────────────────────────
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Telegram Desktop/Web opens the Mini App inside an iframe.
+    SESSION_COOKIE_SAMESITE = "None"
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "SAMEORIGIN"
+
+# ── REST framework & JWT ─────────────────────────────────────────────────────
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ["mobile.auth.JWTAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
+    "DEFAULT_THROTTLE_RATES": {
+        "auth": "30/min",
+        "auth_poll": "120/min",
+        "write": "120/min",
+        "upload": "30/min",
+    },
+    "EXCEPTION_HANDLER": "mobile.exceptions.exception_handler",
+}
+
+JWT_SIGNING_KEY = env("JWT_SIGNING_KEY", SECRET_KEY)
+JWT_ACCESS_TTL = timedelta(minutes=int(env("JWT_ACCESS_MINUTES", "30")))
+JWT_REFRESH_TTL = timedelta(days=int(env("JWT_REFRESH_DAYS", "60")))
+LOGIN_NONCE_TTL = timedelta(minutes=5)
+
+# Lets the app sign in with just a Telegram ID. Only for local development.
+ALLOW_DEV_LOGIN = env_bool("ALLOW_DEV_LOGIN", False)
+
+# ── Studio (garment → mannequin pipeline) ────────────────────────────────────
+STUDIO_BG_MODEL = env("STUDIO_BG_MODEL", "isnet-general-use")
+STUDIO_FIT_SCORE_THRESHOLD = float(env("STUDIO_FIT_SCORE_THRESHOLD", "0.6"))
+MANNEQUIN_CANVAS_SIZE = (750, 1000)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"plain": {"format": "%(asctime)s %(levelname)s %(name)s: %(message)s"}},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "plain"}},
+    "root": {"handlers": ["console"], "level": env("LOG_LEVEL", "INFO")},
+}

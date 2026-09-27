@@ -1,19 +1,28 @@
-Django==4.2
-djangorestframework
-psycopg2-binary
-django-cors-headers
-python-dotenv
-requests
-Pillow
+Django==5.2.7
+djangorestframework==3.16.1
+psycopg[binary]==3.2.10
+python-dotenv==1.1.1
+requests==2.32.5
+Pillow==12.3.0
+PyJWT==2.10.1
 
-# WebSocket support
-channels==4.0.0
-channels-redis==4.1.0
-daphne==4.0.0
+# WebSocket (ASGI)
+channels==4.3.1
+channels-redis==4.3.0
+daphne==4.2.1
 
-# Static files for ASGI
-whitenoise==6.6.0
+# Background jobs
+celery==5.5.3
+redis==6.4.0
 
-# Cloud media storage
-cloudinary==1.40.0
+# Static files
+whitenoise==6.11.0
+
+# Optional cloud media storage (enabled when CLOUDINARY_CLOUD_NAME is set)
+cloudinary==1.44.1
 django-cloudinary-storage==0.3.0
+
+# Studio pipeline
+numpy==2.5.3
+scipy==1.18.1
+rembg[cpu]==2.0.75

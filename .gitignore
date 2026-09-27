@@ -23,3 +23,25 @@ __pycache__/
 docs/design/screenshots/.raw/
 # Кэш скачанных исходников шрифтов
 .cache/
+
+# Node modules (make_vkr.js)
+node_modules/
+
+# Secrets
+.env
+**/.env
+!**/.env.example
+
+# Android
+android/local.properties
+android/.gradle/
+android/build/
+android/**/build/
+*.jks
+*.keystore
+android/keystore.properties
+
+# Local build outputs
+dist/
+.venv/
+backend/wait-for-it/

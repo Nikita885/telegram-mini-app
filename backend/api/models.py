@@ -22,6 +22,32 @@ class TelegramUser(models.Model):
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     avatar_random_color = models.CharField(max_length=7, blank=True, null=True)
 
+    ROLE_USER = 'user'
+    ROLE_MODERATOR = 'moderator'
+    ROLE_ADMIN = 'admin'
+    ROLE_CHOICES = [
+        (ROLE_USER, 'Пользователь'),
+        (ROLE_MODERATOR, 'Модератор'),
+        (ROLE_ADMIN, 'Администратор'),
+    ]
+    role = models.CharField(max_length=16, choices=ROLE_CHOICES, default=ROLE_USER)
+    bio = models.CharField(max_length=150, blank=True, default='')
+    is_banned = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+    @property
+    def is_admin(self):
+        return self.role == self.ROLE_ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role in (self.ROLE_ADMIN, self.ROLE_MODERATOR)
+
+    @property
+    def display_name(self):
+        full = ' '.join(p for p in (self.first_name, self.last_name) if p)
+        return full or self.username or f'id{self.telegram_id}'
+
     def __str__(self):
         return self.username or self.first_name or str(self.telegram_id)
 
@@ -66,7 +92,11 @@ class Dialog(models.Model):
 class Message(models.Model):
     dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='sent_messages')
-    text = models.TextField()
+    text = models.TextField(blank=True)
+    # Shared outfit attached to the message (mobile app); Mini App encodes it inside text.
+    post = models.ForeignKey(
+        'OutfitPost', on_delete=models.SET_NULL, null=True, blank=True, related_name='shares'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
     edited = models.BooleanField(default=False)
@@ -86,6 +116,10 @@ class Mannequin(models.Model):
     ]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, unique=True)
     image = models.ImageField(upload_to='mannequins/')
+    # Normalized canvas with the mannequin centred on it, all garment layers share its coordinates.
+    canvas = models.ImageField(upload_to='mannequins/canvas/', blank=True, null=True)
+    # Anchor points {name: [x, y]} in normalized canvas coordinates (0..1).
+    anchors = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['gender']
@@ -107,7 +141,18 @@ class ClothingCategory(models.Model):
         ('hat', 'Головные уборы'),
     ]
     
+    ZONE_CHOICES = [
+        ('head', 'Голова'),
+        ('upper', 'Верх'),
+        ('lower', 'Низ'),
+        ('full', 'Всё тело'),
+        ('feet', 'Стопы'),
+        ('accessory', 'Аксессуар'),
+    ]
+
     name = models.CharField(max_length=50, choices=CATEGORY_CHOICES, unique=True)
+    zone = models.CharField(max_length=16, choices=ZONE_CHOICES, default='upper')
+    default_layer = models.IntegerField(default=30)
     icon_class = models.CharField(max_length=50, default='ri-shirt-line', blank=True)
     icon_svg = models.FileField(upload_to='category_icons/', blank=True, null=True, verbose_name='SVG иконка')
     order = models.IntegerField(default=0)
@@ -145,11 +190,33 @@ class ClothingItem(models.Model):
     tags = models.CharField(max_length=500, blank=True)
     item_description = models.TextField(blank=True, verbose_name='Описание')
     buy_link = models.URLField(max_length=500, blank=True, null=True, verbose_name='Где купить (ссылка)')
+    brand = models.CharField(max_length=120, blank=True, default='')
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    SEASON_CHOICES = [
+        ('all', 'Всесезон'),
+        ('summer', 'Лето'),
+        ('demi', 'Демисезон'),
+        ('winter', 'Зима'),
+    ]
+    season = models.CharField(max_length=10, choices=SEASON_CHOICES, default='all', blank=True)
+
+    # Garment layers fitted to each mannequin canvas (transparent, same size as the canvas).
+    fitted_male = models.ImageField(upload_to='clothing/fitted/', max_length=500, blank=True, null=True)
+    fitted_female = models.ImageField(upload_to='clothing/fitted/', max_length=500, blank=True, null=True)
+    keypoints = models.JSONField(default=dict, blank=True)
+    fit_score = models.FloatField(blank=True, null=True)
+    is_published = models.BooleanField(default=True)
+    created_by = models.ForeignKey(
+        'TelegramUser', on_delete=models.SET_NULL, null=True, blank=True, related_name='studio_items'
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-created_at']
+
+    def fitted_for(self, gender):
+        return self.fitted_female if gender == 'female' else self.fitted_male
     
     def save(self, *args, **kwargs):
         if self.image and hasattr(self.image, 'file'):
@@ -205,9 +272,21 @@ class OutfitPost(models.Model):
     description = models.TextField(blank=True)
     hashtags = models.ManyToManyField(Hashtag, blank=True, related_name='posts')
     final_image = models.ImageField(upload_to='outfits/', blank=True, null=True)
-    
+
+    VISIBILITY_CHOICES = [
+        ('all', 'Все'),
+        ('followers', 'Подписчики'),
+        ('private', 'Только я'),
+    ]
+    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='all')
+    remix_of = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='remixes'
+    )
+    is_hidden = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     likes_count = models.IntegerField(default=0)
+    comments_count = models.IntegerField(default=0)
     
     class Meta:
         ordering = ['-created_at']
@@ -226,6 +305,11 @@ class PostClothingItem(models.Model):
     scale = models.FloatField(default=1.0)
     rotation = models.FloatField(default=0)
     z_index = models.IntegerField(default=0)
+    # Mobile layers use normalized canvas coordinates; Mini App layers use screen pixels.
+    normalized = models.BooleanField(default=False)
+    flipped = models.BooleanField(default=False)
+    # Drawn from the item's fitted layer (canvas-sized) instead of the free cutout.
+    fitted = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['z_index']
@@ -249,6 +333,9 @@ class PostLike(models.Model):
 class PostComment(models.Model):
     post = models.ForeignKey(OutfitPost, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='post_comments')
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies'
+    )
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     likes_count = models.IntegerField(default=0)
@@ -276,7 +363,10 @@ class Notification(models.Model):
     NOTIF_TYPES = [
         ('like', 'Лайк'),
         ('comment', 'Комментарий'),
+        ('reply', 'Ответ'),
         ('follow', 'Подписка'),
+        ('remix', 'Ремикс'),
+        ('studio', 'Студия'),
     ]
     recipient = models.ForeignKey(
         TelegramUser, on_delete=models.CASCADE, related_name='notifications'

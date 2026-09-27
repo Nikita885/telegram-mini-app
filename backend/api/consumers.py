@@ -22,6 +22,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
             
+        # Sender identity always comes from the authenticated session, never from the client.
+        self.user = user
         has_access = await self.check_dialog_access(user, self.dialog_id)
         if not has_access:
             await self.close()
@@ -60,7 +62,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message = await self.save_message(
                 dialog_id=self.dialog_id,
                 text=data.get('text', ''),
-                sender_id=data.get('sender_id')
+                sender_id=self.user.telegram_id
             )
             
             if message:
@@ -96,7 +98,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             success = await self.edit_message(
                 message_id=data.get('message_id'),
                 new_text=data.get('text', ''),
-                sender_id=data.get('sender_id')
+                sender_id=self.user.telegram_id
             )
             
             if success:
@@ -126,7 +128,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Удаление сообщения
             success = await self.delete_message(
                 message_id=data.get('message_id'),
-                sender_id=data.get('sender_id')
+                sender_id=self.user.telegram_id
             )
             
             if success:
@@ -176,7 +178,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'user_typing',
-                    'sender_id': data.get('sender_id')
+                    'sender_id': self.user.telegram_id
                 }
             )
     

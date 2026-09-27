@@ -1,20 +1,13 @@
-# Generated static files — collectstatic creates these fresh on every deploy
-backend/staticfiles/
-
-# Media uploads — stored in Cloudinary on production
-media/
+# Only backend/ and frontend/ are needed in the image.
+*
+!backend/
+!frontend/
+backend/.venv/
+backend/.env
+backend/.env.*
+!backend/.env.example
 backend/media/
-
-# Python cache
+backend/staticfiles/
+backend/*.sqlite3
 **/__pycache__/
 **/*.pyc
-**/*.pyo
-
-# Datasets
-fashion-product-images-dataset/
-
-# Node modules
-node_modules/
-
-# Local env files
-**/.env
