@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Студия: доводка точек». -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_space_1"
+        android:paddingEnd="@dimen/ds_space_1">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/close"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_close"
+            app:icon="@drawable/ds_ic_close" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingStart="@dimen/ds_space_3"
+            android:paddingEnd="@dimen/ds_space_3"
+            android:text="@string/studio_keypoints_title"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="?attr/dsColorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/undo"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_undo"
+            android:enabled="false"
+            app:icon="@drawable/ds_ic_undo" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/redo"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_redo"
+            android:enabled="false"
+            app:icon="@drawable/ds_ic_redo" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/keypoints_canvas_height">
+
+        <app.outfitshare.feature.studio.KeypointEditorView
+            android:id="@+id/editor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/dsColorCanvas"
+            android:contentDescription="@string/studio_review_image"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/mannequin"
+            style="@style/Widget.Ds.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:text="@string/studio_mannequin"
+            app:chipIcon="@drawable/ds_ic_mannequin"
+            app:chipIconVisible="true" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingTop="@dimen/ds_space_3"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:text="@string/studio_keypoints_hint"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/dsColorOnSurfaceVariant" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_space_4">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/reset"
+            style="@style/Widget.Ds.Button.Ghost"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/ds_size_button_height_large"
+            android:text="@string/studio_reset" />
+
+        <Space
+            android:layout_width="@dimen/ds_space_2"
+            android:layout_height="1dp" />
+
+        <app.outfitshare.core.designsystem.component.button.DsButton
+            android:id="@+id/done"
+            style="@style/Widget.Ds.Button.Primary.Large"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/action_done" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Коллекции»: 2×2 mosaic cover (3:4) from the latest outfits, title, count. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical">
+
+    <app.outfitshare.core.ui.AspectFrameLayout
+        android:id="@+id/cover"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_collection_cover"
+        app:aspectRatio="0.75">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnCount="2"
+            android:rowCount="2">
+
+            <ImageView
+                android:id="@+id/c0"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginEnd="@dimen/profile_grid_half_gap"
+                android:layout_marginBottom="@dimen/profile_grid_half_gap"
+                android:background="?attr/dsColorSurfaceSunken"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/c1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="@dimen/profile_grid_half_gap"
+                android:layout_marginBottom="@dimen/profile_grid_half_gap"
+                android:background="?attr/dsColorSurfaceSunken"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/c2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginTop="@dimen/profile_grid_half_gap"
+                android:layout_marginEnd="@dimen/profile_grid_half_gap"
+                android:background="?attr/dsColorSurfaceSunken"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/c3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_rowWeight="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="@dimen/profile_grid_half_gap"
+                android:layout_marginTop="@dimen/profile_grid_half_gap"
+                android:background="?attr/dsColorSurfaceSunken"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop" />
+        </GridLayout>
+    </app.outfitshare.core.ui.AspectFrameLayout>
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:drawablePadding="@dimen/ds_space_1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceTitleSmall"
+        android:textColor="?attr/dsColorOnSurface" />
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/dsColorOnSurfaceVariant" />
+</LinearLayout>

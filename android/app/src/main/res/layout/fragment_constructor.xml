@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Конструктор»: studio canvas on top, catalog in a bottom panel. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constructor_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_space_1"
+        android:paddingEnd="@dimen/ds_space_2">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/close"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_close"
+            app:icon="@drawable/ds_ic_close" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="@dimen/ds_space_3"
+            android:paddingEnd="@dimen/ds_space_3"
+            android:text="@string/constructor_title"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="?attr/dsColorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/undo"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_undo"
+            android:enabled="false"
+            app:icon="@drawable/ds_ic_undo" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/redo"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_redo"
+            android:enabled="false"
+            app:icon="@drawable/ds_ic_redo" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/next"
+            style="@style/Widget.Ds.Button.Primary.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/action_next" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/constructor_canvas_height">
+
+        <app.outfitshare.feature.constructor.OutfitCanvasView
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/mannequin_chip"
+            style="@style/Widget.Ds.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:checkable="false"
+            android:text="@string/constructor_female"
+            app:chipIcon="@drawable/ds_ic_mannequin"
+            app:chipIconVisible="true" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/layers_chip"
+            style="@style/Widget.Ds.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="@dimen/ds_space_3"
+            android:layout_marginBottom="@dimen/ds_space_6"
+            android:checkable="false"
+            android:text="@string/constructor_layers"
+            app:chipIcon="@drawable/ds_ic_layers"
+            app:chipIconVisible="true" />
+
+        <TextView
+            android:id="@+id/empty_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="@dimen/constructor_hint_margin"
+            android:layout_marginEnd="@dimen/constructor_hint_margin"
+            android:layout_marginBottom="@dimen/constructor_hint_bottom"
+            android:background="@drawable/bg_canvas_hint"
+            android:gravity="center"
+            android:paddingStart="@dimen/ds_space_3"
+            android:paddingTop="@dimen/ds_space_2"
+            android:paddingEnd="@dimen/ds_space_3"
+            android:paddingBottom="@dimen/ds_space_2"
+            android:text="@string/constructor_empty_hint"
+            android:textAppearance="@style/TextAppearance.Ds.EditorialQuote"
+            android:textColor="?attr/dsColorOnSurface" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/constructor_panel_overlap"
+        android:layout_weight="1"
+        android:background="@drawable/bg_panel"
+        android:elevation="@dimen/ds_elevation_level2"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ds_space_5">
+
+            <View
+                android:layout_width="@dimen/ds_size_sheet_handle_width"
+                android:layout_height="@dimen/ds_size_sheet_handle_height"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_handle" />
+        </FrameLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/categories"
+            style="@style/Widget.Ds.TabLayout.Scrollable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.divider.MaterialDivider
+            style="@style/Widget.Ds.Divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <app.outfitshare.core.designsystem.component.banner.OfflineBanner
+            android:id="@+id/offline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/catalog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_3"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_4" />
+
+            <app.outfitshare.core.designsystem.component.state.StateView
+                android:id="@+id/catalog_state"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:dsLoadingLayout="@layout/skeleton_tiles" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

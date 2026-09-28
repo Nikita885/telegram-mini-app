@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Онбординг»: three magazine spreads — photo on top, display headline, one idea per page. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/skip"
+        style="@style/Widget.Ds.Button.Ghost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:layout_marginEnd="@dimen/ds_space_3"
+        android:text="@string/onboarding_skip"
+        android:textColor="@color/onboarding_skip" />
+
+    <LinearLayout
+        android:id="@+id/bottom_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_space_4">
+
+        <app.outfitshare.core.ui.PagerDots
+            android:id="@+id/dots"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <app.outfitshare.core.designsystem.component.button.DsButton
+            android:id="@+id/next"
+            style="@style/Widget.Ds.Button.Primary.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/action_next"
+            app:iconGravity="textEnd" />
+    </LinearLayout>
+</FrameLayout>

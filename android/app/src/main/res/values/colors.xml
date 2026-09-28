@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#EFE9DF</color>
+    <!-- Ink over photos with a light backdrop (mockup: onboarding «Пропустить»). -->
+    <color name="onboarding_skip">#1C1B19</color>
+    <color name="photo_ink_scrim">#99000000</color>
+    <!-- Canvas colour at 88 % over the mannequin (mockup empty-canvas hint). -->
+    <color name="canvas_hint">#E0EFE9DF</color>
+    <!-- Camera: fixed dark palette regardless of theme (mockup .quality, .cam-pill). -->
+    <color name="camera_scrim">#9E0B0B0A</color>
+    <color name="camera_warn_scrim">#D93F2A06</color>
+    <color name="camera_on_scrim">#F6F2EB</color>
+    <color name="camera_ok">#86D0A2</color>
+    <color name="camera_warn">#F1C267</color>
+    <color name="camera_flash">#BFFFFFFF</color>
+</resources>

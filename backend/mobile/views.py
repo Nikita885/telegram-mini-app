@@ -218,7 +218,9 @@ class RefreshView(APIView):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def logout(request):
+    """Revoke the given refresh token; holding it is the proof of ownership."""
     token = request.data.get("refresh")
     if token:
         auth.revoke_refresh(token)
@@ -635,7 +637,7 @@ def catalog_items(request):
     params = request.query_params
     qs = ClothingItem.objects.filter(is_published=True).select_related("category")
     if params.get("category"):
-        qs = qs.filter(category__name=params["category"])
+        qs = qs.filter(category__name__in=[c for c in params["category"].split(",") if c])
     if params.get("gender") in ("male", "female"):
         qs = qs.filter(gender__in=[params["gender"], "unisex"])
     if params.get("style"):

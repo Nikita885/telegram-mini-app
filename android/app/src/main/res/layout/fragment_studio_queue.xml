@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Студия: очередь». -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.Ds.Toolbar.Editorial"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ds_ic_arrow_back"
+        app:title="@string/studio_queue" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        app:tabMode="fixed" />
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/Widget.Ds.Divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <app.outfitshare.core.designsystem.component.banner.OfflineBanner
+        android:id="@+id/offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/studio_list_bottom" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <app.outfitshare.core.designsystem.component.state.StateView
+            android:id="@+id/state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:dsLoadingLayout="@layout/skeleton_rows" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/shoot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="@dimen/ds_layout_gutter"
+            android:layout_marginBottom="@dimen/ds_space_4"
+            android:text="@string/studio_shoot"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?attr/dsColorOnPrimary"
+            app:backgroundTint="?attr/dsColorPrimary"
+            app:icon="@drawable/ds_ic_camera"
+            app:iconTint="?attr/dsColorOnPrimary" />
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Студия: проверка». -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ds_ic_arrow_back"
+        app:title="@string/studio_review" />
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/before_after"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/ds_space_1"
+        android:layout_marginBottom="@dimen/ds_space_2"
+        app:checkedButton="@+id/after"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/before"
+            style="@style/Widget.Ds.Button.Secondary.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/studio_before" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/after"
+            style="@style/Widget.Ds.Button.Secondary.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/studio_after" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/review_canvas_height"
+        android:background="?attr/dsColorCanvas">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/studio_review_image"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/fit_ok"
+            style="@style/Widget.Ds.TextBadge.Success"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:drawablePadding="@dimen/ds_space_1"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/badge_check_small"
+            app:drawableTint="?attr/dsColorOnSuccessContainer" />
+
+        <TextView
+            android:id="@+id/fit_low"
+            style="@style/Widget.Ds.TextBadge.Warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:drawablePadding="@dimen/ds_space_1"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/badge_warning"
+            app:drawableTint="?attr/dsColorOnWarningContainer" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/mannequin"
+            style="@style/Widget.Ds.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="@dimen/ds_space_3"
+            android:checkable="false"
+            android:visibility="gone"
+            app:chipIcon="@drawable/ds_ic_mannequin"
+            app:chipIconVisible="true" />
+
+        <LinearLayout
+            android:id="@+id/processing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/dsColorCanvas"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/low_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/dsColorWarningContainer"
+                android:drawablePadding="@dimen/ds_space_3"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/ds_size_touch_target"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_2"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/studio_low_fit"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/dsColorOnWarningContainer"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ds_ic_warning"
+                app:drawableTint="?attr/dsColorOnWarningContainer" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_3"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="?attr/dsColorOnSurface" />
+
+            <TextView
+                android:id="@+id/steps_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_1"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <app.outfitshare.feature.studio.StepsView
+                android:id="@+id/steps"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/studio_steps_height"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_space_3"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:visibility="gone" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_2"
+                android:paddingEnd="@dimen/ds_layout_gutter" />
+
+            <TextView
+                android:id="@+id/warnings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_2"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingTop="@dimen/ds_space_3"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_space_4">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/keypoints"
+            style="@style/Widget.Ds.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/ds_size_button_height_large"
+            android:layout_weight="1"
+            android:text="@string/studio_keypoints"
+            app:icon="@drawable/ds_ic_keypoint" />
+
+        <Space
+            android:layout_width="@dimen/ds_space_2"
+            android:layout_height="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/next"
+            style="@style/Widget.Ds.Button.Primary.Large"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/action_next" />
+    </LinearLayout>
+</LinearLayout>

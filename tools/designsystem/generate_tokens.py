@@ -495,6 +495,8 @@ def android_type_styles(t: Tokens) -> dict[Path, str]:
         lines.append('        <item name="android:textStyle">normal</item>')
         lines.append(f'        <item name="android:textSize">@dimen/ds_type_{snake(key)}_size</item>')
         lines.append(f'        <item name="lineHeight">@dimen/ds_type_{snake(key)}_line_height</item>')
+        # Material3 parents set android:lineHeight too; without this override it wins on newer APIs.
+        lines.append(f'        <item name="android:lineHeight">@dimen/ds_type_{snake(key)}_line_height</item>')
         lines.append(f'        <item name="android:letterSpacing">{fmt_num(spec["letterSpacing"])}</item>')
         caps = "true" if spec.get("textTransform") == "uppercase" else "false"
         lines.append(f'        <item name="android:textAllCaps">{caps}</item>')

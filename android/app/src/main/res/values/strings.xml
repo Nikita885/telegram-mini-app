@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Outfit Share</string>
+
+    <!-- Navigation -->
+    <string name="nav_feed">Лента</string>
+    <string name="nav_search">Поиск</string>
+    <string name="nav_create">Создать</string>
+    <string name="nav_dialogs">Диалоги</string>
+    <string name="nav_profile">Профиль</string>
+
+    <!-- Common -->
+    <string name="action_back">Назад</string>
+    <string name="action_close">Закрыть</string>
+    <string name="action_more">Ещё</string>
+    <string name="action_next">Далее</string>
+    <string name="action_done">Готово</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_share">Поделиться</string>
+    <string name="action_save">Сохранить в коллекцию</string>
+    <string name="action_send">Отправить</string>
+    <string name="action_follow">Подписаться</string>
+    <string name="action_following">Вы подписаны</string>
+    <string name="action_message">Сообщение</string>
+    <string name="action_edit">Редактировать</string>
+    <string name="action_undo">Отменить действие</string>
+    <string name="action_redo">Повторить действие</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_new_outfit">Новый образ</string>
+    <string name="action_notifications">Уведомления</string>
+    <string name="action_read_all">Прочитать все</string>
+    <string name="action_new_collection">Новая коллекция</string>
+    <string name="action_search_dialogs">Поиск по диалогам</string>
+    <string name="action_new_message">Новое сообщение</string>
+    <string name="action_share_outfit">Поделиться образом</string>
+    <string name="action_clear">Очистить</string>
+
+    <!-- Splash & onboarding -->
+    <string name="splash_kicker">Выпуск осень · 2026</string>
+    <string name="splash_quote">Соберите образ — поделитесь стилем.</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_start">Начать</string>
+    <string name="onboarding_1_title">Собирайте образы на манекене</string>
+    <string name="onboarding_1_text">Выбирайте вещи из каталога — они садятся на манекен по опорным точкам, без ручной подгонки.</string>
+    <string name="onboarding_2_title">Вещи слоями, как в жизни</string>
+    <string name="onboarding_2_text">Рубашка под жилетом, пальто поверх — конструктор сам раскладывает слои по зонам тела.</string>
+    <string name="onboarding_3_title">Делитесь и вдохновляйтесь</string>
+    <string name="onboarding_3_text">Публикуйте образы, сохраняйте чужие в коллекции и делайте ремиксы.</string>
+
+    <!-- Login -->
+    <string name="login_title">Войдите, чтобы сохранять образы и делиться ими</string>
+    <string name="login_telegram">Войти через Telegram</string>
+    <string name="login_waiting">Ждём подтверждения в Telegram…</string>
+    <string name="login_hint">Откроется бот Outfit Share. Нажмите «Старт» и вернитесь сюда — вход выполнится сам.</string>
+    <string name="login_open_bot_again">Открыть бота ещё раз</string>
+    <string name="login_legal">Продолжая, вы принимаете Условия и Политику конфиденциальности</string>
+    <string name="login_dev">Тестовый вход</string>
+    <string name="login_server">Сервер</string>
+    <string name="login_offline">Нет подключения — вход станет доступен, когда появится сеть</string>
+
+    <!-- Feed -->
+    <string name="tab_following">Подписки</string>
+    <string name="tab_for_you">Для вас</string>
+    <string name="feed_new_posts">Новые образы</string>
+
+    <!-- Outfit -->
+    <string name="outfit_items_title">Вещи в образе</string>
+    <string name="outfit_similar_title">Похожие образы</string>
+    <string name="outfit_buy">Где купить</string>
+    <string name="outfit_remix">Сделать ремикс</string>
+    <string name="outfit_try">Собрать образ с этой вещью</string>
+    <string name="comments_title">Комментарии</string>
+    <string name="comments_hint">Добавьте комментарий…</string>
+    <string name="comments_reply">Ответить</string>
+    <string name="comments_author">Автор</string>
+    <string name="comment_failed">Не отправлено · Повторить</string>
+
+    <!-- Constructor -->
+    <string name="constructor_title">Образ</string>
+    <string name="constructor_empty_hint">Выберите вещь внизу — она сама сядет на манекен</string>
+    <string name="constructor_layers">Слои</string>
+    <string name="constructor_male">Мужской</string>
+    <string name="constructor_female">Женский</string>
+    <string name="constructor_layers_hint">Перетащите, чтобы изменить порядок. Зона тела определяет, что поверх чего.</string>
+    <string name="publish_title">Публикация</string>
+    <string name="publish_caption">Подпись</string>
+    <string name="publish_caption_hint">Расскажите об образе…</string>
+    <string name="publish_hashtags">Хэштеги</string>
+    <string name="publish_hashtag_hint">Добавить хэштег</string>
+    <string name="publish_collection">Коллекция</string>
+    <string name="publish_visibility">Кто видит</string>
+    <string name="publish_button">Опубликовать</string>
+    <string name="publish_in_progress">Публикуем…</string>
+    <string name="publish_done">Опубликовано</string>
+    <string name="publish_done_title">Образ в ленте ваших подписчиков</string>
+    <string name="publish_view">Смотреть образ</string>
+    <string name="publish_more">Собрать ещё</string>
+    <string name="publish_preview">Превью образа</string>
+    <string name="publish_remix">Разрешить ремиксы</string>
+    <string name="publish_remix_sub">Другие смогут собрать свой образ из ваших вещей</string>
+    <string name="layer_drag">Перетащить слой</string>
+    <string name="layer_delete">Удалить слой</string>
+
+    <!-- Profile -->
+    <string name="profile_outfits">Образы</string>
+    <string name="profile_collections">Коллекции</string>
+    <string name="profile_saved">Сохранённое</string>
+    <string name="profile_drafts">Черновики</string>
+    <string name="profile_edit_photo">Изменить фото</string>
+    <string name="profile_first_name">Имя</string>
+    <string name="profile_last_name">Фамилия</string>
+    <string name="profile_username">Имя пользователя</string>
+    <string name="profile_username_help">Латиница, цифры, точка и _</string>
+    <string name="profile_bio">О себе</string>
+    <string name="profile_photo_sheet">Фото профиля</string>
+    <string name="profile_photo_gallery">Выбрать из галереи</string>
+    <string name="profile_photo_telegram">Взять из Telegram</string>
+    <string name="profile_photo_delete">Удалить фото</string>
+    <string name="profile_studio">Студия</string>
+    <string name="profile_studio_sub">Съёмка и публикация вещей в каталог</string>
+
+    <!-- Follows -->
+    <string name="follows_followers">Подписчики</string>
+    <string name="follows_following">Подписки</string>
+    <string name="search_hint">Образы, люди, вещи, #теги</string>
+    <string name="search_title">Поиск</string>
+    <string name="search_recent">Недавние</string>
+    <string name="search_trending">В тренде</string>
+    <string name="search_people">Люди для вас</string>
+    <string name="filter_outfits">Образы</string>
+    <string name="filter_people">Люди</string>
+    <string name="filter_items">Вещи</string>
+    <string name="filter_tags">Теги</string>
+
+    <!-- Collections -->
+    <string name="collections_title">Коллекции</string>
+    <string name="collection_new">Новая коллекция</string>
+    <string name="collection_name">Название</string>
+    <string name="collection_private">Приватная</string>
+    <string name="collection_private_sub">Видите только вы</string>
+    <string name="collection_create">Создать</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Уведомления</string>
+    <string name="notifications_new">Новые</string>
+    <string name="notifications_week">На этой неделе</string>
+    <string name="notifications_earlier">Раньше</string>
+
+    <!-- Messages -->
+    <string name="dialogs_title">Диалоги</string>
+    <string name="dialogs_pinned">Закреплённые</string>
+    <string name="dialogs_all">Все</string>
+    <string name="chat_hint">Сообщение</string>
+    <string name="chat_typing">печатает…</string>
+    <string name="chat_online">в сети</string>
+    <string name="chat_waiting">ожидание сети…</string>
+    <string name="message_failed">Не отправлено · Повторить</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_system">Как в системе</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_value">Русский</string>
+    <string name="settings_account">Аккаунт</string>
+    <string name="settings_notifications">Уведомления</string>
+    <string name="settings_notif_likes">Лайки и комментарии</string>
+    <string name="settings_notif_follows">Новые подписчики</string>
+    <string name="settings_notif_messages">Сообщения</string>
+    <string name="search_in_list">Поиск по списку</string>
+    <string name="settings_server">Сервер</string>
+    <string name="settings_logout">Выйти</string>
+    <string name="settings_logout_title">Выйти из аккаунта?</string>
+    <string name="settings_logout_text">Черновики на этом телефоне сохранятся. Чтобы вернуться, войдите через Telegram.</string>
+
+    <!-- Studio -->
+    <string name="studio_title">Студия</string>
+    <string name="studio_queue">Очередь</string>
+    <string name="studio_tab_active">В работе</string>
+    <string name="studio_tab_ready">Готово</string>
+    <string name="studio_tab_failed">Ошибки</string>
+    <string name="studio_shoot">Снять</string>
+    <string name="studio_hint">Разложите вещь целиком в рамке, на ровном фоне</string>
+    <string name="studio_shutter">Сделать снимок</string>
+    <string name="studio_gallery">Выбрать из галереи</string>
+    <string name="studio_flash">Вспышка</string>
+    <string name="studio_review">Проверка</string>
+    <string name="studio_before">До</string>
+    <string name="studio_after">После</string>
+    <string name="studio_keypoints">Доводка точек</string>
+    <string name="studio_keypoints_title">Доводка</string>
+    <string name="studio_keypoints_hint">Перетащите точку к краю ткани. Манекен под вещью — ориентир.</string>
+    <string name="studio_reset">Сбросить</string>
+    <string name="studio_mannequin">Манекен</string>
+    <string name="studio_publish_title">Публикация вещи</string>
+    <string name="studio_item_name">Название</string>
+    <string name="studio_category">Категория</string>
+    <string name="studio_color">Цвет</string>
+    <string name="studio_fit">Посадка</string>
+    <string name="studio_style">Стиль</string>
+    <string name="studio_gender">Для кого</string>
+    <string name="studio_buy_link">Где купить (ссылка)</string>
+    <string name="studio_brand">Бренд</string>
+    <string name="studio_price">Цена, ₽</string>
+    <string name="studio_description">Описание</string>
+    <string name="studio_publish_button">Опубликовать в каталог</string>
+    <string name="studio_published">В каталоге</string>
+    <string name="studio_shoot_next">Снять следующую</string>
+    <string name="studio_to_queue">К очереди</string>
+    <string name="studio_viewfinder">Видоискатель камеры</string>
+    <string name="studio_low_fit">Посадка ниже нормы — поправьте опорные точки</string>
+    <string name="studio_review_image">Вещь на манекене</string>
+    <string name="studio_layer">Слой</string>
+    <string name="studio_shop">Где купить</string>
+    <string name="studio_q_light">Свет</string>
+    <string name="studio_q_background">Фон</string>
+    <string name="studio_q_frame">Вещь в кадре</string>
+    <string name="studio_g_female">Женское</string>
+    <string name="studio_g_unisex">Унисекс</string>
+    <string name="studio_g_male">Мужское</string>
+
+    <plurals name="outfits_word">
+        <item quantity="one">образ</item>
+        <item quantity="few">образа</item>
+        <item quantity="many">образов</item>
+        <item quantity="other">образа</item>
+    </plurals>
+    <plurals name="outfits_count">
+        <item quantity="one">%d образ</item>
+        <item quantity="few">%d образа</item>
+        <item quantity="many">%d образов</item>
+        <item quantity="other">%d образа</item>
+    </plurals>
+    <plurals name="items_count">
+        <item quantity="one">%d вещь</item>
+        <item quantity="few">%d вещи</item>
+        <item quantity="many">%d вещей</item>
+        <item quantity="other">%d вещи</item>
+    </plurals>
+    <plurals name="comments_count">
+        <item quantity="one">%d комментарий</item>
+        <item quantity="few">%d комментария</item>
+        <item quantity="many">%d комментариев</item>
+        <item quantity="other">%d комментария</item>
+    </plurals>
+    <plurals name="followers_word">
+        <item quantity="one">подписчик</item>
+        <item quantity="few">подписчика</item>
+        <item quantity="many">подписчиков</item>
+        <item quantity="other">подписчика</item>
+    </plurals>
+</resources>

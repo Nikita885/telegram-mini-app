@@ -11,9 +11,10 @@
     <style name="Base.Theme.Ds" parent="Platform.Theme.Ds">
         <item name="android:windowBackground">?attr/dsColorBackground</item>
 
-        <!-- Типографика -->
-        <item name="fontFamily">@font/ds_text_regular</item>
-        <item name="android:fontFamily">@font/ds_text_regular</item>
+        <!-- Типографика. Шрифт по умолчанию задаётся стилями TextView/EditText, а не темой:
+             android:fontFamily в теме перебивал бы шрифт из textAppearance (антиква заголовков). -->
+        <item name="android:textViewStyle">@style/Widget.Ds.TextView</item>
+        <item name="editTextStyle">@style/Widget.Ds.EditText</item>
         <item name="textAppearanceDisplayLarge">@style/TextAppearance.Ds.DisplayLarge</item>
         <item name="textAppearanceDisplayMedium">@style/TextAppearance.Ds.DisplayMedium</item>
         <item name="textAppearanceDisplaySmall">@style/TextAppearance.Ds.DisplaySmall</item>

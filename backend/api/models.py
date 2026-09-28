@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.files.base import ContentFile
 import io
+import os
 
 
 class CustomUser(AbstractUser):
@@ -241,7 +242,7 @@ class ClothingItem(models.Model):
                     img.save(output, format='JPEG', quality=85, optimize=True)
                     ext = 'jpg'
                 output.seek(0)
-                original_name = self.image.name.rsplit('.', 1)[0]
+                original_name = os.path.splitext(os.path.basename(self.image.name))[0]
                 self.image.save(f"{original_name}.{ext}", ContentFile(output.read()), save=False)
             except Exception:
                 pass  # если что-то пошло не так — сохраняем как есть

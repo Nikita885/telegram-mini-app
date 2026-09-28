@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Настройки»: large serif title, groups with kickers, danger actions via confirmation. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ds_ic_arrow_back" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Widget.Ds.Text.ScreenTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_4"
+                android:text="@string/settings_title" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/me"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowShowChevron="true" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/settings_appearance" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/theme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_palette"
+                app:dsRowShowChevron="true"
+                app:dsRowTitle="@string/settings_theme" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/language"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_language"
+                app:dsRowTitle="@string/settings_language"
+                app:dsRowValue="@string/settings_language_value" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/settings_notifications" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/notif_likes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_favorite"
+                app:dsRowTitle="@string/settings_notif_likes" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/notif_follows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_person_add"
+                app:dsRowTitle="@string/settings_notif_follows" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/notif_messages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_chat"
+                app:dsRowTitle="@string/settings_notif_messages" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/settings_account" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/studio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:dsRowIcon="@drawable/ds_ic_camera"
+                app:dsRowShowChevron="true"
+                app:dsRowSubtitle="@string/profile_studio_sub"
+                app:dsRowTitle="@string/profile_studio" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/server"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_link"
+                app:dsRowTitle="@string/settings_server" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowDestructive="true"
+                app:dsRowIcon="@drawable/ds_ic_logout"
+                app:dsRowTitle="@string/settings_logout" />
+
+            <TextView
+                android:id="@+id/version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_4"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_6"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

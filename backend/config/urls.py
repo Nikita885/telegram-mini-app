@@ -3,7 +3,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.views.static import serve as serve_media
+from mobile.media import serve_media
 from api.views import (
     authorize_view, home_view, search_view, messages_view, 
     chat_view, chat_with_user_view,  # ✅ NEW
@@ -37,5 +37,5 @@ urlpatterns = [
     path('update-avatar/', UpdateAvatarView.as_view(), name='update-avatar'),
     # Media is served by Django itself so the deployment needs no extra proxy rules;
     # a front proxy may still serve /media/ directly from the shared volume.
-    re_path(r'^media/(?P<path>.*)$', serve_media, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r'^media/(?P<path>.*)$', serve_media),
 ]

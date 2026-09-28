@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<app.outfitshare.core.designsystem.component.image.AspectRatioImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_columnWeight="1"
+    android:layout_margin="@dimen/ds_space_1"
+    android:background="@drawable/ds_bg_skeleton_tile"
+    android:importantForAccessibility="no"
+    app:dsAspectRatio="@string/ds_aspect_item" />

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Публикация образа». -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ds_ic_arrow_back"
+        app:title="@string/publish_title" />
+
+    <app.outfitshare.core.designsystem.component.banner.OfflineBanner
+        android:id="@+id/offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_2"
+                android:paddingEnd="@dimen/ds_layout_gutter">
+
+                <app.outfitshare.core.designsystem.component.image.AspectRatioImageView
+                    android:id="@+id/preview"
+                    style="@style/Widget.Ds.Photo"
+                    android:layout_width="@dimen/publish_preview_width"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/publish_preview"
+                    android:scaleType="centerCrop"
+                    app:dsAspectRatio="@string/ds_aspect_outfit" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/caption_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/ds_space_4"
+                    android:layout_weight="1"
+                    android:hint="@string/publish_caption"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="2200"
+                    app:placeholderText="@string/publish_caption_hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/caption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:maxLength="2200"
+                        android:minLines="4" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/publish_hashtags" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingEnd="@dimen/ds_layout_gutter" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_space_2"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:hint="@string/publish_hashtag_hint"
+                app:prefixText="#">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/tag_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLength="40" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/suggestions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/ds_layout_gutter"
+                    android:paddingTop="@dimen/ds_space_2"
+                    android:paddingEnd="@dimen/ds_layout_gutter"
+                    app:singleLine="true" />
+            </HorizontalScrollView>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ds_space_2" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/collection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_collections"
+                app:dsRowShowChevron="true"
+                app:dsRowTitle="@string/publish_collection" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/visibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_visibility"
+                app:dsRowShowChevron="true"
+                app:dsRowTitle="@string/publish_visibility" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/allow_remix"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_remix"
+                app:dsRowSubtitle="@string/publish_remix_sub"
+                app:dsRowTitle="@string/publish_remix" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <app.outfitshare.core.designsystem.component.button.DsButton
+        android:id="@+id/publish"
+        style="@style/Widget.Ds.Button.Primary.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_3"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:layout_marginBottom="@dimen/ds_space_4"
+        android:text="@string/publish_button" />
+</LinearLayout>

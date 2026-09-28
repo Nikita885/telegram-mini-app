@@ -8,6 +8,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_display_large_size</item>
         <item name="lineHeight">@dimen/ds_type_display_large_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_display_large_line_height</item>
         <item name="android:letterSpacing">-0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -19,6 +20,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_display_medium_size</item>
         <item name="lineHeight">@dimen/ds_type_display_medium_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_display_medium_line_height</item>
         <item name="android:letterSpacing">-0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -30,6 +32,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_display_small_size</item>
         <item name="lineHeight">@dimen/ds_type_display_small_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_display_small_line_height</item>
         <item name="android:letterSpacing">-0.005</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -41,6 +44,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_headline_large_size</item>
         <item name="lineHeight">@dimen/ds_type_headline_large_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_headline_large_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -52,6 +56,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_headline_medium_size</item>
         <item name="lineHeight">@dimen/ds_type_headline_medium_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_headline_medium_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -63,6 +68,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_headline_small_size</item>
         <item name="lineHeight">@dimen/ds_type_headline_small_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_headline_small_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -74,6 +80,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_editorial_quote_size</item>
         <item name="lineHeight">@dimen/ds_type_editorial_quote_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_editorial_quote_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -85,6 +92,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_numeral_size</item>
         <item name="lineHeight">@dimen/ds_type_numeral_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_numeral_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -96,6 +104,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_title_large_size</item>
         <item name="lineHeight">@dimen/ds_type_title_large_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_title_large_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -107,6 +116,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_title_medium_size</item>
         <item name="lineHeight">@dimen/ds_type_title_medium_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_title_medium_line_height</item>
         <item name="android:letterSpacing">0.005</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -118,6 +128,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_title_small_size</item>
         <item name="lineHeight">@dimen/ds_type_title_small_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_title_small_line_height</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -129,6 +140,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_body_large_size</item>
         <item name="lineHeight">@dimen/ds_type_body_large_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_body_large_line_height</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -140,6 +152,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_body_medium_size</item>
         <item name="lineHeight">@dimen/ds_type_body_medium_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_body_medium_line_height</item>
         <item name="android:letterSpacing">0.005</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -151,6 +164,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_body_small_size</item>
         <item name="lineHeight">@dimen/ds_type_body_small_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_body_small_line_height</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -162,6 +176,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_label_large_size</item>
         <item name="lineHeight">@dimen/ds_type_label_large_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_label_large_line_height</item>
         <item name="android:letterSpacing">0.01</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -173,6 +188,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_label_medium_size</item>
         <item name="lineHeight">@dimen/ds_type_label_medium_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_label_medium_line_height</item>
         <item name="android:letterSpacing">0.02</item>
         <item name="android:textAllCaps">false</item>
         <item name="textAllCaps">false</item>
@@ -184,6 +200,7 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/ds_type_label_small_size</item>
         <item name="lineHeight">@dimen/ds_type_label_small_line_height</item>
+        <item name="android:lineHeight">@dimen/ds_type_label_small_line_height</item>
         <item name="android:letterSpacing">0.08</item>
         <item name="android:textAllCaps">true</item>
         <item name="textAllCaps">true</item>

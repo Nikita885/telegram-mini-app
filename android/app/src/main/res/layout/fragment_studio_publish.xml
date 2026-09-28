@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Студия: публикация вещи». -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_size_app_bar_height"
+        app:navigationContentDescription="@string/action_back"
+        app:navigationIcon="@drawable/ds_ic_arrow_back"
+        app:title="@string/studio_publish_title" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_1"
+                android:paddingEnd="@dimen/ds_layout_gutter">
+
+                <FrameLayout
+                    android:layout_width="@dimen/studio_item_preview"
+                    android:layout_height="@dimen/studio_item_preview"
+                    android:background="@drawable/ds_bg_item_tile">
+
+                    <ImageView
+                        android:id="@+id/cutout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:importantForAccessibility="no"
+                        android:padding="@dimen/ds_space_2"
+                        android:scaleType="fitCenter" />
+                </FrameLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/name_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/ds_space_4"
+                    android:layout_weight="1"
+                    android:hint="@string/studio_item_name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences"
+                        android:maxLength="255" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/studio_category" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/categories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                app:selectionRequired="true"
+                app:singleSelection="true" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/studio_color" />
+
+            <LinearLayout
+                android:id="@+id/swatches"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingEnd="@dimen/ds_layout_gutter" />
+
+            <TextView
+                android:id="@+id/color_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_1"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_1"
+                android:text="@string/studio_fit" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/layer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_layers"
+                app:dsRowTitle="@string/studio_layer" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/gender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_mannequin"
+                app:dsRowShowChevron="true"
+                app:dsRowTitle="@string/studio_gender" />
+
+            <app.outfitshare.core.designsystem.component.list.ListRowView
+                android:id="@+id/style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:dsRowIcon="@drawable/ds_ic_sparkle"
+                app:dsRowShowChevron="true"
+                app:dsRowTitle="@string/studio_style" />
+
+            <TextView
+                style="@style/Widget.Ds.Text.Kicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_6"
+                android:paddingEnd="@dimen/ds_layout_gutter"
+                android:paddingBottom="@dimen/ds_space_2"
+                android:text="@string/studio_shop" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:hint="@string/studio_brand">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/brand"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:maxLength="120" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_layout_stack_gap"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:hint="@string/studio_price">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:maxLength="10" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/link_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_layout_stack_gap"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:hint="@string/studio_buy_link">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"
+                    android:maxLength="500" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_layout_stack_gap"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:layout_marginBottom="@dimen/ds_space_4"
+                android:hint="@string/studio_description">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="2000"
+                    android:minLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <app.outfitshare.core.designsystem.component.button.DsButton
+        android:id="@+id/publish"
+        style="@style/Widget.Ds.Button.Primary.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_2"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:layout_marginBottom="@dimen/ds_space_4"
+        android:text="@string/studio_publish_button" />
+</LinearLayout>

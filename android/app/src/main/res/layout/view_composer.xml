@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup .composer: leading avatar or button, rounded field, send (filled when there is text). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/composer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_composer"
+    android:gravity="bottom"
+    android:orientation="horizontal"
+    android:padding="@dimen/ds_space_2">
+
+    <FrameLayout
+        android:id="@+id/composer_lead"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/ds_size_touch_target">
+
+        <app.outfitshare.core.designsystem.component.avatar.AvatarView
+            android:id="@+id/composer_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/ds_space_1"
+            android:layout_marginEnd="@dimen/ds_space_1"
+            app:dsAvatarDecorative="true"
+            app:dsAvatarSize="s" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/composer_attach"
+            style="@style/Widget.Ds.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_share_outfit"
+            android:visibility="gone"
+            app:icon="@drawable/ds_ic_hanger" />
+    </FrameLayout>
+
+    <EditText
+        android:id="@+id/composer_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_space_1"
+        android:layout_marginEnd="@dimen/ds_space_1"
+        android:layout_weight="1"
+        android:background="@drawable/bg_composer_field"
+        android:hint="@string/comments_hint"
+        android:importantForAutofill="no"
+        android:inputType="textCapSentences|textMultiLine"
+        android:maxLines="5"
+        android:minHeight="@dimen/ds_size_touch_target"
+        android:paddingStart="@dimen/ds_space_4"
+        android:paddingTop="@dimen/ds_space_3"
+        android:paddingEnd="@dimen/ds_space_4"
+        android:paddingBottom="@dimen/ds_space_3"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/dsColorOnSurface"
+        android:textColorHint="?attr/dsColorOnSurfaceVariant" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/composer_send"
+        style="@style/Widget.Ds.Button.Icon.Filled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/action_send"
+        android:enabled="false"
+        app:icon="@drawable/ds_ic_send" />
+</LinearLayout>

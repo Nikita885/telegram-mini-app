@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="?attr/dsColorSurfaceContainerHigh" />
+    <corners
+        android:bottomLeftRadius="@dimen/ds_shape_bubble_tail"
+        android:bottomRightRadius="@dimen/ds_shape_bubble"
+        android:topLeftRadius="@dimen/ds_shape_bubble"
+        android:topRightRadius="@dimen/ds_shape_bubble" />
+</shape>

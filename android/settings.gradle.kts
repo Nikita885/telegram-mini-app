@@ -22,4 +22,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "OutfitShare"
 
+include(":app")
 include(":core:designsystem")

@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Просмотр образа»: photo comes in via container transform; round on-photo buttons only. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/outfit_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:transitionName="outfit_container">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/ds_space_8">
+
+            <FrameLayout
+                android:id="@+id/photo_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <app.outfitshare.core.designsystem.component.image.AspectRatioImageView
+                    android:id="@+id/photo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/dsColorSurfaceSunken"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    app:dsAspectRatio="@string/ds_aspect_outfit" />
+
+                <ImageView
+                    android:id="@+id/heart"
+                    android:layout_width="@dimen/ds_size_heart_burst"
+                    android:layout_height="@dimen/ds_size_heart_burst"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ds_ic_favorite_filled"
+                    android:visibility="invisible"
+                    app:tint="?attr/dsColorOnPhoto" />
+
+                <TextView
+                    android:id="@+id/items_badge"
+                    style="@style/Widget.Ds.TextBadge.Inverse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="@dimen/ds_space_3"
+                    android:drawablePadding="@dimen/ds_space_1"
+                    app:drawableStartCompat="@drawable/badge_hanger"
+                    app:drawableTint="?attr/dsColorInverseOnSurface" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/author_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:minHeight="@dimen/ds_size_list_item_min_height"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/ds_layout_gutter"
+                android:paddingTop="@dimen/ds_space_3"
+                android:paddingEnd="@dimen/ds_layout_gutter">
+
+                <app.outfitshare.core.designsystem.component.avatar.AvatarView
+                    android:id="@+id/avatar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:dsAvatarDecorative="true"
+                    app:dsAvatarSize="m" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/ds_space_4"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/author_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="?attr/textAppearanceTitleSmall"
+                        android:textColor="?attr/dsColorOnSurface" />
+
+                    <TextView
+                        android:id="@+id/author_handle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/ds_space_0_5"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/dsColorOnSurfaceVariant" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/follow"
+                    style="@style/Widget.Ds.Button.Secondary.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/action_follow" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/ds_space_2"
+                android:paddingEnd="@dimen/ds_space_2">
+
+                <app.outfitshare.core.designsystem.component.like.LikeButton
+                    android:id="@+id/like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/comments"
+                    style="@style/Widget.Ds.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/comments_title"
+                    android:textColor="?attr/dsColorOnSurface"
+                    app:icon="@drawable/ds_ic_comment"
+                    app:iconTint="?attr/dsColorOnSurface" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/remix"
+                    style="@style/Widget.Ds.Button.Ghost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/outfit_remix"
+                    android:textColor="?attr/dsColorOnSurface"
+                    app:icon="@drawable/ds_ic_remix"
+                    app:iconTint="?attr/dsColorOnSurface" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/save"
+                    style="@style/Widget.Ds.Button.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/action_save"
+                    app:icon="@drawable/ds_ic_bookmark" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/share"
+                    style="@style/Widget.Ds.Button.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/action_share"
+                    app:icon="@drawable/ds_ic_share" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_space_1"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/dsColorOnSurface" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ds_layout_gutter"
+                android:layout_marginTop="@dimen/ds_space_2"
+                android:layout_marginEnd="@dimen/ds_layout_gutter"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant" />
+
+            <LinearLayout
+                android:id="@+id/items_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/ds_space_6">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="true"
+                    android:orientation="horizontal"
+                    android:paddingStart="@dimen/ds_layout_gutter"
+                    android:paddingEnd="@dimen/ds_layout_gutter"
+                    android:paddingBottom="@dimen/ds_space_3">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:accessibilityHeading="true"
+                        android:text="@string/outfit_items_title"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/dsColorOnSurface" />
+
+                    <TextView
+                        android:id="@+id/items_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceLabelLarge"
+                        android:textColor="?attr/dsColorAccent" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingStart="@dimen/ds_layout_gutter"
+                    android:paddingEnd="@dimen/ds_layout_gutter" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/similar_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/ds_space_6"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:paddingStart="@dimen/ds_layout_gutter"
+                    android:paddingEnd="@dimen/ds_layout_gutter"
+                    android:paddingBottom="@dimen/ds_space_3"
+                    android:text="@string/outfit_similar_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                    android:textColor="?attr/dsColorOnSurface" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/similar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingStart="@dimen/ds_layout_gutter"
+                    android:paddingEnd="@dimen/ds_layout_gutter" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/top_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_space_2"
+        android:paddingTop="@dimen/ds_space_1"
+        android:paddingEnd="@dimen/ds_space_2">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/back"
+            style="@style/Widget.Ds.Button.Icon.OnPhoto"
+            android:layout_width="@dimen/ds_size_icon_button"
+            android:layout_height="@dimen/ds_size_icon_button"
+            android:contentDescription="@string/action_back"
+            app:icon="@drawable/ds_ic_arrow_back" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/more"
+            style="@style/Widget.Ds.Button.Icon.OnPhoto"
+            android:layout_width="@dimen/ds_size_icon_button"
+            android:layout_height="@dimen/ds_size_icon_button"
+            android:contentDescription="@string/action_more"
+            app:icon="@drawable/ds_ic_more_vert" />
+    </LinearLayout>
+
+    <app.outfitshare.core.designsystem.component.state.StateView
+        android:id="@+id/state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:dsLoadingLayout="@layout/skeleton_outfit" />
+</FrameLayout>

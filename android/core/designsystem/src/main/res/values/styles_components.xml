@@ -71,6 +71,15 @@
     <style name="Widget.Ds.FilterChipGroup" parent="Widget.Ds.ChipGroup.Filter" />
 
     <!-- Текстовые роли, часто повторяющиеся в разметке экранов. -->
+    <!-- TextView по умолчанию: гротеск bodyMedium. Явный textAppearance у вью его перекрывает. -->
+    <style name="Widget.Ds.TextView" parent="android:Widget.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyMedium</item>
+    </style>
+
+    <style name="Widget.Ds.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textAppearance">@style/TextAppearance.Ds.BodyLarge</item>
+    </style>
+
     <style name="Widget.Ds.Text.Kicker" parent="Widget.MaterialComponents.TextView">
         <item name="android:textAppearance">@style/TextAppearance.Ds.LabelSmall</item>
         <item name="android:textColor">?attr/dsColorOnSurfaceVariant</item>

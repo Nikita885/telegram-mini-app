@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/comments_sheet_height"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/ds_space_2" />
+
+        <app.outfitshare.core.designsystem.component.state.StateView
+            android:id="@+id/state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:dsLoadingLayout="@layout/skeleton_rows" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/replying"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/dsColorSurfaceContainerHigh"
+        android:drawablePadding="@dimen/ds_space_2"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/ds_size_touch_target"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/dsColorOnSurfaceVariant"
+        android:visibility="gone"
+        app:drawableEndCompat="@drawable/ds_ic_close" />
+
+    <include layout="@layout/view_composer" />
+</LinearLayout>

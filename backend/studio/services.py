@@ -107,8 +107,9 @@ def _fit_all(job: GarmentJob, cutout: Image.Image, keypoints: dict):
     """Fit the cutout onto every mannequin the item is meant for; stores layers and previews."""
     zone = job.category.zone
     scores, details = [], {}
-    for field in ("fitted_male", "fitted_female", "preview_male", "preview_female"):
-        getattr(job, field).delete(save=False) if getattr(job, field) else None
+    # New files get new names (the storage adds a suffix), so clients never see a cached old fit.
+    old_files = [getattr(job, f).name for f in ("fitted_male", "fitted_female", "preview_male", "preview_female")
+                 if getattr(job, f)]
     for gender in genders_for(job.gender):
         canvas, anchors, profile = fit_context(gender)
         result = G.fit_garment(cutout, keypoints, zone, anchors, profile, canvas.size)
@@ -124,6 +125,10 @@ def _fit_all(job: GarmentJob, cutout: Image.Image, keypoints: dict):
         details[gender] = {k: v for k, v in result.details.items() if k != "control_points"}
     job.fit_score = min(scores) if scores else None
     job.attributes = {**job.attributes, "fit": details}
+    current = {getattr(job, f).name for f in ("fitted_male", "fitted_female", "preview_male", "preview_female")}
+    for name in old_files:
+        if name not in current:
+            job.fitted_male.storage.delete(name)
 
 
 def _jpeg_bytes(image: Image.Image) -> bytes:

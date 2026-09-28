@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="nav_create_pill_width">56dp</dimen>
+    <dimen name="nav_create_pill_height">32dp</dimen>
+    <dimen name="nav_create_pill_radius">16dp</dimen>
+    <!-- Mockup geometry (1 CSS px = 1 dp). -->
+    <dimen name="onboarding_photo_height">420dp</dimen>
+    <dimen name="constructor_canvas_height">400dp</dimen>
+    <dimen name="review_canvas_height">380dp</dimen>
+    <dimen name="keypoints_canvas_height">440dp</dimen>
+    <dimen name="item_rail_width">124dp</dimen>
+    <dimen name="publish_preview_width">112dp</dimen>
+    <dimen name="publish_success_width">200dp</dimen>
+    <dimen name="chat_shared_card_width">212dp</dimen>
+    <dimen name="notification_thumb_width">44dp</dimen>
+    <dimen name="notification_thumb_height">55dp</dimen>
+    <dimen name="studio_thumb">56dp</dimen>
+    <dimen name="swatch_size">32dp</dimen>
+    <dimen name="loupe_size">116dp</dimen>
+    <dimen name="login_wordmark_size">22sp</dimen>
+    <dimen name="feed_wordmark_size">26sp</dimen>
+    <dimen name="comments_sheet_height">560dp</dimen>
+    <dimen name="reply_indent">68dp</dimen>
+    <dimen name="constructor_hint_margin">60dp</dimen>
+    <dimen name="constructor_hint_bottom">72dp</dimen>
+    <dimen name="constructor_panel_overlap">-12dp</dimen>
+    <dimen name="profile_grid_gap">2dp</dimen>
+    <dimen name="profile_grid_half_gap">1dp</dimen>
+    <dimen name="profile_tab_min_height">320dp</dimen>
+    <dimen name="search_field_start">16dp</dimen>
+    <dimen name="person_tile_width">72dp</dimen>
+    <dimen name="chat_gap">6dp</dimen>
+    <dimen name="bubble_max_width">260dp</dimen>
+    <dimen name="studio_list_bottom">96dp</dimen>
+    <dimen name="studio_steps_height">3dp</dimen>
+    <dimen name="studio_frame_side">36dp</dimen>
+    <dimen name="studio_frame_top">96dp</dimen>
+    <dimen name="studio_frame_bottom">240dp</dimen>
+    <dimen name="studio_quality_height">32dp</dimen>
+    <dimen name="studio_quality_gap">6dp</dimen>
+    <dimen name="studio_item_preview">96dp</dimen>
+</resources>

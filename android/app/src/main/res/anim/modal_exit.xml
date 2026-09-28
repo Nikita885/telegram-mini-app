@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@integer/ds_motion_duration_medium"
+    android:interpolator="@interpolator/ds_easing_emphasized_accelerate">
+    <translate android:fromYDelta="0" android:toYDelta="8%" />
+    <alpha android:fromAlpha="1" android:toAlpha="0" />
+</set>

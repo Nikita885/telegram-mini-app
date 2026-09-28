@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mockup .quality: live check chip over the camera frame. -->
+    <style name="Studio.Quality" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/studio_quality_height</item>
+        <item name="android:background">@drawable/bg_quality_ok</item>
+        <item name="android:drawablePadding">@dimen/studio_quality_gap</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/ds_space_3</item>
+        <item name="android:paddingEnd">@dimen/ds_space_3</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ds.LabelMedium</item>
+        <item name="android:textColor">@color/camera_on_scrim</item>
+        <item name="drawableStartCompat">@drawable/badge_check_small</item>
+        <item name="drawableTint">@color/camera_ok</item>
+    </style>
+</resources>

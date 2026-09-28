@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground">
+
+    <View
+        android:id="@+id/unread"
+        android:layout_width="@dimen/ds_size_badge_dot"
+        android:layout_height="@dimen/ds_size_badge_dot"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="@dimen/ds_space_2"
+        android:background="@drawable/ds_bg_dot"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/ds_size_list_item_two_line_min_height"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingTop="@dimen/ds_layout_list_item_padding_vertical"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_layout_list_item_padding_vertical">
+
+        <app.outfitshare.core.designsystem.component.avatar.AvatarView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:dsAvatarDecorative="true"
+            app:dsAvatarSize="m" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/ds_space_4"
+            android:layout_marginEnd="@dimen/ds_space_3"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/dsColorOnSurface" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/ds_space_0_5"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/dsColorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="@dimen/notification_thumb_width"
+            android:layout_height="@dimen/notification_thumb_height"
+            android:background="@drawable/bg_thumb"
+            android:importantForAccessibility="no"
+            android:scaleType="centerCrop" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action"
+            style="@style/Widget.Ds.Button.Primary.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </LinearLayout>
+</FrameLayout>

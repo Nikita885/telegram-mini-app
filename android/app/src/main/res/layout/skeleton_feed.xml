@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/ds_layout_gutter"
+    android:paddingTop="@dimen/ds_space_4"
+    android:paddingEnd="@dimen/ds_layout_gutter">
+
+    <include layout="@layout/ds_skeleton_outfit_card" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ds_space_8" />
+
+    <include layout="@layout/ds_skeleton_outfit_card" />
+</LinearLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- «Создать» in the bottom bar: the 56×32 primary pill behind the plus (mockup bottom nav create). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="?attr/dsColorPrimary" />
+    <corners android:radius="@dimen/nav_create_pill_radius" />
+    <size
+        android:width="@dimen/nav_create_pill_width"
+        android:height="@dimen/nav_create_pill_height" />
+</shape>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background with a hairline on top (mockup: inset 0 1px 0 outline-variant). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/dsColorOutlineVariant" />
+        </shape>
+    </item>
+    <item android:top="@dimen/ds_size_stroke_hairline">
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/dsColorBackground" />
+        </shape>
+    </item>
+</layer-list>

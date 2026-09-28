@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mockup «Вход»: wordmark, display headline, one primary action — sign in via the Telegram bot. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/login_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/dsColorBackground"
+    android:orientation="vertical">
+
+    <app.outfitshare.core.designsystem.component.banner.OfflineBanner
+        android:id="@+id/offline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/wordmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_10"
+        android:textColor="?attr/dsColorOnSurface"
+        android:textSize="@dimen/login_wordmark_size" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_10"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:accessibilityHeading="true"
+        android:text="@string/login_title"
+        android:textAppearance="?attr/textAppearanceDisplaySmall"
+        android:textColor="?attr/dsColorOnSurface" />
+
+    <app.outfitshare.core.designsystem.component.button.DsButton
+        android:id="@+id/telegram"
+        style="@style/Widget.Ds.Button.Primary.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_8"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:text="@string/login_telegram"
+        app:icon="@drawable/ds_ic_send"
+        app:iconGravity="textStart" />
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_3"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:gravity="center"
+        android:text="@string/login_hint"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/dsColorOnSurfaceVariant"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/reopen"
+        style="@style/Widget.Ds.Button.Ghost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/login_open_bot_again"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/dev"
+        style="@style/Widget.Ds.Button.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_3"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:text="@string/login_dev"
+        android:visibility="gone" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/legal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="@dimen/ds_layout_gutter"
+        android:paddingEnd="@dimen/ds_layout_gutter"
+        android:paddingBottom="@dimen/ds_space_4"
+        android:text="@string/login_legal"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="?attr/dsColorOnSurfaceVariant" />
+</LinearLayout>

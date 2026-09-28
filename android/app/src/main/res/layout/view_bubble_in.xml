@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bubble_in"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/ds_space_3"
+    android:paddingTop="@dimen/ds_space_2"
+    android:paddingEnd="@dimen/ds_space_3"
+    android:paddingBottom="@dimen/ds_space_2">
+
+    <include
+        android:id="@+id/card"
+        layout="@layout/view_shared_outfit"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="@dimen/bubble_max_width"
+        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="?attr/dsColorOnSurface" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:alpha="0.7"
+        android:drawablePadding="@dimen/ds_space_0_5"
+        android:textAppearance="@style/TextAppearance.Ds.LabelSmall"
+        android:textColor="?attr/dsColorOnSurface" />
+</LinearLayout>
