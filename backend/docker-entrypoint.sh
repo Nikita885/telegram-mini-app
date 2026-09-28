@@ -2,6 +2,16 @@
 # Roles: web | worker | bot | <any command>
 set -e
 
+# Started as root: make the volumes writable for the unprivileged user, then drop privileges.
+# (Volumes created by older versions of the stack, or copied in during a migration, may be root-owned.)
+if [ "$(id -u)" = "0" ]; then
+  for dir in /app/media /app/models /app/staticfiles; do
+    mkdir -p "$dir"
+    find "$dir" ! -user app -exec chown app:app {} +
+  done
+  exec setpriv --reuid=app --regid=app --init-groups "$0" "$@"
+fi
+
 wait_for_db() {
   python - <<'PY'
 import os, sys, time
@@ -26,11 +36,13 @@ case "$1" in
     python manage.py migrate --noinput
     python manage.py collectstatic --noinput --clear -v 0
     python manage.py setup_catalog
-    exec daphne -b 0.0.0.0 -p 8000 --proxy-headers config.asgi:application
+    exec daphne -b 0.0.0.0 -p "${PORT:-8000}" --proxy-headers config.asgi:application
     ;;
   worker)
     wait_for_db
-    exec celery -A config worker -Q ml,celery -c "${WORKER_CONCURRENCY:-1}" --loglevel=INFO
+    # A fresh child per Studio job: onnxruntime keeps its memory arena after inference, and the
+    # few seconds of model loading are cheaper than holding ~3 GB between rare admin uploads.
+    exec celery -A config worker -Q ml,celery -c "${WORKER_CONCURRENCY:-1}" --max-tasks-per-child=1 --loglevel=INFO
     ;;
   bot)
     wait_for_db

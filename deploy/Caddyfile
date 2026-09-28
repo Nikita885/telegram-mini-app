@@ -1,7 +1,27 @@
-{$DOMAIN}, www.{$DOMAIN} {
-	encode gzip
+# Bundled HTTPS proxy (docker compose --profile caddy up -d). Certificates are issued automatically.
+# To also serve www, add a DNS record for it and change the first line to: {$DOMAIN}, www.{$DOMAIN}
+{$DOMAIN} {
+	encode zstd gzip
+
 	request_body {
 		max_size 25MB
 	}
-	reverse_proxy web:8000
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	# Uploaded media straight from the shared volume.
+	handle_path /media/* {
+		root * /srv/media
+		header Cache-Control "public, max-age=86400"
+		file_server
+	}
+
+	# Everything else (API, WebSocket, Mini App pages) goes to Django. Caddy overwrites
+	# X-Forwarded-For with the real client address, which the API uses for rate limits.
+	handle {
+		reverse_proxy web:8000
+	}
 }

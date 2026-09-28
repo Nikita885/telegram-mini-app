@@ -1,9 +1,16 @@
-# Outfit Share — production stack.
+# Outfit Share — production stack (see DEPLOY.md).
 #   cp .env.example .env   # fill it in
 #   docker compose up -d --build
-# The app listens on 127.0.0.1:${APP_PORT:-8010}; put your HTTPS proxy in front of it
-# (see DEPLOY.md), or start the bundled Caddy with:  docker compose --profile caddy up -d
+# The app listens on 127.0.0.1:${APP_PORT:-8010} only; an HTTPS proxy in front of it (nginx on the
+# host, or the bundled Caddy: docker compose --profile caddy up -d) makes it public.
+# Everything here is namespaced by the project name, so it can share a server with other stacks.
 name: outfitshare
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
 
 x-app: &app
   build: .
@@ -18,8 +25,9 @@ x-app: &app
     db:
       condition: service_healthy
     redis:
-      condition: service_started
+      condition: service_healthy
   restart: unless-stopped
+  logging: *logging
 
 services:
   db:
@@ -36,13 +44,20 @@ services:
       timeout: 5s
       retries: 20
     restart: unless-stopped
+    logging: *logging
 
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
     volumes:
       - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
     restart: unless-stopped
+    logging: *logging
 
   web:
     <<: *app
@@ -50,15 +65,22 @@ services:
     ports:
       - "127.0.0.1:${APP_PORT:-8010}:8000"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/', timeout=4)"]
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 60s
+      start_period: 90s
+    deploy:
+      resources:
+        limits:
+          memory: ${WEB_MEMORY:-1g}
 
   worker:
     <<: *app
     command: worker
+    volumes:
+      - media:/app/media
+      - models:/app/models
     deploy:
       resources:
         limits:
@@ -67,9 +89,13 @@ services:
   bot:
     <<: *app
     command: bot
+    deploy:
+      resources:
+        limits:
+          memory: 256m
 
   # Optional HTTPS proxy with automatic Let's Encrypt certificates.
-  # Use only if ports 80/443 on the server are free.
+  # Only when ports 80/443 on the server are free (no nginx or another proxy there).
   caddy:
     image: caddy:2-alpine
     profiles: ["caddy"]
@@ -80,15 +106,18 @@ services:
       DOMAIN: ${DOMAIN}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - media:/srv/media:ro
       - caddydata:/data
       - caddyconfig:/config
     depends_on:
       - web
     restart: unless-stopped
+    logging: *logging
 
 volumes:
   pgdata:
   redisdata:
   media:
+  models:
   caddydata:
   caddyconfig:
