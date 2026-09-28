@@ -155,7 +155,8 @@ public class EditProfileFragment extends BaseFragment {
               && ("username_taken".equals(r.error.code)
                   || r.error.fieldMessage("username") != null)) {
             String msg = r.error.fieldMessage("username");
-            layout.setError(msg != null ? msg : "Имя @" + text(username) + " уже занято");
+            layout.setError(
+                msg != null ? msg : getString(R.string.profile_username_taken, text(username)));
             done.setEnabled(false);
           } else {
             showError(r.error, this::save);
@@ -213,7 +214,7 @@ public class EditProfileFragment extends BaseFragment {
     try (InputStream in = requireContext().getContentResolver().openInputStream(uri)) {
       Bitmap bitmap = BitmapFactory.decodeStream(in);
       if (bitmap == null) {
-        toast("Не удалось прочитать фото");
+        toast(getString(R.string.photo_read_failed));
         return;
       }
       int side = Math.min(bitmap.getWidth(), bitmap.getHeight());
@@ -232,7 +233,7 @@ public class EditProfileFragment extends BaseFragment {
           api().uploadAvatar(part),
           r -> onAvatar(r.ok() && r.data != null ? r.data.avatarUrl : null, r.error));
     } catch (Exception e) {
-      toast("Не удалось прочитать фото");
+      toast(getString(R.string.photo_read_failed));
     }
   }
 

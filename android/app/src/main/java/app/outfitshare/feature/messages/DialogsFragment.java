@@ -156,7 +156,7 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
           refresh.setRefreshing(false);
           if (!r.ok() || r.data == null) {
             if (dialogs.isEmpty()) {
-              stateView.setState(States.failure(r.error, "Диалоги не загрузились"));
+              stateView.setState(States.failure(r.error, getString(R.string.dialogs_failed)));
             }
             return;
           }
@@ -168,9 +168,9 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
               dialogs.isEmpty()
                   ? States.empty(
                       app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_messages,
-                      "Пока нет диалогов",
-                      "Напишите автору образа или поделитесь своим — прямо из просмотра.",
-                      "Найти людей")
+                      getString(R.string.dialogs_empty_title),
+                      getString(R.string.dialogs_empty_text),
+                      getString(R.string.action_find_people))
                   : ScreenState.content());
         });
   }
@@ -208,10 +208,10 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
       Calls.run(api().pinDialog(d.id, body), r -> load());
     } else if ("delete".equals(id)) {
       ConfirmDialog.with(requireContext())
-          .title("Удалить диалог?")
-          .message("Переписка удалится у обоих собеседников.")
-          .confirm("Удалить")
-          .cancel("Отмена")
+          .title(getString(R.string.dialog_delete_title))
+          .message(getString(R.string.dialog_delete_text))
+          .confirm(getString(R.string.action_delete))
+          .cancel(getString(R.string.action_cancel))
           .destructive()
           .onConfirm(() -> Calls.run(api().deleteDialog(d.id), r -> load()))
           .show();
@@ -268,8 +268,10 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
         r.sub.setText(s);
         r.sub.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
       } else if (d.lastMessage != null) {
-        String prefix = d.lastMessage.isMine ? "Вы: " : "";
-        r.sub.setText(prefix + d.lastMessage.text);
+        r.sub.setText(
+            d.lastMessage.isMine
+                ? getString(R.string.dialogs_you_prefix, d.lastMessage.text)
+                : d.lastMessage.text);
         r.sub.setCompoundDrawablesRelativeWithIntrinsicBounds(
             d.lastMessage.isOutfit ? R.drawable.badge_hanger_small : 0, 0, 0, 0);
       } else {
@@ -278,7 +280,9 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
       r.time.setText(d.lastMessage != null ? Formats.dialogTime(d.lastMessage.createdAt) : "");
       r.unread.setVisibility(d.unreadCount > 0 ? View.VISIBLE : View.GONE);
       r.unread.setText(String.valueOf(d.unreadCount));
-      r.unread.setContentDescription(d.unreadCount + " непрочитанных");
+      r.unread.setContentDescription(
+          getResources()
+              .getQuantityString(R.plurals.unread_messages, d.unreadCount, d.unreadCount));
       r.read.setVisibility(
           d.unreadCount == 0
                   && d.lastMessage != null
@@ -295,14 +299,14 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
                 new ActionSheet.Row(
                     "pin",
                     app.outfitshare.core.designsystem.R.drawable.ds_ic_north_west,
-                    d.pinned ? "Открепить" : "Закрепить",
+                    getString(d.pinned ? R.string.dialog_unpin : R.string.dialog_pin),
                     null,
                     false));
             actions.add(
                 new ActionSheet.Row(
                     "delete",
                     app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
-                    "Удалить диалог",
+                    getString(R.string.dialog_delete),
                     null,
                     true));
             ActionSheet.show(getChildFragmentManager(), ACTIONS, d.user.name, actions);

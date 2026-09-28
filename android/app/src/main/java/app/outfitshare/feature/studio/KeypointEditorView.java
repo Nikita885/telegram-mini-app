@@ -15,6 +15,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import app.outfitshare.core.designsystem.haptics.Haptics;
 import app.outfitshare.core.designsystem.theme.DsTheme;
+import app.outfitshare.core.ui.Res;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,7 +84,7 @@ public class KeypointEditorView extends View {
         getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_touch_target)
             / 2f;
     loupeRadius = 58 * d;
-    setContentDescription("Опорные точки вещи");
+    setContentDescription(Res.str(app.outfitshare.R.string.kp_description));
   }
 
   public void setListener(@Nullable Listener listener) {
@@ -192,23 +193,23 @@ public class KeypointEditorView extends View {
   public static String label(String key) {
     switch (key) {
       case "neck":
-        return "Ворот";
+        return Res.str(app.outfitshare.R.string.kp_neck);
       case "shoulder_left":
-        return "Плечо Л";
+        return Res.str(app.outfitshare.R.string.kp_shoulder_l);
       case "shoulder_right":
-        return "Плечо П";
+        return Res.str(app.outfitshare.R.string.kp_shoulder_r);
       case "waist_left":
-        return "Талия Л";
+        return Res.str(app.outfitshare.R.string.kp_waist_l);
       case "waist_right":
-        return "Талия П";
+        return Res.str(app.outfitshare.R.string.kp_waist_r);
       case "hem_left":
-        return "Низ Л";
+        return Res.str(app.outfitshare.R.string.kp_hem_l);
       case "hem_right":
-        return "Низ П";
+        return Res.str(app.outfitshare.R.string.kp_hem_r);
       case "box_left_top":
-        return "Угол ↖";
+        return Res.str(app.outfitshare.R.string.kp_box_tl);
       case "box_right_bottom":
-        return "Угол ↘";
+        return Res.str(app.outfitshare.R.string.kp_box_br);
       default:
         return key;
     }
@@ -217,17 +218,17 @@ public class KeypointEditorView extends View {
   public static String longLabel(String key) {
     switch (key) {
       case "shoulder_left":
-        return "Плечо слева";
+        return Res.str(app.outfitshare.R.string.kp_shoulder_left);
       case "shoulder_right":
-        return "Плечо справа";
+        return Res.str(app.outfitshare.R.string.kp_shoulder_right);
       case "waist_left":
-        return "Талия слева";
+        return Res.str(app.outfitshare.R.string.kp_waist_left);
       case "waist_right":
-        return "Талия справа";
+        return Res.str(app.outfitshare.R.string.kp_waist_right);
       case "hem_left":
-        return "Низ слева";
+        return Res.str(app.outfitshare.R.string.kp_hem_left);
       case "hem_right":
-        return "Низ справа";
+        return Res.str(app.outfitshare.R.string.kp_hem_right);
       default:
         return label(key);
     }

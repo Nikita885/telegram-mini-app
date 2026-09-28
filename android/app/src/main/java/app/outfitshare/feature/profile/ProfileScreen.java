@@ -141,7 +141,7 @@ public abstract class ProfileScreen extends BaseFragment {
           refresh.setRefreshing(false);
           if (!r.ok() || r.data == null) {
             if (profile == null) {
-              stateView.setState(States.failure(r.error, "Профиль не загрузился"));
+              stateView.setState(States.failure(r.error, getString(R.string.profile_failed)));
             } else {
               showError(r.error, this::reload);
             }
@@ -169,7 +169,8 @@ public abstract class ProfileScreen extends BaseFragment {
                     @Override
                     public void onError(ApiError error, boolean firstPage) {
                       if (tab == TAB_OUTFITS && firstPage) {
-                        tabState.setState(States.failure(error, "Образы не загрузились"));
+                        tabState.setState(
+                            States.failure(error, getString(R.string.outfits_failed)));
                       }
                     }
                   });
@@ -186,8 +187,12 @@ public abstract class ProfileScreen extends BaseFragment {
         v.findViewById(R.id.count_outfits),
         p.outfitsCount,
         Formats.outfitsWord(requireContext(), p.outfitsCount));
-    bindCounter(v.findViewById(R.id.count_followers), p.followersCount, "подписчики");
-    bindCounter(v.findViewById(R.id.count_following), p.followingCount, "подписки");
+    bindCounter(
+        v.findViewById(R.id.count_followers),
+        p.followersCount,
+        getResources().getQuantityString(R.plurals.followers_word, p.followersCount));
+    bindCounter(
+        v.findViewById(R.id.count_following), p.followingCount, getString(R.string.following_word));
     v.findViewById(R.id.count_followers)
         .setOnClickListener(x -> nav().push(FollowsFragment.newInstance(p.id, p.username, true)));
     v.findViewById(R.id.count_following)
@@ -274,7 +279,7 @@ public abstract class ProfileScreen extends BaseFragment {
   protected ScreenState emptyOutfitsState() {
     return States.empty(
         app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-        "Пока нет образов",
+        getString(R.string.feed_empty_title),
         null,
         null);
   }
@@ -291,7 +296,7 @@ public abstract class ProfileScreen extends BaseFragment {
             return;
           }
           if (!r.ok() || r.data == null) {
-            tabState.setState(States.failure(r.error, "Коллекции не загрузились"));
+            tabState.setState(States.failure(r.error, getString(R.string.collections_failed)));
             return;
           }
           collectionsAdapter.submit(r.data.results);
@@ -300,7 +305,7 @@ public abstract class ProfileScreen extends BaseFragment {
                   ? States.empty(
                       app.outfitshare.core.designsystem.R.drawable
                           .ds_illustration_empty_collections,
-                      "Коллекций пока нет",
+                      getString(R.string.collections_empty),
                       null,
                       null)
                   : ScreenState.content());
@@ -313,7 +318,8 @@ public abstract class ProfileScreen extends BaseFragment {
     Intent send = new Intent(Intent.ACTION_SEND);
     send.setType("text/plain");
     send.putExtra(
-        Intent.EXTRA_TEXT, p.name + " в Outfit Share: " + container().prefs.server() + "u/" + p.id);
+        Intent.EXTRA_TEXT,
+        getString(R.string.profile_share_text, p.name, container().prefs.server() + "u/" + p.id));
     startActivity(Intent.createChooser(send, getString(R.string.action_share)));
   }
 }

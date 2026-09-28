@@ -20,6 +20,7 @@ import app.outfitshare.core.net.Calls;
 import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.ActionSheet;
 import app.outfitshare.core.ui.BaseFragment;
+import app.outfitshare.core.ui.Res;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -110,10 +111,10 @@ public class PublishFragment extends BaseFragment {
     loadSuggestions(view.findViewById(R.id.suggestions));
 
     ListRowView collectionRow = view.findViewById(R.id.collection);
-    collectionRow.setValue("Не добавлять");
+    collectionRow.setValue(getString(R.string.publish_no_collection));
     collectionRow.setOnClickListener(v -> pickCollection());
     ListRowView visibilityRow = view.findViewById(R.id.visibility);
-    visibilityRow.setValue("Все");
+    visibilityRow.setValue(getString(R.string.visibility_all));
     visibilityRow.setOnClickListener(v -> pickVisibility());
     ListRowView remixRow = view.findViewById(R.id.allow_remix);
     remixRow.setToggle(true, (row, checked) -> {});
@@ -133,7 +134,7 @@ public class PublishFragment extends BaseFragment {
             (k, r) -> {
               String id = r.getString(ActionSheet.RESULT_ID, "none");
               collectionId = "none".equals(id) ? null : Long.parseLong(id);
-              String label = "Не добавлять";
+              String label = getString(R.string.publish_no_collection);
               for (Dto.Collection c : collections) {
                 if (collectionId != null && c.id == collectionId) {
                   label = c.title;
@@ -157,11 +158,11 @@ public class PublishFragment extends BaseFragment {
   private static String visibilityLabel(String v) {
     switch (v) {
       case "followers":
-        return "Подписчики";
+        return Res.str(R.string.visibility_followers);
       case "private":
-        return "Только я";
+        return Res.str(R.string.visibility_private);
       default:
-        return "Все";
+        return Res.str(R.string.visibility_all);
     }
   }
 
@@ -171,24 +172,24 @@ public class PublishFragment extends BaseFragment {
         new ActionSheet.Row(
             "all",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility,
-            "Все",
-            "Образ увидят все в ленте «Для вас»",
+            getString(R.string.visibility_all),
+            getString(R.string.visibility_all_sub),
             false,
             "all".equals(visibility)));
     rows.add(
         new ActionSheet.Row(
             "followers",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_following,
-            "Подписчики",
-            "Только те, кто на вас подписан",
+            getString(R.string.visibility_followers),
+            getString(R.string.visibility_followers_sub),
             false,
             "followers".equals(visibility)));
     rows.add(
         new ActionSheet.Row(
             "private",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_lock,
-            "Только я",
-            "Образ останется в профиле скрытым",
+            getString(R.string.visibility_private),
+            getString(R.string.visibility_private_sub),
             false,
             "private".equals(visibility)));
     ActionSheet.show(
@@ -201,7 +202,7 @@ public class PublishFragment extends BaseFragment {
         new ActionSheet.Row(
             "none",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_close,
-            "Не добавлять",
+            getString(R.string.publish_no_collection),
             null,
             false,
             collectionId == null));
@@ -253,7 +254,7 @@ public class PublishFragment extends BaseFragment {
     chip.setText("#" + tag);
     chip.setCloseIconVisible(true);
     chip.setCheckable(false);
-    chip.setCloseIconContentDescription("Убрать #" + tag);
+    chip.setCloseIconContentDescription(getString(R.string.publish_remove_tag, tag));
     chip.setOnCloseIconClickListener(
         v -> {
           tags.remove(tag);

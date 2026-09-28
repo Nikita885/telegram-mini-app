@@ -53,9 +53,9 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
   protected ScreenState emptyOutfitsState() {
     return States.empty(
         app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-        "Соберите первый образ",
-        "Вещи из каталога сами сядут на манекен.",
-        "Открыть конструктор");
+        getString(R.string.profile_empty_title),
+        getString(R.string.profile_empty_text),
+        getString(R.string.action_open_constructor));
   }
 
   @Override
@@ -108,9 +108,9 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
       tabState.setState(
           States.empty(
               app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-              "Черновиков нет",
-              "Незаконченный образ сохранится здесь сам.",
-              "Открыть конструктор"));
+              getString(R.string.drafts_empty_title),
+              getString(R.string.drafts_empty_text),
+              getString(R.string.action_open_constructor)));
       return;
     }
     tabState.setState(ScreenState.content());
@@ -118,9 +118,11 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
     row.setIcon(
         ContextCompat.getDrawable(
             requireContext(), app.outfitshare.core.designsystem.R.drawable.ds_ic_draft));
-    row.setTitle("Без названия");
+    row.setTitle(getString(R.string.draft_untitled));
     row.setSubtitle(
-        "Черновик · " + getResources().getQuantityString(R.plurals.items_count, count, count));
+        getString(
+            R.string.draft_subtitle,
+            getResources().getQuantityString(R.plurals.items_count, count, count)));
     row.setShowChevron(true);
     row.setOnClickListener(v -> nav().present(new ConstructorFragment()));
     gridManager.setSpanCount(1);

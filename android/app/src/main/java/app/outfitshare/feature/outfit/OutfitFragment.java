@@ -24,6 +24,7 @@ import app.outfitshare.core.designsystem.haptics.Haptics;
 import app.outfitshare.core.designsystem.motion.HeartBurst;
 import app.outfitshare.core.designsystem.motion.SharedElements;
 import app.outfitshare.core.designsystem.theme.SystemBars;
+import app.outfitshare.core.net.Api;
 import app.outfitshare.core.net.Calls;
 import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.ActionSheet;
@@ -172,13 +173,13 @@ public class OutfitFragment extends BaseFragment {
             return;
           }
           if (!r.ok() || r.data == null) {
-            stateView.setState(States.failure(r.error, "Образ не загрузился"));
+            stateView.setState(States.failure(r.error, getString(R.string.outfit_failed)));
             if (r.error != null
                 && r.error.kind == app.outfitshare.core.net.ApiError.Kind.FORBIDDEN) {
               stateView.setState(
                   States.locked(
-                      "Образ недоступен",
-                      "Автор скрыл его или открыл только для подписчиков.",
+                      getString(R.string.outfit_locked_title),
+                      getString(R.string.outfit_locked_text),
                       null));
             }
             return;
@@ -194,7 +195,8 @@ public class OutfitFragment extends BaseFragment {
     View v = requireView();
     ImageView photo = v.findViewById(R.id.photo);
     Images.photo(photo, o.imageUrl);
-    photo.setContentDescription("Образ " + (o.author != null ? o.author.name : ""));
+    photo.setContentDescription(
+        getString(R.string.chat_outfit_by, o.author != null ? o.author.name : ""));
     TextView badge = v.findViewById(R.id.items_badge);
     int n = o.items.size();
     badge.setText(getResources().getQuantityString(R.plurals.items_count, n, n));
@@ -268,11 +270,12 @@ public class OutfitFragment extends BaseFragment {
     caption.setVisibility(caption.length() == 0 ? View.GONE : View.VISIBLE);
     String date = Formats.dayMonth(o.createdAt);
     if (o.remixOf != null && o.remixOf.author != null) {
-      date += " · ремикс образа " + Formats.handle(o.remixOf.author.username);
+      date = getString(R.string.outfit_date_remix, date, Formats.handle(o.remixOf.author.username));
     }
     ((TextView) v.findViewById(R.id.date)).setText(date);
 
-    ((TextView) v.findViewById(R.id.items_count)).setText(n > 0 ? "Все " + n : "");
+    ((TextView) v.findViewById(R.id.items_count))
+        .setText(n > 0 ? getString(R.string.outfit_items_all, n) : "");
     v.findViewById(R.id.items_section).setVisibility(n > 0 ? View.VISIBLE : View.GONE);
     itemsAdapter.submit(o.items);
   }
@@ -288,7 +291,7 @@ public class OutfitFragment extends BaseFragment {
         saved
             ? app.outfitshare.core.designsystem.R.drawable.ds_ic_bookmark_filled
             : app.outfitshare.core.designsystem.R.drawable.ds_ic_bookmark);
-    save.setContentDescription(saved ? "Убрать из сохранённого" : getString(R.string.action_save));
+    save.setContentDescription(getString(saved ? R.string.outfit_unsave : R.string.action_save));
   }
 
   private void toggleFollow(MaterialButton follow) {
@@ -337,28 +340,28 @@ public class OutfitFragment extends BaseFragment {
         new ActionSheet.Row(
             "save",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_bookmark,
-            outfit.isSaved ? "Убрать из сохранённого" : "Сохранить в коллекцию",
+            getString(outfit.isSaved ? R.string.outfit_unsave : R.string.action_save),
             null,
             false));
     rows.add(
         new ActionSheet.Row(
             "remix",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_remix,
-            "Сделать ремикс",
-            "Откроется конструктор с этими вещами",
+            getString(R.string.outfit_remix),
+            getString(R.string.outfit_remix_sub),
             false));
     rows.add(
         new ActionSheet.Row(
             "link",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_link,
-            "Скопировать ссылку",
+            getString(R.string.action_copy_link),
             null,
             false));
     rows.add(
         new ActionSheet.Row(
             "send",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_share,
-            "Отправить в диалог",
+            getString(R.string.share_to_dialog),
             null,
             false));
     if (outfit.isMine) {
@@ -366,7 +369,7 @@ public class OutfitFragment extends BaseFragment {
           new ActionSheet.Row(
               "delete",
               app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
-              "Удалить образ",
+              getString(R.string.outfit_delete),
               null,
               true));
     } else {
@@ -374,7 +377,7 @@ public class OutfitFragment extends BaseFragment {
           new ActionSheet.Row(
               "report",
               app.outfitshare.core.designsystem.R.drawable.ds_ic_flag,
-              "Пожаловаться",
+              getString(R.string.action_report),
               null,
               true));
     }
@@ -397,17 +400,17 @@ public class OutfitFragment extends BaseFragment {
       case "link":
         ClipboardManager cm = requireContext().getSystemService(ClipboardManager.class);
         cm.setPrimaryClip(ClipData.newPlainText("Outfit Share", OutfitActions.link(outfit.id)));
-        toast("Ссылка скопирована");
+        toast(getString(R.string.link_copied));
         break;
       case "send":
         ShareToDialogSheet.show(getChildFragmentManager(), outfit.id);
         break;
       case "delete":
         ConfirmDialog.with(requireContext())
-            .title("Удалить образ?")
-            .message("Образ исчезнет из ленты и профиля. Это действие нельзя отменить.")
-            .confirm("Удалить")
-            .cancel("Отмена")
+            .title(getString(R.string.outfit_delete_title))
+            .message(getString(R.string.outfit_delete_text))
+            .confirm(getString(R.string.action_delete))
+            .cancel(getString(R.string.action_cancel))
             .destructive()
             .onConfirm(this::delete)
             .show();
@@ -416,10 +419,10 @@ public class OutfitFragment extends BaseFragment {
         Map<String, Object> body = new HashMap<>();
         body.put("target_type", "post");
         body.put("target_id", outfit.id);
-        body.put("reason", "Жалоба из приложения");
+        body.put("reason", Api.REPORT_REASON);
         Calls.run(
             api().report(body),
-            r -> toast(r.ok() ? "Спасибо, модераторы посмотрят" : "Не удалось отправить жалобу"));
+            r -> toast(getString(r.ok() ? R.string.report_sent : R.string.report_failed)));
         break;
       default:
         break;

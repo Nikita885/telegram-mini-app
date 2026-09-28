@@ -76,7 +76,10 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
             c -> {
               dot.setVisibility(c.notifications > 0 ? View.VISIBLE : View.GONE);
               bell.setContentDescription(
-                  c.notifications > 0 ? "Уведомления, есть новые" : "Уведомления");
+                  getString(
+                      c.notifications > 0
+                          ? R.string.notifications_has_new
+                          : R.string.action_notifications));
             });
 
     adapter =
@@ -204,7 +207,7 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
           public void onError(ApiError error, boolean firstPage) {
             refresh.setRefreshing(false);
             if (firstPage && adapter.getItemCount() == 0) {
-              stateView.setState(States.failure(error, "Лента не загрузилась"));
+              stateView.setState(States.failure(error, getString(R.string.feed_failed)));
             } else {
               showError(error, () -> pagings[tab].refresh());
             }
@@ -234,16 +237,16 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
         stateView.setState(
             States.empty(
                 app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
-                "Здесь будут образы тех, на кого вы подпишетесь",
-                "Загляните в рекомендации или найдите друзей из Telegram.",
-                "Смотреть «Для вас»",
-                "Найти людей"));
+                getString(R.string.feed_following_empty_title),
+                getString(R.string.feed_following_empty_text),
+                getString(R.string.feed_following_empty_action),
+                getString(R.string.action_find_people)));
       } else {
         stateView.setState(
             States.empty(
                 app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
-                "Пока нет образов",
-                "Соберите первый — он появится у всех в ленте.",
+                getString(R.string.feed_empty_title),
+                getString(R.string.feed_empty_text),
                 null));
       }
     } else {

@@ -39,23 +39,27 @@ public final class States {
     if (error.isOffline()) {
       return ScreenState.builder(ScreenState.Kind.OFFLINE)
           .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_offline)
-          .title("Нет подключения")
-          .message("Всё обновится само, как только появится сеть.")
-          .action("Повторить")
+          .title(Res.str(app.outfitshare.R.string.state_offline_title))
+          .message(Res.str(app.outfitshare.R.string.state_offline_text))
+          .action(Res.str(app.outfitshare.R.string.action_retry))
           .build();
     }
     if (error.kind == ApiError.Kind.FORBIDDEN || error.kind == ApiError.Kind.NOT_FOUND) {
       return ScreenState.builder(ScreenState.Kind.NO_PERMISSION)
           .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_locked)
-          .title(error.kind == ApiError.Kind.NOT_FOUND ? "Не найдено" : "Нет доступа")
+          .title(
+              Res.str(
+                  error.kind == ApiError.Kind.NOT_FOUND
+                      ? app.outfitshare.R.string.state_not_found
+                      : app.outfitshare.R.string.state_forbidden))
           .message(error.message)
           .build();
     }
     return ScreenState.builder(ScreenState.Kind.ERROR)
         .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_error)
         .title(errorTitle)
-        .message("Проверьте подключение и попробуйте ещё раз.")
-        .action("Повторить")
+        .message(Res.str(app.outfitshare.R.string.state_error_text))
+        .action(Res.str(app.outfitshare.R.string.action_retry))
         .build();
   }
 

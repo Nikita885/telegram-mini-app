@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English UI. Russian (res/values) is the default language; keys mirror values/strings.xml. -->
+<resources>
+    <!-- Navigation -->
+    <string name="nav_feed">Feed</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_create">Create</string>
+    <string name="nav_dialogs">Chats</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Common -->
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_more">More</string>
+    <string name="action_next">Next</string>
+    <string name="action_done">Done</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_share">Share</string>
+    <string name="action_save">Save to a collection</string>
+    <string name="action_send">Send</string>
+    <string name="action_follow">Follow</string>
+    <string name="action_following">Following</string>
+    <string name="action_message">Message</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_redo">Redo</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_new_outfit">New outfit</string>
+    <string name="action_notifications">Notifications</string>
+    <string name="action_read_all">Mark all as read</string>
+    <string name="action_new_collection">New collection</string>
+    <string name="action_search_dialogs">Search chats</string>
+    <string name="action_new_message">New message</string>
+    <string name="action_share_outfit">Share an outfit</string>
+    <string name="action_clear">Clear</string>
+
+    <!-- Splash & onboarding -->
+    <string name="splash_kicker">Autumn issue · 2026</string>
+    <string name="splash_quote">Build an outfit — share your style.</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Get started</string>
+    <string name="onboarding_1_title">Build outfits on a mannequin</string>
+    <string name="onboarding_1_text">Pick items from the catalog — they fit onto the mannequin by anchor points, no manual adjusting.</string>
+    <string name="onboarding_2_title">Layers, like in real life</string>
+    <string name="onboarding_2_text">A shirt under a vest, a coat on top — the outfit maker layers items by body zone.</string>
+    <string name="onboarding_3_title">Share and get inspired</string>
+    <string name="onboarding_3_text">Publish outfits, save others’ to collections and remix them.</string>
+
+    <!-- Login -->
+    <string name="login_title">Sign in to save and share outfits</string>
+    <string name="login_telegram">Sign in with Telegram</string>
+    <string name="login_waiting">Waiting for confirmation in Telegram…</string>
+    <string name="login_hint">The Outfit Share bot will open. Tap “Start”, check that the bot shows the same code, and tap “It’s me” — you will be signed in automatically.</string>
+    <string name="login_code_description">Confirmation code: %1$s</string>
+    <string name="login_telegram_missing">Install Telegram to sign in</string>
+    <string name="login_expired">The confirmation timed out — tap again</string>
+    <string name="login_open_bot_again">Open the bot again</string>
+    <string name="login_legal">By continuing you accept the Terms and the Privacy Policy</string>
+    <string name="login_dev">Test sign-in</string>
+    <string name="login_server">Server</string>
+    <string name="login_offline">No connection — sign-in becomes available once you are online</string>
+
+    <!-- Feed -->
+    <string name="tab_following">Following</string>
+    <string name="tab_for_you">For you</string>
+    <string name="feed_new_posts">New outfits</string>
+
+    <!-- Outfit -->
+    <string name="outfit_items_title">Items in this outfit</string>
+    <string name="outfit_similar_title">Similar outfits</string>
+    <string name="outfit_buy">Where to buy</string>
+    <string name="outfit_remix">Remix</string>
+    <string name="outfit_try">Build an outfit with this item</string>
+    <string name="comments_title">Comments</string>
+    <string name="comments_hint">Add a comment…</string>
+    <string name="comments_reply">Reply</string>
+    <string name="comments_author">Author</string>
+    <string name="comment_failed">Not sent · Retry</string>
+
+    <!-- Constructor -->
+    <string name="constructor_title">Outfit</string>
+    <string name="constructor_empty_hint">Pick an item below — it will fit onto the mannequin by itself</string>
+    <string name="constructor_layers">Layers</string>
+    <string name="constructor_male">Male</string>
+    <string name="constructor_female">Female</string>
+    <string name="constructor_layers_hint">Drag to reorder. The body zone decides what goes on top.</string>
+    <string name="publish_title">Publish</string>
+    <string name="publish_caption">Caption</string>
+    <string name="publish_caption_hint">Tell about the outfit…</string>
+    <string name="publish_hashtags">Hashtags</string>
+    <string name="publish_hashtag_hint">Add a hashtag</string>
+    <string name="publish_collection">Collection</string>
+    <string name="publish_visibility">Who can see it</string>
+    <string name="publish_button">Publish</string>
+    <string name="publish_in_progress">Publishing…</string>
+    <string name="publish_done">Published</string>
+    <string name="publish_done_title">The outfit is in your followers’ feed</string>
+    <string name="publish_view">View outfit</string>
+    <string name="publish_more">Build another</string>
+    <string name="publish_preview">Outfit preview</string>
+    <string name="publish_remix">Allow remixes</string>
+    <string name="publish_remix_sub">Others can build their own outfit from your items</string>
+    <string name="layer_drag">Drag layer</string>
+    <string name="layer_delete">Delete layer</string>
+
+    <!-- Profile -->
+    <string name="profile_outfits">Outfits</string>
+    <string name="profile_collections">Collections</string>
+    <string name="profile_saved">Saved</string>
+    <string name="profile_drafts">Drafts</string>
+    <string name="profile_edit_photo">Change photo</string>
+    <string name="profile_first_name">First name</string>
+    <string name="profile_last_name">Last name</string>
+    <string name="profile_username">Username</string>
+    <string name="profile_username_help">Latin letters, digits, dot and _</string>
+    <string name="profile_bio">About</string>
+    <string name="profile_photo_sheet">Profile photo</string>
+    <string name="profile_photo_gallery">Choose from gallery</string>
+    <string name="profile_photo_telegram">Take from Telegram</string>
+    <string name="profile_photo_delete">Remove photo</string>
+    <string name="profile_studio">Studio</string>
+    <string name="profile_studio_sub">Shooting and publishing items to the catalog</string>
+
+    <!-- Follows -->
+    <string name="follows_followers">Followers</string>
+    <string name="follows_following">Following</string>
+    <string name="search_hint">Outfits, people, items, #tags</string>
+    <string name="search_title">Search</string>
+    <string name="search_recent">Recent</string>
+    <string name="search_trending">Trending</string>
+    <string name="search_people">People for you</string>
+    <string name="filter_outfits">Outfits</string>
+    <string name="filter_people">People</string>
+    <string name="filter_items">Items</string>
+    <string name="filter_tags">Tags</string>
+
+    <!-- Collections -->
+    <string name="collections_title">Collections</string>
+    <string name="collection_new">New collection</string>
+    <string name="collection_name">Name</string>
+    <string name="collection_private">Private</string>
+    <string name="collection_private_sub">Only you can see it</string>
+    <string name="collection_create">Create</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_new">New</string>
+    <string name="notifications_week">This week</string>
+    <string name="notifications_earlier">Earlier</string>
+
+    <!-- Messages -->
+    <string name="dialogs_title">Chats</string>
+    <string name="dialogs_pinned">Pinned</string>
+    <string name="dialogs_all">All</string>
+    <string name="chat_hint">Message</string>
+    <string name="chat_typing">typing…</string>
+    <string name="chat_online">online</string>
+    <string name="chat_waiting">waiting for network…</string>
+    <string name="message_failed">Not sent · Retry</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_system">System default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_value">English</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notif_likes">Likes and comments</string>
+    <string name="settings_notif_follows">New followers</string>
+    <string name="settings_notif_messages">Messages</string>
+    <string name="search_in_list">Search the list</string>
+    <string name="settings_server">Server</string>
+    <string name="settings_logout">Sign out</string>
+    <string name="settings_logout_title">Sign out?</string>
+    <string name="settings_logout_text">Drafts on this phone are kept. To come back, sign in with Telegram.</string>
+
+    <!-- Studio -->
+    <string name="studio_title">Studio</string>
+    <string name="studio_queue">Queue</string>
+    <string name="studio_tab_active">In progress</string>
+    <string name="studio_tab_ready">Ready</string>
+    <string name="studio_tab_failed">Errors</string>
+    <string name="studio_shoot">Shoot</string>
+    <string name="studio_hint">Lay the whole item inside the frame, on an even background</string>
+    <string name="studio_shutter">Take photo</string>
+    <string name="studio_gallery">Choose from gallery</string>
+    <string name="studio_flash">Flash</string>
+    <string name="studio_review">Review</string>
+    <string name="studio_before">Before</string>
+    <string name="studio_after">After</string>
+    <string name="studio_keypoints">Adjust points</string>
+    <string name="studio_keypoints_title">Adjust</string>
+    <string name="studio_keypoints_hint">Drag a point to the fabric’s edge. The mannequin under the item is your guide.</string>
+    <string name="studio_reset">Reset</string>
+    <string name="studio_mannequin">Mannequin</string>
+    <string name="studio_publish_title">Publish item</string>
+    <string name="studio_item_name">Name</string>
+    <string name="studio_category">Category</string>
+    <string name="studio_color">Colour</string>
+    <string name="studio_fit">Fit</string>
+    <string name="studio_style">Style</string>
+    <string name="studio_gender">For whom</string>
+    <string name="studio_buy_link">Where to buy (link)</string>
+    <string name="studio_brand">Brand</string>
+    <string name="studio_price">Price, ₽</string>
+    <string name="studio_description">Description</string>
+    <string name="studio_publish_button">Publish to the catalog</string>
+    <string name="studio_published">In the catalog</string>
+    <string name="studio_shoot_next">Shoot the next one</string>
+    <string name="studio_to_queue">To the queue</string>
+    <string name="studio_viewfinder">Camera viewfinder</string>
+    <string name="studio_low_fit">The fit is below normal — adjust the anchor points</string>
+    <string name="studio_review_image">Item on the mannequin</string>
+    <string name="studio_layer">Layer</string>
+    <string name="studio_shop">Where to buy</string>
+    <string name="studio_q_light">Light</string>
+    <string name="studio_q_background">Background</string>
+    <string name="studio_q_frame">Item in frame</string>
+    <string name="studio_g_female">Women</string>
+    <string name="studio_g_unisex">Unisex</string>
+    <string name="studio_g_male">Men</string>
+
+    <plurals name="outfits_word">
+        <item quantity="one">outfit</item>
+        <item quantity="other">outfits</item>
+    </plurals>
+    <plurals name="outfits_count">
+        <item quantity="one">%d outfit</item>
+        <item quantity="other">%d outfits</item>
+    </plurals>
+    <plurals name="items_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+    <plurals name="comments_count">
+        <item quantity="one">%d comment</item>
+        <item quantity="other">%d comments</item>
+    </plurals>
+    <plurals name="followers_word">
+        <item quantity="one">follower</item>
+        <item quantity="other">followers</item>
+    </plurals>
+</resources>

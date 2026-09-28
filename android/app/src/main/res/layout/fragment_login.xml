@@ -47,6 +47,19 @@
         app:icon="@drawable/ds_ic_send"
         app:iconGravity="textStart" />
 
+    <!-- The same code is shown by the bot: the user confirms only if they match. -->
+    <TextView
+        android:id="@+id/code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/ds_layout_gutter"
+        android:layout_marginTop="@dimen/ds_space_6"
+        android:layout_marginEnd="@dimen/ds_layout_gutter"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.Ds.DisplayMedium"
+        android:textColor="?attr/dsColorOnSurface"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/hint"
         android:layout_width="match_parent"

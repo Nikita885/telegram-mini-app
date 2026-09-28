@@ -1,7 +1,9 @@
 package app.outfitshare.core.net;
 
 import androidx.annotation.Nullable;
+import app.outfitshare.R;
 import app.outfitshare.core.net.dto.Dto;
+import app.outfitshare.core.ui.Res;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.Map;
@@ -38,21 +40,20 @@ public final class ApiError {
   }
 
   public static ApiError offline() {
-    return new ApiError(Kind.OFFLINE, 0, "offline", "Нет подключения к сети", null);
+    return new ApiError(Kind.OFFLINE, 0, "offline", Res.str(R.string.error_offline), null);
   }
 
   static ApiError from(Throwable t) {
     if (t instanceof IOException) {
       return offline();
     }
-    return new ApiError(Kind.CLIENT, 0, "unexpected", "Что-то пошло не так", null);
+    return new ApiError(Kind.CLIENT, 0, "unexpected", Res.str(R.string.error_unexpected), null);
   }
 
   static ApiError from(Response<?> response, Gson gson) {
     int status = response.code();
     String code = "http_" + status;
-    String message =
-        status >= 500 ? "Сервер не ответил. Попробуйте ещё раз" : "Не получилось выполнить запрос";
+    String message = Res.str(status >= 500 ? R.string.error_server : R.string.error_request_failed);
     Map<String, Object> fields = null;
     try (okhttp3.ResponseBody body = response.errorBody()) {
       if (body != null) {

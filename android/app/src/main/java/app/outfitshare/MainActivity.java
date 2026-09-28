@@ -14,6 +14,7 @@ import app.outfitshare.feature.auth.OnboardingFragment;
 import app.outfitshare.feature.outfit.OutfitFragment;
 import app.outfitshare.feature.profile.UserFragment;
 import app.outfitshare.feature.shell.ShellFragment;
+import java.util.List;
 
 /** Single activity: splash → onboarding/login or the tabbed shell; everything else is fragments. */
 public class MainActivity extends AppCompatActivity {
@@ -74,22 +75,37 @@ public class MainActivity extends AppCompatActivity {
     handleDeepLink(intent);
   }
 
-  /** outfitshare://outfit/42 and outfitshare://user/7 (shared links). */
+  /**
+   * outfitshare://outfit/42, outfitshare://user/7 and https://<server>/o/42, /u/7 (shared links).
+   */
   private void handleDeepLink(@Nullable Intent intent) {
     Uri uri = intent == null ? null : intent.getData();
-    if (uri == null || !container.session.isSignedIn() || uri.getLastPathSegment() == null) {
+    if (uri == null || !container.session.isSignedIn()) {
       return;
     }
+    String kind = linkKind(uri);
     long id;
     try {
       id = Long.parseLong(uri.getLastPathSegment());
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException | NullPointerException e) {
       return;
     }
-    if ("outfit".equals(uri.getHost())) {
+    if ("outfit".equals(kind)) {
       getWindow().getDecorView().post(() -> navigator.push(OutfitFragment.newInstance(id)));
-    } else if ("user".equals(uri.getHost())) {
+    } else if ("user".equals(kind)) {
       getWindow().getDecorView().post(() -> navigator.push(UserFragment.newInstance(id)));
     }
+  }
+
+  @Nullable
+  private static String linkKind(Uri uri) {
+    if ("outfitshare".equals(uri.getScheme())) {
+      return uri.getHost();
+    }
+    List<String> path = uri.getPathSegments();
+    if (path.size() != 2) {
+      return null;
+    }
+    return "o".equals(path.get(0)) ? "outfit" : "u".equals(path.get(0)) ? "user" : null;
   }
 }

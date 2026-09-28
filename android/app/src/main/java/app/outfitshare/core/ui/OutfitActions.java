@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import app.outfitshare.App;
+import app.outfitshare.R;
 import app.outfitshare.core.AppContainer;
 import app.outfitshare.core.designsystem.component.snackbar.DsSnackbar;
 import app.outfitshare.core.net.Calls;
@@ -32,7 +33,9 @@ public final class OutfitActions {
             outfit.likesCount = before;
             c.outfitBus.liked(outfit.id, wasLiked, before);
             DsSnackbar.error(
-                anchor, "Не удалось отметить образ", () -> setLiked(anchor, outfit, liked));
+                anchor,
+                Res.str(R.string.outfit_like_failed),
+                () -> setLiked(anchor, outfit, liked));
           }
         });
   }
@@ -51,10 +54,12 @@ public final class OutfitActions {
             c.outfitBus.saved(outfit.id, !target);
             onChanged.run();
             DsSnackbar.error(
-                anchor, "Не удалось сохранить", () -> toggleSaved(anchor, outfit, onChanged));
+                anchor,
+                Res.str(R.string.outfit_save_failed),
+                () -> toggleSaved(anchor, outfit, onChanged));
           } else {
             DsSnackbar.message(
-                anchor, target ? "Сохранено в «Сохранённое»" : "Убрано из сохранённого");
+                anchor, Res.str(target ? R.string.outfit_saved : R.string.outfit_unsaved));
           }
         });
   }
@@ -68,7 +73,9 @@ public final class OutfitActions {
     Intent send = new Intent(Intent.ACTION_SEND);
     send.setType("text/plain");
     String author = outfit.author != null ? outfit.author.name : "";
-    send.putExtra(Intent.EXTRA_TEXT, "Образ " + author + " в Outfit Share: " + link(outfit.id));
-    context.startActivity(Intent.createChooser(send, "Поделиться образом"));
+    send.putExtra(
+        Intent.EXTRA_TEXT, context.getString(R.string.outfit_share_text, author, link(outfit.id)));
+    context.startActivity(
+        Intent.createChooser(send, context.getString(R.string.outfit_share_title)));
   }
 }

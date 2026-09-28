@@ -18,6 +18,7 @@ import app.outfitshare.R;
 import app.outfitshare.core.designsystem.component.sheet.DsBottomSheetDialogFragment;
 import app.outfitshare.core.designsystem.haptics.Haptics;
 import app.outfitshare.core.ui.Images;
+import app.outfitshare.core.ui.Res;
 import com.google.android.material.button.MaterialButton;
 import java.util.Collections;
 import java.util.List;
@@ -140,15 +141,17 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
       Images.cutout(h.thumb, l.item.imageUrl);
       h.title.setText(l.item.name);
       h.sub.setText(
-          (l.item.categoryName == null ? "" : l.item.categoryName)
-              + " · слой "
-              + (layers.size() - position));
+          Res.str(
+              R.string.layer_subtitle,
+              l.item.categoryName == null ? "" : l.item.categoryName,
+              layers.size() - position));
       h.itemView.setAlpha(l.hidden ? 0.5f : 1f);
       h.visibility.setIconResource(
           l.hidden
               ? app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility_off
               : app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility);
-      h.visibility.setContentDescription(l.hidden ? "Показать слой" : "Скрыть слой");
+      h.visibility.setContentDescription(
+          Res.str(l.hidden ? R.string.layer_show : R.string.layer_hide));
       h.visibility.setOnClickListener(
           v -> {
             host().onToggleHidden(l);

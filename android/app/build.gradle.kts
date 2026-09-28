@@ -4,7 +4,9 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-// Release signing: android/keystore.properties (not in git) — see DEPLOY.md.
+// Release signing: android/keystore.properties (not in git) — see android/README.md. Without it the
+// release build is unsigned (Android Studio's "Generate Signed App Bundle / APK" signs it); it is
+// never signed with the debug key.
 val keystoreProps = Properties().apply {
     val f = rootProject.file("keystore.properties")
     if (f.exists()) f.inputStream().use { load(it) }
@@ -20,8 +22,12 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0.0"
-        // Server the app talks to; can be changed on the login screen (long press on the logo).
-        buildConfigField("String", "DEFAULT_SERVER", "\"${project.findProperty("outfitshare.server") ?: "https://moiservis.pro"}\"")
+        // Server the app talks to (debug builds can switch it: long press on the logo at sign-in).
+        // Override with -Poutfitshare.server=https://example.com or in gradle.properties.
+        val server = (project.findProperty("outfitshare.server") ?: "https://moiservis.pro").toString()
+        buildConfigField("String", "DEFAULT_SERVER", "\"$server\"")
+        // Shared https links (/o/<id>, /u/<id>) open in the app: Android App Links for this host.
+        manifestPlaceholders["appLinkHost"] = java.net.URI(server).host
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,7 +47,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release")
         }
         debug {
             applicationIdSuffix = ".debug"
@@ -94,4 +100,7 @@ dependencies {
     implementation(libs.glide)
 
     testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.espresso)
 }

@@ -151,7 +151,7 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
             return;
           }
           if (!r.ok() || r.data == null) {
-            stateView.setState(States.failure(r.error, "Не загрузились"));
+            stateView.setState(States.failure(r.error, getString(R.string.notifications_failed)));
             return;
           }
           comments.clear();
@@ -188,8 +188,8 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       stateView.setState(
           States.empty(
               app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_comments,
-              "Пока тихо",
-              "Напишите первым — автор увидит уведомление.",
+              getString(R.string.notifications_empty_title),
+              getString(R.string.comments_empty_text),
               null));
     } else {
       stateView.setState(ScreenState.content());
@@ -202,7 +202,8 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       replying.setVisibility(View.GONE);
       return;
     }
-    replying.setText("Ответ " + Formats.handle(comment.author.username));
+    replying.setText(
+        getString(R.string.comments_replying_to, Formats.handle(comment.author.username)));
     replying.setVisibility(View.VISIBLE);
     field.requestFocus();
   }
@@ -280,7 +281,7 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
     showEmptyIfNeeded();
     DsSnackbar.undo(
         requireView(),
-        "Комментарий удалён",
+        getString(R.string.comment_deleted),
         () -> {
           comments.addAll(Math.min(index, comments.size()), removed);
           adapter.notifyDataSetChanged();
@@ -352,7 +353,8 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
           0,
           handle.length(),
           Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-      head.append("  ").append(cm.createdAt == null ? "сейчас" : Formats.ago(cm.createdAt));
+      head.append("  ")
+          .append(cm.createdAt == null ? getString(R.string.time_now) : Formats.ago(cm.createdAt));
       h.head.setText(head);
       h.badge.setVisibility(cm.isPostAuthor ? View.VISIBLE : View.GONE);
       h.text.setText(cm.text);
@@ -368,7 +370,8 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       h.like.setVisibility(sent ? View.VISIBLE : View.INVISIBLE);
       h.like.setChecked(cm.isLiked);
       h.like.setText(cm.likesCount > 0 ? String.valueOf(cm.likesCount) : "");
-      h.like.setContentDescription(cm.isLiked ? "Убрать отметку «Нравится»" : "Нравится");
+      h.like.setContentDescription(
+          getString(cm.isLiked ? R.string.like_remove : R.string.like_add));
       h.like.setOnClickListener(x -> toggleLike(cm, h.getBindingAdapterPosition()));
       h.avatar.setOnClickListener(x -> openAuthor(cm));
       h.itemView.setOnLongClickListener(

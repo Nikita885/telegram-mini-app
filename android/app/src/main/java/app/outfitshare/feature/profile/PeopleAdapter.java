@@ -15,6 +15,7 @@ import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.ButtonStyles;
 import app.outfitshare.core.ui.Formats;
 import app.outfitshare.core.ui.Images;
+import app.outfitshare.core.ui.Res;
 import com.google.android.material.button.MaterialButton;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +50,11 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
     h.title.setText(u.name);
     String sub = Formats.handle(u.username);
     if (u.isMe) {
-      sub += " · это вы";
+      sub = Res.str(R.string.people_sub_me, sub);
     } else if (u.isFollowing && u.followsYou) {
-      sub += " · взаимно";
+      sub = Res.str(R.string.people_sub_mutual, sub);
     } else if (u.followsYou) {
-      sub += " · подписан(а) на вас";
+      sub = Res.str(R.string.people_sub_follows_you, sub);
     }
     h.sub.setText(sub);
     h.action.setVisibility(u.isMe ? View.GONE : View.VISIBLE);
@@ -77,7 +78,10 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             if (pos != RecyclerView.NO_POSITION) {
               notifyItemChanged(pos);
             }
-            DsSnackbar.error(h.itemView, r.error != null ? r.error.message : "Не получилось", null);
+            DsSnackbar.error(
+                h.itemView,
+                r.error != null ? r.error.message : Res.str(R.string.error_request_failed),
+                null);
           }
         });
   }

@@ -25,6 +25,7 @@ import app.outfitshare.core.ui.ButtonStyles;
 import app.outfitshare.core.ui.Formats;
 import app.outfitshare.core.ui.Images;
 import app.outfitshare.core.ui.Paging;
+import app.outfitshare.core.ui.Res;
 import app.outfitshare.core.ui.States;
 import app.outfitshare.core.ui.Text;
 import app.outfitshare.feature.outfit.OutfitFragment;
@@ -102,8 +103,8 @@ public class NotificationsFragment extends BaseFragment {
                         ? States.empty(
                             app.outfitshare.core.designsystem.R.drawable
                                 .ds_illustration_empty_notifications,
-                            "Пока тихо",
-                            "Здесь появятся лайки, комментарии, подписки и новости Студии.",
+                            getString(R.string.notifications_empty_title),
+                            getString(R.string.notifications_empty_text),
                             null)
                         : ScreenState.content());
                 if (reset && !fromCache) {
@@ -117,7 +118,8 @@ public class NotificationsFragment extends BaseFragment {
               public void onError(ApiError error, boolean firstPage) {
                 refresh.setRefreshing(false);
                 if (firstPage) {
-                  stateView.setState(States.failure(error, "Не загрузились"));
+                  stateView.setState(
+                      States.failure(error, getString(R.string.notifications_failed)));
                 }
               }
             });
@@ -166,17 +168,17 @@ public class NotificationsFragment extends BaseFragment {
   private static String describe(Dto.Notification n) {
     switch (n.type) {
       case "like":
-        return " оценил(а) ваш образ";
+        return " " + Res.str(R.string.notif_like);
       case "comment":
-        return " прокомментировал(а): «" + (n.comment != null ? n.comment.text : "") + "»";
+        return " " + Res.str(R.string.notif_comment, n.comment != null ? n.comment.text : "");
       case "reply":
-        return " ответил(а): «" + (n.comment != null ? n.comment.text : "") + "»";
+        return " " + Res.str(R.string.notif_reply, n.comment != null ? n.comment.text : "");
       case "follow":
-        return " подписался(ась) на вас";
+        return " " + Res.str(R.string.notif_follow);
       case "remix":
-        return " сделал(а) ремикс вашего образа";
+        return " " + Res.str(R.string.notif_remix);
       case "studio":
-        return ": новая вещь в каталоге";
+        return Res.str(R.string.notif_studio);
       default:
         return "";
     }

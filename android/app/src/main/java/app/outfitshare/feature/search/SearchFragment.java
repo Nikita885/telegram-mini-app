@@ -309,19 +309,19 @@ public class SearchFragment extends BaseFragment implements ShellFragment.Resele
               ? ScreenState.builder(ScreenState.Kind.OFFLINE)
                   .illustration(
                       app.outfitshare.core.designsystem.R.drawable.ds_illustration_offline)
-                  .title("Поиск без сети не работает")
-                  .message("Недавние запросы и сохранённое доступны в профиле.")
-                  .action("Повторить")
+                  .title(getString(R.string.search_offline_title))
+                  .message(getString(R.string.search_offline_text))
+                  .action(getString(R.string.action_retry))
                   .build()
-              : States.failure(error, "Поиск не ответил"));
+              : States.failure(error, getString(R.string.search_failed)));
       return;
     }
     stateView.setState(
         count == 0
             ? States.empty(
                 app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_search,
-                "Ничего не нашлось",
-                "Попробуйте короче или по-другому.",
+                getString(R.string.search_empty_title),
+                getString(R.string.search_empty_text),
                 null)
             : ScreenState.content());
   }
@@ -351,7 +351,7 @@ public class SearchFragment extends BaseFragment implements ShellFragment.Resele
             new com.google.android.material.button.MaterialButton(
                 requireContext(), null, com.google.android.material.R.attr.materialIconButtonStyle);
         remove.setIconResource(app.outfitshare.core.designsystem.R.drawable.ds_ic_close);
-        remove.setContentDescription("Удалить из истории");
+        remove.setContentDescription(getString(R.string.search_remove_recent));
         remove.setOnClickListener(
             v -> {
               container().prefs.removeRecentSearch(q);

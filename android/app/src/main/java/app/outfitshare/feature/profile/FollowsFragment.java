@@ -105,10 +105,11 @@ public class FollowsFragment extends BaseFragment {
                     all.isEmpty()
                         ? States.empty(
                             app.outfitshare.core.designsystem.R.drawable.ds_illustration_people,
-                            query.isEmpty() ? "Пока никого" : "Никого не нашли",
-                            query.isEmpty()
-                                ? "Поделитесь профилем — подписчики появятся здесь."
-                                : null,
+                            getString(
+                                query.isEmpty()
+                                    ? R.string.follows_empty_title
+                                    : R.string.follows_not_found),
+                            query.isEmpty() ? getString(R.string.follows_empty_text) : null,
                             null)
                         : ScreenState.content());
               }
@@ -116,7 +117,7 @@ public class FollowsFragment extends BaseFragment {
               @Override
               public void onError(ApiError error, boolean firstPage) {
                 if (firstPage) {
-                  stateView.setState(States.failure(error, "Список не загрузился"));
+                  stateView.setState(States.failure(error, getString(R.string.list_failed)));
                 }
               }
             });

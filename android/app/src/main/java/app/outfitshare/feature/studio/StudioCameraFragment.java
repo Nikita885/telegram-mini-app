@@ -129,8 +129,8 @@ public class StudioCameraFragment extends BaseFragment {
     if (!container().session.isAdmin()) {
       stateView.setState(
           States.locked(
-              "Студия — для администраторов каталога",
-              "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.",
+              getString(R.string.studio_locked_title),
+              getString(R.string.studio_locked_text),
               null));
       return;
     }
@@ -147,12 +147,10 @@ public class StudioCameraFragment extends BaseFragment {
     stateView.setState(
         ScreenState.builder(ScreenState.Kind.NO_PERMISSION)
             .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera)
-            .title("Нужен доступ к камере")
-            .message(
-                "Студия снимает вещь и сразу проверяет свет и кадр. Фото не уходят никуда, кроме"
-                    + " каталога.")
-            .action("Разрешить")
-            .secondaryAction("Выбрать из галереи")
+            .title(getString(R.string.studio_camera_permission_title))
+            .message(getString(R.string.studio_camera_permission_text))
+            .action(getString(R.string.action_allow))
+            .secondaryAction(getString(R.string.studio_gallery))
             .build());
   }
 
@@ -237,10 +235,10 @@ public class StudioCameraFragment extends BaseFragment {
                 ScreenState.builder(ScreenState.Kind.ERROR)
                     .illustration(
                         app.outfitshare.core.designsystem.R.drawable.ds_illustration_error)
-                    .title("Камера недоступна")
-                    .message("Выберите фото из галереи или попробуйте ещё раз.")
-                    .action("Повторить")
-                    .secondaryAction("Выбрать из галереи")
+                    .title(getString(R.string.studio_camera_unavailable_title))
+                    .message(getString(R.string.studio_camera_unavailable_text))
+                    .action(getString(R.string.action_retry))
+                    .secondaryAction(getString(R.string.studio_gallery))
                     .build());
           }
         },
@@ -316,13 +314,23 @@ public class StudioCameraFragment extends BaseFragment {
     if (!isAdded()) {
       return;
     }
-    setCheck(qLight, light, light ? "Свет" : (mean < 0.5 ? "Мало света" : "Пересвет"));
-    setCheck(qBackground, background, background ? "Фон" : "Пёстрый фон");
-    setCheck(qFrame, frame, frame ? "Вещь в кадре" : "Вещь не видна");
+    setCheck(
+        qLight,
+        light,
+        getString(
+            light
+                ? R.string.studio_q_light
+                : (mean < 0.5 ? R.string.studio_q_dark : R.string.studio_q_overexposed)));
+    setCheck(
+        qBackground,
+        background,
+        getString(background ? R.string.studio_q_background : R.string.studio_q_busy_background));
+    setCheck(
+        qFrame, frame, getString(frame ? R.string.studio_q_frame : R.string.studio_q_not_visible));
     if (!light && mean < 0.5) {
-      hint.setText("Включите вспышку или подойдите к окну");
+      hint.setText(R.string.studio_hint_light);
     } else if (!background) {
-      hint.setText("Положите вещь на ровный однотонный фон");
+      hint.setText(R.string.studio_hint_background);
     } else {
       hint.setText(R.string.studio_hint);
     }
@@ -338,7 +346,8 @@ public class StudioCameraFragment extends BaseFragment {
         ColorStateList.valueOf(
             ContextCompat.getColor(
                 requireContext(), ok ? R.color.camera_ok : R.color.camera_warn)));
-    chip.setContentDescription((ok ? "В порядке: " : "Внимание: ") + text);
+    chip.setContentDescription(
+        getString(ok ? R.string.studio_check_ok : R.string.studio_check_warn, text));
   }
 
   // ── Shooting ─────────────────────────────────────────────────────────────
@@ -346,7 +355,9 @@ public class StudioCameraFragment extends BaseFragment {
   private void shoot() {
     Dto.Category category = selectedCategory();
     if (capture == null || category == null) {
-      toast(category == null ? "Выберите категорию вещи" : "Камера ещё не готова");
+      toast(
+          getString(
+              category == null ? R.string.studio_pick_category : R.string.studio_camera_not_ready));
       return;
     }
     View shutter = requireView().findViewById(R.id.shutter);
@@ -367,7 +378,7 @@ public class StudioCameraFragment extends BaseFragment {
           @Override
           public void onError(@NonNull ImageCaptureException e) {
             showError(app.outfitshare.core.net.ApiError.offline(), null);
-            toast("Не удалось сделать снимок");
+            toast(getString(R.string.studio_shot_failed));
           }
         });
   }
@@ -380,7 +391,7 @@ public class StudioCameraFragment extends BaseFragment {
 
   private void queue(File file, Dto.Category category) {
     UploadWorker.enqueue(requireContext(), file, category.slug, category.name, selectedGender());
-    hint.setText("Снято — загружаем в очередь");
+    hint.setText(R.string.studio_shot_uploading);
   }
 
   private void pickFromGallery() {
@@ -394,13 +405,13 @@ public class StudioCameraFragment extends BaseFragment {
   private void queueFromGallery(Uri uri) {
     Dto.Category category = selectedCategory();
     if (category == null) {
-      toast("Выберите категорию вещи");
+      toast(getString(R.string.studio_pick_category));
       return;
     }
     try (InputStream in = requireContext().getContentResolver().openInputStream(uri)) {
       Bitmap bitmap = BitmapFactory.decodeStream(in);
       if (bitmap == null) {
-        toast("Не удалось прочитать фото");
+        toast(getString(R.string.photo_read_failed));
         return;
       }
       float k = Math.min(1f, 2400f / Math.max(bitmap.getWidth(), bitmap.getHeight()));
@@ -413,7 +424,7 @@ public class StudioCameraFragment extends BaseFragment {
       }
       queue(file, category);
     } catch (Exception e) {
-      toast("Не удалось прочитать фото");
+      toast(getString(R.string.photo_read_failed));
     }
   }
 

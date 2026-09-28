@@ -52,8 +52,8 @@ public final class Session {
   public synchronized void setTokens(String access, String refresh) {
     this.access = access;
     this.refresh = refresh;
-    store.put(ACCESS, access);
-    store.put(REFRESH, refresh);
+    store.put(ACCESS, access, true);
+    store.put(REFRESH, refresh, true);
     signedOut.postValue(false);
   }
 

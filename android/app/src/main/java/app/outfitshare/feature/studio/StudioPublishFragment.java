@@ -39,8 +39,9 @@ public class StudioPublishFragment extends BaseFragment {
   private static final String ARG_JOB = "job";
   private static final String GENDER = "gender";
   private static final String STYLE = "style";
+  // Style names are the catalog's own labels (Latin in both languages); "" is "no style".
   private static final String[][] STYLES = {
-    {"", "Без стиля"},
+    {"", ""},
     {"casual", "Casual"},
     {"formal", "Formal"},
     {"sport", "Sport"},
@@ -102,14 +103,19 @@ public class StudioPublishFragment extends BaseFragment {
               genderRow.setValue(StudioText.genderLabel(gender));
             });
     ListRowView styleRow = view.findViewById(R.id.style);
-    styleRow.setValue(STYLES[0][1]);
+    styleRow.setValue(styleLabel(STYLES[0]));
     styleRow.setOnClickListener(
         v -> {
           ArrayList<ActionSheet.Row> rows = new ArrayList<>();
           for (String[] s : STYLES) {
             rows.add(
                 new ActionSheet.Row(
-                    s[0].isEmpty() ? "none" : s[0], 0, s[1], null, false, s[0].equals(style)));
+                    s[0].isEmpty() ? "none" : s[0],
+                    0,
+                    styleLabel(s),
+                    null,
+                    false,
+                    s[0].equals(style)));
           }
           ActionSheet.show(
               getChildFragmentManager(), STYLE, getString(R.string.studio_style), rows);
@@ -123,7 +129,7 @@ public class StudioPublishFragment extends BaseFragment {
               style = "none".equals(id) ? "" : id;
               for (String[] s : STYLES) {
                 if (s[0].equals(style)) {
-                  styleRow.setValue(s[1]);
+                  styleRow.setValue(styleLabel(s));
                 }
               }
             });
@@ -163,7 +169,7 @@ public class StudioPublishFragment extends BaseFragment {
       LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size + 8, size + 8);
       lp.setMarginEnd(gap);
       swatch.setLayoutParams(lp);
-      swatch.setContentDescription("Цвет: " + label);
+      swatch.setContentDescription(getString(R.string.studio_color_description, label));
       int fill;
       try {
         fill = Color.parseColor(hex);
@@ -239,7 +245,7 @@ public class StudioPublishFragment extends BaseFragment {
     String name = ((EditText) v.findViewById(R.id.name)).getText().toString().trim();
     TextInputLayout nameLayout = v.findViewById(R.id.name_layout);
     if (name.isEmpty()) {
-      nameLayout.setError("Назовите вещь");
+      nameLayout.setError(getString(R.string.studio_name_required));
       return;
     }
     nameLayout.setError(null);
@@ -283,7 +289,8 @@ public class StudioPublishFragment extends BaseFragment {
           if (!r.ok() || r.data == null) {
             String field = r.error == null ? null : r.error.fieldMessage("buy_link");
             if (field != null) {
-              ((TextInputLayout) v.findViewById(R.id.link_layout)).setError("Проверьте ссылку");
+              ((TextInputLayout) v.findViewById(R.id.link_layout))
+                  .setError(getString(R.string.studio_link_invalid));
             } else {
               showError(r.error, this::publish);
             }
@@ -300,5 +307,9 @@ public class StudioPublishFragment extends BaseFragment {
                       preview != null ? preview : done.cutoutUrl,
                       r.data.item.name));
         });
+  }
+
+  private String styleLabel(String[] style) {
+    return style[0].isEmpty() ? getString(R.string.studio_no_style) : style[1];
   }
 }

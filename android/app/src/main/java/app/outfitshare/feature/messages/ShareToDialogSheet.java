@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.FragmentManager;
 import app.outfitshare.App;
+import app.outfitshare.R;
 import app.outfitshare.core.designsystem.component.avatar.AvatarView;
 import app.outfitshare.core.designsystem.component.list.ListRowView;
 import app.outfitshare.core.designsystem.component.sheet.DsBottomSheetDialogFragment;
@@ -19,6 +20,7 @@ import app.outfitshare.core.net.Calls;
 import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.Formats;
 import app.outfitshare.core.ui.Images;
+import app.outfitshare.core.ui.Res;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class ShareToDialogSheet extends DsBottomSheetDialogFragment {
   @Nullable
   @Override
   protected CharSequence getSheetTitle() {
-    return "Отправить в диалог";
+    return getString(R.string.share_to_dialog);
   }
 
   @NonNull
@@ -68,10 +70,7 @@ public class ShareToDialogSheet extends DsBottomSheetDialogFragment {
           }
           list.removeAllViews();
           if (!r.ok() || r.data == null || r.data.results.isEmpty()) {
-            loading.setText(
-                r.ok()
-                    ? "Пока нет диалогов — напишите кому-нибудь из профиля"
-                    : "Диалоги не загрузились");
+            loading.setText(r.ok() ? R.string.share_no_dialogs : R.string.dialogs_failed);
             list.addView(loading);
             return;
           }
@@ -100,7 +99,10 @@ public class ShareToDialogSheet extends DsBottomSheetDialogFragment {
         r -> {
           if (anchor != null) {
             DsSnackbar.message(
-                anchor, r.ok() ? "Отправлено: " + d.user.name : "Не удалось отправить");
+                anchor,
+                r.ok()
+                    ? Res.str(R.string.share_sent, d.user.name)
+                    : Res.str(R.string.share_failed));
           }
         });
   }

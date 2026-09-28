@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Outfit Share</string>
+    <string name="app_name" translatable="false">Outfit Share</string>
 
     <!-- Navigation -->
     <string name="nav_feed">Лента</string>
@@ -51,7 +51,10 @@
     <string name="login_title">Войдите, чтобы сохранять образы и делиться ими</string>
     <string name="login_telegram">Войти через Telegram</string>
     <string name="login_waiting">Ждём подтверждения в Telegram…</string>
-    <string name="login_hint">Откроется бот Outfit Share. Нажмите «Старт» и вернитесь сюда — вход выполнится сам.</string>
+    <string name="login_hint">Откроется бот Outfit Share. Нажмите «Старт», проверьте, что код в боте такой же, и нажмите «Это я» — вход выполнится сам.</string>
+    <string name="login_code_description">Код подтверждения: %1$s</string>
+    <string name="login_telegram_missing">Установите Telegram, чтобы войти</string>
+    <string name="login_expired">Время на подтверждение вышло — нажмите ещё раз</string>
     <string name="login_open_bot_again">Открыть бота ещё раз</string>
     <string name="login_legal">Продолжая, вы принимаете Условия и Политику конфиденциальности</string>
     <string name="login_dev">Тестовый вход</string>

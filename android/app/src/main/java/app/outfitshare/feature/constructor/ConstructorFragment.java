@@ -21,6 +21,7 @@ import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.ActionSheet;
 import app.outfitshare.core.ui.BaseFragment;
 import app.outfitshare.core.ui.Paging;
+import app.outfitshare.core.ui.Res;
 import app.outfitshare.core.ui.Spacing;
 import app.outfitshare.core.ui.States;
 import app.outfitshare.feature.outfit.ItemSheet;
@@ -50,8 +51,13 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   private static final String DRAFT_PREFS = "constructor_draft";
 
   /** Catalog tabs → category slugs (comma-separated for the API). */
-  private static final String[] TAB_TITLES = {
-    "Все", "Верх", "Низ", "Платья", "Обувь", "Аксессуары"
+  private static final int[] TAB_TITLES = {
+    R.string.catalog_tab_all,
+    R.string.catalog_tab_tops,
+    R.string.catalog_tab_bottoms,
+    R.string.catalog_tab_dresses,
+    R.string.catalog_tab_shoes,
+    R.string.catalog_tab_accessories
   };
 
   private static final String[] TAB_CATEGORIES = {
@@ -81,7 +87,7 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   private String gender;
   private int tab;
   @Nullable private Long remixOf;
-  private String title = "Образ";
+  private String title = Res.str(R.string.constructor_title);
 
   public ConstructorFragment() {
     super(R.layout.fragment_constructor);
@@ -165,7 +171,7 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
         });
 
     TabLayout tabs = view.findViewById(R.id.categories);
-    for (String t : TAB_TITLES) {
+    for (int t : TAB_TITLES) {
       tabs.addTab(tabs.newTab().setText(t));
     }
     for (int i = 0; i < TAB_TITLES.length; i++) {
@@ -221,8 +227,8 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
                 all.isEmpty()
                     ? States.empty(
                         app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_search,
-                        "Пока пусто",
-                        "Вещи этой категории скоро появятся в каталоге.",
+                        getString(R.string.catalog_empty_title),
+                        getString(R.string.catalog_empty_text),
                         null)
                     : ScreenState.content());
           }
@@ -230,7 +236,7 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
           @Override
           public void onError(ApiError error, boolean firstPage) {
             if (index == tab && firstPage) {
-              catalogState.setState(States.failure(error, "Каталог не загрузился"));
+              catalogState.setState(States.failure(error, getString(R.string.catalog_failed)));
             }
           }
         });
@@ -334,7 +340,8 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
       pushUndo();
       layers.remove(existing);
       commitLayers();
-      DsSnackbar.undo(requireView(), item.name + " убрана из образа", this::undo, null);
+      DsSnackbar.undo(
+          requireView(), getString(R.string.constructor_item_removed, item.name), this::undo, null);
       return;
     }
     pushUndo();
@@ -353,7 +360,10 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     loadBitmap(layer, true);
     if (!replaced.isEmpty()) {
       DsSnackbar.undo(
-          requireView(), replaced.get(0).item.name + " убрана из образа", this::undo, null);
+          requireView(),
+          getString(R.string.constructor_item_removed, replaced.get(0).item.name),
+          this::undo,
+          null);
     }
   }
 
@@ -460,7 +470,9 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
               public void onLoadFailed(@Nullable Drawable errorDrawable) {
                 if (isAdded()) {
                   DsSnackbar.error(
-                      requireView(), "Не удалось загрузить вещь", () -> loadBitmap(layer, drop));
+                      requireView(),
+                      getString(R.string.constructor_item_load_failed),
+                      () -> loadBitmap(layer, drop));
                 }
               }
             });
@@ -556,21 +568,21 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
         new ActionSheet.Row(
             "front",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_layers,
-            "Поднять слой",
+            getString(R.string.layer_up),
             null,
             false));
     rows.add(
         new ActionSheet.Row(
             "back",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_layers,
-            "Опустить слой",
+            getString(R.string.layer_down),
             null,
             false));
     rows.add(
         new ActionSheet.Row(
             "flip",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_swap,
-            "Отразить",
+            getString(R.string.layer_flip),
             null,
             false));
     if (layer.canFit(gender)) {
@@ -578,22 +590,22 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
           new ActionSheet.Row(
               "home",
               app.outfitshare.core.designsystem.R.drawable.ds_ic_magnet,
-              "Вернуть на манекен",
-              "Сядет по опорным точкам",
+              getString(R.string.layer_home),
+              getString(R.string.layer_home_sub),
               false));
     }
     rows.add(
         new ActionSheet.Row(
             "info",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_info,
-            "О вещи",
+            getString(R.string.layer_info),
             null,
             false));
     rows.add(
         new ActionSheet.Row(
             "delete",
             app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
-            "Убрать из образа",
+            getString(R.string.layer_remove),
             null,
             true));
     ActionSheet.show(getChildFragmentManager(), LAYER_ACTIONS, layer.item.name, rows);
@@ -690,7 +702,11 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     pushUndo();
     layers.remove(layer);
     commitLayers();
-    DsSnackbar.undo(requireView(), layer.item.name + " убрана из образа", this::undo, null);
+    DsSnackbar.undo(
+        requireView(),
+        getString(R.string.constructor_item_removed, layer.item.name),
+        this::undo,
+        null);
   }
 
   @Override
@@ -705,7 +721,7 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     if (args != null && args.getString(ARG_REMIX) != null) {
       Dto.Outfit o = container().gson.fromJson(args.getString(ARG_REMIX), Dto.Outfit.class);
       remixOf = o.id;
-      title = "Ремикс";
+      title = getString(R.string.constructor_remix_title);
       ((android.widget.TextView) requireView().findViewById(R.id.title)).setText(title);
       if (o.mannequin != null) {
         gender = o.mannequin;
@@ -780,7 +796,8 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
         }
       }
       if (!layers.isEmpty()) {
-        requireView().post(() -> DsSnackbar.message(requireView(), "Черновик восстановлен"));
+        requireView()
+            .post(() -> DsSnackbar.message(requireView(), getString(R.string.draft_restored)));
       }
     } catch (RuntimeException ignored) {
       clearDraft();
@@ -831,10 +848,10 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
       return;
     }
     ConfirmDialog.with(requireContext())
-        .title("Сохранить черновик?")
-        .message("Образ откроется здесь же в следующий раз.")
-        .confirm("Сохранить")
-        .cancel("Удалить")
+        .title(getString(R.string.draft_save_title))
+        .message(getString(R.string.draft_save_text))
+        .confirm(getString(R.string.action_save_short))
+        .cancel(getString(R.string.action_delete))
         .onConfirm(
             () -> {
               saveDraft();

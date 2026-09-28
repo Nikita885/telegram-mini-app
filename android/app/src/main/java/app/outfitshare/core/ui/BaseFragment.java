@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import app.outfitshare.App;
 import app.outfitshare.MainActivity;
+import app.outfitshare.R;
 import app.outfitshare.core.AppContainer;
 import app.outfitshare.core.designsystem.component.snackbar.DsSnackbar;
 import app.outfitshare.core.net.Api;
@@ -56,6 +57,7 @@ public abstract class BaseFragment extends Fragment {
     if (v == null || error == null) {
       return;
     }
-    DsSnackbar.error(v, error.isOffline() ? "Нет подключения к сети" : error.message, retry);
+    DsSnackbar.error(
+        v, error.isOffline() ? getString(R.string.error_offline) : error.message, retry);
   }
 }

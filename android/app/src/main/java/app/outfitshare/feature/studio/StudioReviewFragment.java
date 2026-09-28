@@ -3,6 +3,8 @@ package app.outfitshare.feature.studio;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,10 +18,12 @@ import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.realtime.Realtime;
 import app.outfitshare.core.ui.BaseFragment;
 import app.outfitshare.core.ui.Images;
+import app.outfitshare.core.ui.Res;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +32,8 @@ import java.util.List;
  */
 public class StudioReviewFragment extends BaseFragment {
   private static final String ARG_ID = "id";
+  private static final int MENU_RETRY = 1;
+  private static final int MENU_DELETE = 2;
 
   private final Handler handler = new Handler(Looper.getMainLooper());
   private long jobId;
@@ -63,16 +69,17 @@ public class StudioReviewFragment extends BaseFragment {
     jobId = requireArguments().getLong(ARG_ID);
     MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
     toolbar.setNavigationOnClickListener(v -> nav().back());
-    toolbar.getMenu().add("Переобработать");
-    toolbar.getMenu().add("Удалить");
+    // Menu items are matched by id, not by their (translated) titles.
+    toolbar.getMenu().add(Menu.NONE, MENU_RETRY, Menu.NONE, R.string.studio_reprocess);
+    toolbar.getMenu().add(Menu.NONE, MENU_DELETE, Menu.NONE, R.string.action_delete);
     toolbar.setOnMenuItemClickListener(
         item -> {
-          if ("Удалить".contentEquals(item.getTitle())) {
+          if (item.getItemId() == MENU_DELETE) {
             ConfirmDialog.with(requireContext())
-                .title("Удалить снимок?")
-                .message("Вещь не попадёт в каталог.")
-                .confirm("Удалить")
-                .cancel("Отмена")
+                .title(getString(R.string.studio_delete_shot_title))
+                .message(getString(R.string.studio_delete_shot_text))
+                .confirm(getString(R.string.action_delete))
+                .cancel(getString(R.string.action_cancel))
                 .destructive()
                 .onConfirm(() -> Calls.run(api().deleteJob(jobId), r -> nav().back()))
                 .show();
@@ -164,12 +171,12 @@ public class StudioReviewFragment extends BaseFragment {
       int step = StudioText.step(j.stage);
       title.setText(StudioText.stageLabel(j.stage));
       stepsLabel.setText(
-          "Шаг " + Math.max(1, step) + " из " + StepsView.COUNT + " · обычно меньше минуты");
+          getString(R.string.studio_review_steps, Math.max(1, step), StepsView.COUNT));
       stepsLabel.setVisibility(View.VISIBLE);
       steps.setVisibility(View.VISIBLE);
       steps.setDone(Math.max(0, step - 1));
     } else {
-      title.setText(failed ? "Не удалось обработать" : j.categoryName);
+      title.setText(failed ? getString(R.string.studio_failed) : j.categoryName);
       stepsLabel.setVisibility(failed ? View.VISIBLE : View.GONE);
       stepsLabel.setText(j.error);
       steps.setVisibility(View.GONE);
@@ -178,7 +185,7 @@ public class StudioReviewFragment extends BaseFragment {
     boolean low = StudioText.lowFit(j);
     TextView ok = v.findViewById(R.id.fit_ok);
     TextView lowBadge = v.findViewById(R.id.fit_low);
-    String fit = "Посадка " + StudioText.fitPercent(j) + " %";
+    String fit = getString(R.string.studio_fit_percent, StudioText.fitPercent(j));
     ok.setText(fit);
     lowBadge.setText(fit);
     ok.setVisibility(j.fitScore != null && !low ? View.VISIBLE : View.GONE);
@@ -216,26 +223,26 @@ public class StudioReviewFragment extends BaseFragment {
     if (!(list instanceof List) || ((List<?>) list).isEmpty()) {
       return "";
     }
-    StringBuilder sb = new StringBuilder("Замечания к фото: ");
+    List<String> notes = new ArrayList<>();
     for (Object o : (List<?>) list) {
       switch (String.valueOf(o)) {
         case "blurry":
-          sb.append("нерезко; ");
+          notes.add(Res.str(R.string.studio_warn_blurry));
           break;
         case "dark":
-          sb.append("темно; ");
+          notes.add(Res.str(R.string.studio_warn_dark));
           break;
         case "overexposed":
-          sb.append("пересвет; ");
+          notes.add(Res.str(R.string.studio_warn_overexposed));
           break;
         case "cropped":
-          sb.append("вещь обрезана краем кадра; ");
+          notes.add(Res.str(R.string.studio_warn_cropped));
           break;
         default:
           break;
       }
     }
-    return sb.toString().replaceAll("; $", "");
+    return notes.isEmpty() ? "" : Res.str(R.string.studio_warnings, TextUtils.join("; ", notes));
   }
 
   private void addChip(ChipGroup group, @Nullable String text) {
@@ -254,7 +261,8 @@ public class StudioReviewFragment extends BaseFragment {
     }
     ImageView image = requireView().findViewById(R.id.image);
     Chip mannequin = requireView().findViewById(R.id.mannequin);
-    mannequin.setText("female".equals(viewGender) ? "Женский" : "Мужской");
+    mannequin.setText(
+        "female".equals(viewGender) ? R.string.constructor_female : R.string.constructor_male);
     String url =
         showBefore
             ? job.sourceUrl

@@ -6,6 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import app.outfitshare.R;
+import app.outfitshare.core.net.Api;
 import app.outfitshare.core.net.Calls;
 import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.ActionSheet;
@@ -56,14 +57,10 @@ public class UserFragment extends ProfileScreen {
                 Map<String, Object> body = new HashMap<>();
                 body.put("target_type", "user");
                 body.put("target_id", profile.id);
-                body.put("reason", "Жалоба из приложения");
+                body.put("reason", Api.REPORT_REASON);
                 Calls.run(
                     api().report(body),
-                    x ->
-                        toast(
-                            x.ok()
-                                ? "Спасибо, модераторы посмотрят"
-                                : "Не удалось отправить жалобу"));
+                    x -> toast(getString(x.ok() ? R.string.report_sent : R.string.report_failed)));
               } else if ("share".equals(r.getString(ActionSheet.RESULT_ID)) && profile != null) {
                 shareProfile(profile);
               }
@@ -87,14 +84,14 @@ public class UserFragment extends ProfileScreen {
               new ActionSheet.Row(
                   "share",
                   app.outfitshare.core.designsystem.R.drawable.ds_ic_share,
-                  "Поделиться профилем",
+                  getString(R.string.profile_share),
                   null,
                   false));
           rows.add(
               new ActionSheet.Row(
                   "report",
                   app.outfitshare.core.designsystem.R.drawable.ds_ic_flag,
-                  "Пожаловаться",
+                  getString(R.string.action_report),
                   null,
                   true));
           ActionSheet.show(getChildFragmentManager(), MORE, null, rows);

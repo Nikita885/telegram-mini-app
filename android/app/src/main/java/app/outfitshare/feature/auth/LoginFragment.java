@@ -3,18 +3,22 @@ package app.outfitshare.feature.auth;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import app.outfitshare.BuildConfig;
 import app.outfitshare.MainActivity;
 import app.outfitshare.R;
+import app.outfitshare.core.designsystem.a11y.A11y;
 import app.outfitshare.core.designsystem.component.banner.OfflineBanner;
 import app.outfitshare.core.designsystem.component.button.DsButton;
 import app.outfitshare.core.designsystem.haptics.Haptics;
@@ -26,11 +30,13 @@ import app.outfitshare.core.ui.BaseFragment;
 import app.outfitshare.core.ui.Wordmark;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
- * Sign in through the Telegram bot: the API issues a one-time nonce, the bot confirms it when the
- * user presses Start, and this screen polls until tokens are issued.
+ * Sign in through the Telegram bot: the API issues a one-time login request with a four-digit code,
+ * the bot shows this device and the same code and asks the user to confirm («Это я»), and this
+ * screen polls until tokens are issued. A declined or expired request stops polling with a message.
  */
 public class LoginFragment extends BaseFragment {
   private static final long POLL_MS = 2000;
@@ -38,6 +44,7 @@ public class LoginFragment extends BaseFragment {
   private final Handler handler = new Handler(Looper.getMainLooper());
   private DsButton telegram;
   private TextView hint;
+  private TextView code;
   private View reopen;
   private OfflineBanner offline;
   @Nullable private Dto.LoginStart pending;
@@ -54,13 +61,17 @@ public class LoginFragment extends BaseFragment {
     SystemBars.applyPadding(view, true, true);
     TextView wordmark = view.findViewById(R.id.wordmark);
     Wordmark.apply(wordmark);
-    wordmark.setOnLongClickListener(
-        v -> {
-          askServer();
-          return true;
-        });
+    if (BuildConfig.DEBUG) {
+      // Pointing the app at another server is a development tool only.
+      wordmark.setOnLongClickListener(
+          v -> {
+            askServer();
+            return true;
+          });
+    }
     telegram = view.findViewById(R.id.telegram);
     hint = view.findViewById(R.id.hint);
+    code = view.findViewById(R.id.code);
     reopen = view.findViewById(R.id.reopen);
     offline = view.findViewById(R.id.offline);
     offline.setOnRetryClickListener(v -> loadConfig());
@@ -89,8 +100,10 @@ public class LoginFragment extends BaseFragment {
 
   private void start() {
     setWaiting(true);
+    Map<String, Object> body = new HashMap<>();
+    body.put("device", deviceName());
     Calls.run(
-        api().telegramStart(),
+        api().telegramStart(body),
         r -> {
           if (!isAdded()) {
             return;
@@ -102,6 +115,7 @@ public class LoginFragment extends BaseFragment {
           }
           pending = r.data;
           pendingSince = System.currentTimeMillis();
+          showCode(r.data.code);
           openBot();
           startPolling();
         });
@@ -123,7 +137,7 @@ public class LoginFragment extends BaseFragment {
       try {
         startActivity(new Intent(Intent.ACTION_VIEW, web));
       } catch (ActivityNotFoundException ignored) {
-        toast("Установите Telegram, чтобы войти");
+        toast(getString(R.string.login_telegram_missing));
       }
     }
   }
@@ -145,7 +159,7 @@ public class LoginFragment extends BaseFragment {
       polling = false;
       pending = null;
       setWaiting(false);
-      toast("Время на подтверждение вышло — нажмите ещё раз");
+      toast(getString(R.string.login_expired));
       return;
     }
     Map<String, Object> body = new HashMap<>();
@@ -191,6 +205,43 @@ public class LoginFragment extends BaseFragment {
     telegram.setText(waiting ? R.string.login_waiting : R.string.login_telegram);
     hint.setVisibility(waiting ? View.VISIBLE : View.GONE);
     reopen.setVisibility(waiting ? View.VISIBLE : View.GONE);
+    if (!waiting) {
+      code.setVisibility(View.GONE);
+    }
+  }
+
+  private void showCode(@Nullable String value) {
+    if (value == null || value.isEmpty()) {
+      code.setVisibility(View.GONE);
+      return;
+    }
+    // Polite live region: TalkBack reads the code when it appears, digit by digit, not "four
+    // thousand…".
+    A11y.announceChanges(code);
+    code.setContentDescription(
+        getString(R.string.login_code_description, TextUtils.join(" ", value.split(""))));
+    code.setText(value);
+    code.setVisibility(View.VISIBLE);
+  }
+
+  /** Shown by the bot next to the code, e.g. "Google Pixel 8 · Android 15". */
+  static String deviceName() {
+    return deviceName(Build.MANUFACTURER, Build.MODEL, Build.VERSION.RELEASE);
+  }
+
+  static String deviceName(
+      @Nullable String manufacturer, @Nullable String model, @Nullable String release) {
+    String maker = manufacturer == null ? "" : manufacturer.trim();
+    String name = model == null ? "" : model.trim();
+    if (!maker.isEmpty()
+        && !name.toLowerCase(Locale.ROOT).startsWith(maker.toLowerCase(Locale.ROOT))) {
+      name = (maker + " " + name).trim();
+    }
+    if (!name.isEmpty()) {
+      name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    }
+    String os = release == null || release.isEmpty() ? "Android" : "Android " + release;
+    return name.isEmpty() ? os : name + " · " + os;
   }
 
   @Override

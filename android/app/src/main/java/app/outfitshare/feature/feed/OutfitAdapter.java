@@ -15,6 +15,7 @@ import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.Formats;
 import app.outfitshare.core.ui.Images;
 import app.outfitshare.core.ui.OutfitActions;
+import app.outfitshare.core.ui.Res;
 import app.outfitshare.core.ui.Text;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +94,11 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
     Images.avatar(card.getAvatarView(), o.author);
     String meta;
     if (o.remixOf != null && o.remixOf.author != null) {
-      meta = Formats.ago(o.createdAt) + " · ремикс " + Formats.handle(o.remixOf.author.username);
+      meta =
+          Res.str(
+              R.string.outfit_meta_remix,
+              Formats.ago(o.createdAt),
+              Formats.handle(o.remixOf.author.username));
     } else {
       int n = o.items.size();
       meta =
@@ -102,7 +107,7 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
               + card.getResources().getQuantityString(R.plurals.items_count, n, n);
     }
     card.setAuthor(o.author.id, displayName(o.author), compact ? null : meta);
-    card.setBadge(o.remixOf != null ? "Ремикс" : null);
+    card.setBadge(o.remixOf != null ? Res.str(R.string.constructor_remix_title) : null);
     card.setLiked(o.isLiked, o.likesCount);
     card.setSharedElementName(SharedElements.outfitPhoto(o.id));
     if (compact) {

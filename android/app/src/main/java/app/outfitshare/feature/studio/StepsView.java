@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.Nullable;
 import app.outfitshare.core.designsystem.theme.DsTheme;
+import app.outfitshare.core.ui.Res;
 
 /** Mockup `.steps`: five segments of the pipeline, finished ones in the accent colour. */
 public class StepsView extends View {
@@ -29,7 +30,8 @@ public class StepsView extends View {
 
   public void setDone(int done) {
     this.done = done;
-    setContentDescription("Шаг " + Math.min(done + 1, COUNT) + " из " + COUNT);
+    setContentDescription(
+        Res.str(app.outfitshare.R.string.step_of, Math.min(done + 1, COUNT), COUNT));
     invalidate();
   }
 

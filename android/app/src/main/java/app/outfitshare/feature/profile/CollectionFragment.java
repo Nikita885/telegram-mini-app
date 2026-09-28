@@ -108,7 +108,7 @@ public class CollectionFragment extends BaseFragment {
             return;
           }
           if (!r.ok() || r.data == null) {
-            stateView.setState(States.failure(r.error, "Коллекция не загрузилась"));
+            stateView.setState(States.failure(r.error, getString(R.string.collection_failed)));
             return;
           }
           Dto.Collection c = r.data.collection;
@@ -119,8 +119,8 @@ public class CollectionFragment extends BaseFragment {
                   ? States.empty(
                       app.outfitshare.core.designsystem.R.drawable
                           .ds_illustration_empty_collections,
-                      "Сохраняйте образы",
-                      "Нажмите на закладку под образом — он попадёт сюда.",
+                      getString(R.string.collection_empty_title),
+                      getString(R.string.collection_empty_text),
                       null)
                   : ScreenState.content());
           MaterialToolbar toolbar = requireView().findViewById(R.id.toolbar);
@@ -128,14 +128,14 @@ public class CollectionFragment extends BaseFragment {
           if (!c.isDefault) {
             toolbar
                 .getMenu()
-                .add("Удалить коллекцию")
+                .add(R.string.collection_delete)
                 .setOnMenuItemClickListener(
                     item -> {
                       ConfirmDialog.with(requireContext())
-                          .title("Удалить коллекцию?")
-                          .message("Образы останутся у авторов, пропадёт только подборка.")
-                          .confirm("Удалить")
-                          .cancel("Отмена")
+                          .title(getString(R.string.collection_delete_title))
+                          .message(getString(R.string.collection_delete_text))
+                          .confirm(getString(R.string.action_delete))
+                          .cancel(getString(R.string.action_cancel))
                           .destructive()
                           .onConfirm(
                               () ->
@@ -180,9 +180,11 @@ public class CollectionFragment extends BaseFragment {
       int n = collection.count;
       ((TextView) h.itemView.findViewById(R.id.kicker))
           .setText(
-              "Коллекция · "
-                  + getResources().getQuantityString(R.plurals.outfits_count, n, n)
-                  + (collection.isPrivate ? " · приватная" : ""));
+              getString(
+                  collection.isPrivate
+                      ? R.string.collection_kicker_private
+                      : R.string.collection_kicker,
+                  getResources().getQuantityString(R.plurals.outfits_count, n, n)));
       ((TextView) h.itemView.findViewById(R.id.title)).setText(collection.title);
     }
 

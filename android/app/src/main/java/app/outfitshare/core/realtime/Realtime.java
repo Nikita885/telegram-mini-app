@@ -5,6 +5,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import app.outfitshare.core.net.ApiClient;
+import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.session.Session;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -13,6 +14,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 /**
  * One WebSocket per signed-in app (ws/v1/): messages, typing, notifications, Studio progress.
@@ -79,8 +82,39 @@ public final class Realtime {
       return;
     }
     String base = client.baseUrl().replaceFirst("^http", "ws");
-    Request request = new Request.Builder().url(base + "ws/v1/?token=" + session.access()).build();
+    // The token goes in a header, never in the URL: URLs end up in proxy access logs.
+    Request request =
+        new Request.Builder()
+            .url(base + "ws/v1/")
+            .header("Authorization", "Bearer " + session.access())
+            .build();
     socket = client.http().newWebSocket(request, new Callbacks());
+  }
+
+  /** Access token rejected: any authorized REST call refreshes it (ApiClient), then reconnect. */
+  private void refreshThenReconnect() {
+    socket = null;
+    connected = false;
+    if (!wanted) {
+      return;
+    }
+    client
+        .api()
+        .counters()
+        .enqueue(
+            new Callback<Dto.Counters>() {
+              @Override
+              public void onResponse(
+                  @NonNull Call<Dto.Counters> call,
+                  @NonNull retrofit2.Response<Dto.Counters> response) {
+                main.post(Realtime.this::scheduleReconnect);
+              }
+
+              @Override
+              public void onFailure(@NonNull Call<Dto.Counters> call, @NonNull Throwable t) {
+                main.post(Realtime.this::scheduleReconnect);
+              }
+            });
   }
 
   private void scheduleReconnect() {
@@ -130,8 +164,8 @@ public final class Realtime {
       main.post(
           () -> {
             if (code == 4401) {
-              // Access token expired: the next REST call refreshes it, then we reconnect.
-              backoffMs = 3000;
+              refreshThenReconnect();
+              return;
             }
             scheduleReconnect();
           });

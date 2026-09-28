@@ -36,6 +36,10 @@ public final class Dto {
 
   public static class LoginStart {
     public String nonce;
+
+    /** Four digits the bot repeats; the user signs in only if both match. */
+    public String code;
+
     public String botUrl;
     public int expiresIn;
   }

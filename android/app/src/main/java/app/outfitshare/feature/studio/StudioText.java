@@ -1,7 +1,9 @@
 package app.outfitshare.feature.studio;
 
 import androidx.annotation.Nullable;
+import app.outfitshare.R;
 import app.outfitshare.core.net.dto.Dto;
+import app.outfitshare.core.ui.Res;
 import java.util.List;
 import java.util.Map;
 
@@ -35,17 +37,17 @@ final class StudioText {
   static String stageLabel(@Nullable String stage) {
     switch (step(stage)) {
       case 1:
-        return "Вырезаем фон";
+        return Res.str(R.string.studio_stage_background);
       case 2:
-        return "Выравниваем контур";
+        return Res.str(R.string.studio_stage_normalize);
       case 3:
-        return "Ищем опорные точки";
+        return Res.str(R.string.studio_stage_keypoints);
       case 4:
-        return "Подгоняем к манекену";
+        return Res.str(R.string.studio_stage_fit);
       case 5:
-        return "Готовим превью";
+        return Res.str(R.string.studio_stage_preview);
       default:
-        return "В очереди";
+        return Res.str(R.string.studio_stage_queued);
     }
   }
 
@@ -77,11 +79,11 @@ final class StudioText {
   static String genderLabel(String gender) {
     switch (gender) {
       case "male":
-        return "Мужское";
+        return Res.str(R.string.studio_g_male);
       case "female":
-        return "Женское";
+        return Res.str(R.string.studio_g_female);
       default:
-        return "Унисекс";
+        return Res.str(R.string.studio_g_unisex);
     }
   }
 
@@ -91,17 +93,17 @@ final class StudioText {
     }
     switch (zone) {
       case "head":
-        return "Голова";
+        return Res.str(R.string.zone_head);
       case "upper":
-        return "Плечи · торс";
+        return Res.str(R.string.zone_upper);
       case "lower":
-        return "Талия · ноги";
+        return Res.str(R.string.zone_lower);
       case "full":
-        return "Всё тело";
+        return Res.str(R.string.zone_full);
       case "feet":
-        return "Стопы";
+        return Res.str(R.string.zone_feet);
       default:
-        return "Свободно";
+        return Res.str(R.string.zone_free);
     }
   }
 }

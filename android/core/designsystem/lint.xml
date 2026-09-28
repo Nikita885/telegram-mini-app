@@ -2,8 +2,8 @@
 <lint>
     <!-- Сгенерированные токены и иконки не должны давать ложных срабатываний. -->
     <issue id="UnusedResources" severity="ignore" />
-    <!-- Строки интерфейса на русском — основной язык продукта; перевод появится вместе с values-en. -->
-    <issue id="MissingTranslation" severity="warning" />
+    <!-- Русский — язык по умолчанию, английский в values-en: строка без перевода — ошибка. -->
+    <issue id="MissingTranslation" severity="error" />
     <!-- Нарушения доступности — ошибки, а не предупреждения. -->
     <issue id="ContentDescription" severity="error" />
     <issue id="ClickableViewAccessibility" severity="error" />

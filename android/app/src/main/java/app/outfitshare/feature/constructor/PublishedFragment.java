@@ -58,7 +58,7 @@ public class PublishedFragment extends BaseFragment {
     if (studio) {
       ((TextView) view.findViewById(R.id.kicker)).setText(R.string.studio_published);
       ((TextView) view.findViewById(R.id.headline))
-          .setText(args.getString(ARG_NAME) + " — уже в конструкторе");
+          .setText(getString(R.string.studio_published_headline, args.getString(ARG_NAME)));
       primary.setText(R.string.studio_shoot_next);
       primary.setIconResource(app.outfitshare.core.designsystem.R.drawable.ds_ic_camera);
       secondary.setText(R.string.studio_to_queue);

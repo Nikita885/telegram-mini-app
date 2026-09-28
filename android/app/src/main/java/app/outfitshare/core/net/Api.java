@@ -18,13 +18,15 @@ import retrofit2.http.Query;
 
 /** Mobile API v1 (backend/mobile/urls.py). */
 public interface Api {
+  /** Report reason for moderators; server-side data in the moderators' language, not UI text. */
+  String REPORT_REASON = "Жалоба из приложения";
 
   // Auth
   @GET("api/v1/config/")
   Call<Dto.AppConfig> config();
 
   @POST("api/v1/auth/telegram/start/")
-  Call<Dto.LoginStart> telegramStart();
+  Call<Dto.LoginStart> telegramStart(@Body Map<String, Object> body);
 
   @POST("api/v1/auth/telegram/poll/")
   Call<Dto.AuthResult> telegramPoll(@Body Map<String, Object> body);

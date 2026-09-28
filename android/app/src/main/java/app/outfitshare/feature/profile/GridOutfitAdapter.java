@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import app.outfitshare.R;
 import app.outfitshare.core.net.dto.Dto;
 import app.outfitshare.core.ui.Images;
+import app.outfitshare.core.ui.Res;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -50,7 +51,9 @@ public class GridOutfitAdapter extends RecyclerView.Adapter<GridOutfitAdapter.Ho
     Dto.Outfit o = items.get(position);
     Images.photo(h.photo, o.imageUrl);
     h.photo.setContentDescription(
-        "Образ" + (o.description == null || o.description.isEmpty() ? "" : ": " + o.description));
+        o.description == null || o.description.isEmpty()
+            ? Res.str(R.string.constructor_title)
+            : Res.str(R.string.outfit_described, o.description));
     h.badge.setVisibility(o.remixOf != null ? View.VISIBLE : View.GONE);
     h.itemView.setOnClickListener(v -> onClick.accept(o));
   }

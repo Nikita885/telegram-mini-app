@@ -35,7 +35,8 @@ public class PagerDots extends View {
   public void set(int count, int current) {
     this.count = count;
     this.current = current;
-    setContentDescription("Шаг " + (current + 1) + " из " + count);
+    setContentDescription(
+        getContext().getString(app.outfitshare.R.string.step_of, current + 1, count));
     invalidate();
   }
 

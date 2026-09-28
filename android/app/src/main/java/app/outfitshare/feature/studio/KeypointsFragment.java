@@ -91,11 +91,11 @@ public class KeypointsFragment extends BaseFragment {
           @Override
           public void onPointMoved(String name, float x, float y) {
             hint.setText(
-                KeypointEditorView.longLabel(name)
-                    + "   x "
-                    + Math.round(x)
-                    + " · y "
-                    + Math.round(y));
+                getString(
+                    R.string.kp_position,
+                    KeypointEditorView.longLabel(name),
+                    Math.round(x),
+                    Math.round(y)));
           }
 
           @Override

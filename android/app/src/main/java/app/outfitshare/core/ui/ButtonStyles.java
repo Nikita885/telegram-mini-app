@@ -38,11 +38,11 @@ public final class ButtonStyles {
   public static void follow(MaterialButton b, boolean following) {
     if (following) {
       secondary(b);
-      b.setText("Вы подписаны");
+      b.setText(app.outfitshare.R.string.action_following);
       b.setIconResource(app.outfitshare.core.designsystem.R.drawable.ds_ic_check);
     } else {
       primary(b);
-      b.setText("Подписаться");
+      b.setText(app.outfitshare.R.string.action_follow);
       b.setIcon(null);
     }
   }

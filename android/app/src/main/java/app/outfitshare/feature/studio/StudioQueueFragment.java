@@ -34,7 +34,6 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -82,8 +81,8 @@ public class StudioQueueFragment extends BaseFragment {
     if (!container().session.isAdmin()) {
       stateView.setState(
           States.locked(
-              "Студия — для администраторов каталога",
-              "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.",
+              getString(R.string.studio_locked_title),
+              getString(R.string.studio_locked_text),
               null));
       view.findViewById(R.id.shoot).setVisibility(View.GONE);
       return;
@@ -179,7 +178,7 @@ public class StudioQueueFragment extends BaseFragment {
           refresh.setRefreshing(false);
           if (!r.ok() || r.data == null) {
             if (jobs.isEmpty() && uploads.isEmpty()) {
-              stateView.setState(States.failure(r.error, "Очередь не загрузилась"));
+              stateView.setState(States.failure(r.error, getString(R.string.studio_queue_failed)));
             }
             return;
           }
@@ -223,9 +222,9 @@ public class StudioQueueFragment extends BaseFragment {
       stateView.setState(
           States.empty(
               app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera,
-              tab == 2 ? "Ошибок нет" : "Очередь пуста",
-              tab == 2 ? null : "Сфотографируйте вещь — через пару минут она сядет на манекен.",
-              tab == 2 ? null : "Открыть камеру"));
+              getString(tab == 2 ? R.string.studio_no_errors : R.string.studio_queue_empty),
+              tab == 2 ? null : getString(R.string.studio_queue_empty_text),
+              tab == 2 ? null : getString(R.string.studio_open_camera)));
     } else {
       stateView.setState(ScreenState.content());
     }
@@ -266,7 +265,7 @@ public class StudioQueueFragment extends BaseFragment {
 
     private void bindUpload(Holder h, WorkInfo info) {
       String path = null;
-      String name = "Новая вещь";
+      String name = getString(R.string.studio_new_item);
       for (String tag : info.getTags()) {
         if (tag.startsWith("file:")) {
           path = tag.substring(5);
@@ -283,15 +282,13 @@ public class StudioQueueFragment extends BaseFragment {
       long total = info.getProgress().getLong(UploadWorker.KEY_TOTAL, 0);
       if (info.getState() == WorkInfo.State.ENQUEUED && progress == 0) {
         h.status.setText(
-            container().api.isOnline() ? "Ждёт отправки" : "Загрузка на паузе — нет сети");
+            container().api.isOnline()
+                ? R.string.studio_upload_waiting
+                : R.string.studio_upload_paused);
       } else {
         h.status.setText(
-            String.format(
-                Locale.forLanguageTag("ru"),
-                "Загрузка · %d %% · %.1f из %.1f МБ",
-                progress,
-                sent / 1048576f,
-                total / 1048576f));
+            getString(
+                R.string.studio_upload_progress, progress, sent / 1048576f, total / 1048576f));
       }
       h.progress.setVisibility(View.VISIBLE);
       h.progress.setProgressCompat(progress, true);
@@ -306,11 +303,11 @@ public class StudioQueueFragment extends BaseFragment {
           {
             int step = StudioText.step(j.stage);
             h.status.setText(
-                StudioText.stageLabel(j.stage)
-                    + " · шаг "
-                    + Math.max(1, step)
-                    + " из "
-                    + StepsView.COUNT);
+                getString(
+                    R.string.studio_stage_step,
+                    StudioText.stageLabel(j.stage),
+                    Math.max(1, step),
+                    StepsView.COUNT));
             h.steps.setVisibility(View.VISIBLE);
             h.steps.setDone(Math.max(0, step - 1));
             h.itemView.setOnClickListener(v -> nav().push(StudioReviewFragment.newInstance(j.id)));
@@ -326,9 +323,9 @@ public class StudioQueueFragment extends BaseFragment {
                         ? app.outfitshare.core.designsystem.R.attr.dsColorWarning
                         : app.outfitshare.core.designsystem.R.attr.dsColorSuccess);
             h.status.setText(
-                (low ? "Низкая посадка · " : "Готово к проверке · посадка ")
-                    + StudioText.fitPercent(j)
-                    + " %");
+                getString(
+                    low ? R.string.studio_fit_low : R.string.studio_fit_ready,
+                    StudioText.fitPercent(j)));
             h.status.setTextColor(color);
             h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 low ? R.drawable.badge_warning : R.drawable.badge_check_small, 0, 0, 0);
@@ -344,7 +341,7 @@ public class StudioQueueFragment extends BaseFragment {
                 DsTheme.color(
                     requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorDanger);
             h.status.setText(
-                j.error == null || j.error.isEmpty() ? "Не удалось обработать" : j.error);
+                j.error == null || j.error.isEmpty() ? getString(R.string.studio_failed) : j.error);
             h.status.setTextColor(color);
             h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 R.drawable.badge_error, 0, 0, 0);
@@ -355,7 +352,7 @@ public class StudioQueueFragment extends BaseFragment {
                 j.attributes != null
                     && j.attributes.get("error_code") != null
                     && !"crash".equals(String.valueOf(j.attributes.get("error_code")));
-            h.action.setText(reshoot ? "Переснять" : "Повторить");
+            h.action.setText(reshoot ? R.string.studio_reshoot : R.string.action_retry);
             h.action.setOnClickListener(
                 v -> {
                   if (reshoot) {
@@ -368,7 +365,7 @@ public class StudioQueueFragment extends BaseFragment {
             break;
           }
         default:
-          h.status.setText("Опубликовано");
+          h.status.setText(R.string.publish_done);
       }
     }
 

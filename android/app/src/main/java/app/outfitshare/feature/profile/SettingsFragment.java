@@ -1,8 +1,13 @@
 package app.outfitshare.feature.profile;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -50,7 +55,7 @@ public class SettingsFragment extends BaseFragment {
       Images.avatar(avatar, me);
       meRow.setLeadingView(avatar);
       meRow.setTitle(me.name);
-      meRow.setSubtitle(Formats.handle(me.username) + " · вход через Telegram");
+      meRow.setSubtitle(getString(R.string.settings_me_sub, Formats.handle(me.username)));
     }
     meRow.setOnClickListener(v -> nav().push(new EditProfileFragment()));
 
@@ -65,7 +70,7 @@ public class SettingsFragment extends BaseFragment {
                   ThemeMode.SYSTEM.key(),
                   0,
                   getString(R.string.settings_theme_system),
-                  "Переключается вместе с телефоном",
+                  getString(R.string.settings_theme_system_sub),
                   false,
                   current == ThemeMode.SYSTEM));
           rows.add(
@@ -73,7 +78,7 @@ public class SettingsFragment extends BaseFragment {
                   ThemeMode.LIGHT.key(),
                   0,
                   getString(R.string.settings_theme_light),
-                  "Молочный фон, графитовый текст",
+                  getString(R.string.settings_theme_light_sub),
                   false,
                   current == ThemeMode.LIGHT));
           rows.add(
@@ -81,7 +86,7 @@ public class SettingsFragment extends BaseFragment {
                   ThemeMode.DARK.key(),
                   0,
                   getString(R.string.settings_theme_dark),
-                  "Графитовый фон — бережёт глаза вечером",
+                  getString(R.string.settings_theme_dark_sub),
                   false,
                   current == ThemeMode.DARK));
           ActionSheet.show(
@@ -108,6 +113,8 @@ public class SettingsFragment extends BaseFragment {
     studio.setVisibility(container().session.isAdmin() ? View.VISIBLE : View.GONE);
     studio.setOnClickListener(v -> nav().push(new StudioQueueFragment()));
 
+    view.findViewById(R.id.language).setOnClickListener(v -> openLanguageSettings());
+
     ListRowView server = view.findViewById(R.id.server);
     server.setValue(
         container().prefs.server().replace("https://", "").replace("http://", "").replace("/", ""));
@@ -119,7 +126,7 @@ public class SettingsFragment extends BaseFragment {
                     .title(getString(R.string.settings_logout_title))
                     .message(getString(R.string.settings_logout_text))
                     .confirm(getString(R.string.settings_logout))
-                    .cancel("Отмена")
+                    .cancel(getString(R.string.action_cancel))
                     .destructive()
                     .onConfirm(this::logout)
                     .show());
@@ -153,5 +160,23 @@ public class SettingsFragment extends BaseFragment {
     }
     container().signOut();
     nav().setRoot(new LoginFragment());
+  }
+
+  /**
+   * Android 13+: the app's own language page (ru / en, see xml/locales_config); older: system
+   * languages.
+   */
+  private void openLanguageSettings() {
+    Intent intent =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            ? new Intent(
+                Settings.ACTION_APP_LOCALE_SETTINGS,
+                Uri.fromParts("package", requireContext().getPackageName(), null))
+            : new Intent(Settings.ACTION_LOCALE_SETTINGS);
+    try {
+      startActivity(intent);
+    } catch (ActivityNotFoundException e) {
+      startActivity(new Intent(Settings.ACTION_SETTINGS));
+    }
   }
 }

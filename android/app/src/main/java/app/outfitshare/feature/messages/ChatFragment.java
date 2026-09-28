@@ -250,7 +250,7 @@ public class ChatFragment extends BaseFragment {
             return;
           }
           if (!r.ok() || r.data == null) {
-            stateView.setState(States.failure(r.error, "Сообщения не загрузились"));
+            stateView.setState(States.failure(r.error, getString(R.string.chat_failed)));
             return;
           }
           messages.clear();
@@ -448,11 +448,11 @@ public class ChatFragment extends BaseFragment {
     ChipGroup group = requireView().findViewById(R.id.suggestions);
     group.removeAllViews();
     Chip hello = new Chip(requireContext());
-    hello.setText("👋 Привет!");
+    hello.setText(getString(R.string.chat_hello_chip));
     hello.setCheckable(false);
     hello.setOnClickListener(
         v -> {
-          field.setText("Привет!");
+          field.setText(getString(R.string.chat_hello));
           sendText();
         });
     Chip share = new Chip(requireContext());
@@ -476,7 +476,7 @@ public class ChatFragment extends BaseFragment {
           new ActionSheet.Row(
               "copy",
               app.outfitshare.core.designsystem.R.drawable.ds_ic_copy,
-              "Скопировать",
+              getString(R.string.action_copy),
               null,
               false));
     }
@@ -486,7 +486,7 @@ public class ChatFragment extends BaseFragment {
             new ActionSheet.Row(
                 "edit",
                 app.outfitshare.core.designsystem.R.drawable.ds_ic_edit,
-                "Изменить",
+                getString(R.string.action_change),
                 null,
                 false));
       }
@@ -494,7 +494,7 @@ public class ChatFragment extends BaseFragment {
           new ActionSheet.Row(
               "delete",
               app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
-              "Удалить",
+              getString(R.string.action_delete),
               null,
               true));
     }
@@ -512,7 +512,7 @@ public class ChatFragment extends BaseFragment {
       case "copy":
         ClipboardManager cm = requireContext().getSystemService(ClipboardManager.class);
         cm.setPrimaryClip(ClipData.newPlainText("message", m.text));
-        toast("Скопировано");
+        toast(getString(R.string.copied));
         break;
       case "edit":
         EditText input = new EditText(requireContext());
@@ -528,7 +528,7 @@ public class ChatFragment extends BaseFragment {
         box.setPadding(pad, 0, pad, 0);
         box.addView(input);
         new MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Изменить сообщение")
+            .setTitle(R.string.chat_edit_title)
             .setView(box)
             .setPositiveButton(
                 R.string.action_done,
@@ -601,7 +601,10 @@ public class ChatFragment extends BaseFragment {
       boolean hasText = m.text != null && !m.text.isEmpty();
       h.text.setVisibility(hasText ? View.VISIBLE : View.GONE);
       h.text.setText(m.text);
-      String time = Formats.time(m.createdAt) + (m.edited ? " · изм." : "");
+      String time =
+          m.edited
+              ? getString(R.string.chat_time_edited, Formats.time(m.createdAt))
+              : Formats.time(m.createdAt);
       h.time.setText(time);
       if (m.isMine) {
         int icon =
@@ -618,10 +621,12 @@ public class ChatFragment extends BaseFragment {
         Images.photo(h.cardPhoto, m.outfit.imageUrl);
         h.cardTitle.setText(
             m.outfit.description == null || m.outfit.description.isEmpty()
-                ? "Образ"
+                ? getString(R.string.constructor_title)
                 : m.outfit.description);
         h.cardSub.setText(
-            m.outfit.author != null ? "Образ " + Formats.handle(m.outfit.author.username) : "");
+            m.outfit.author != null
+                ? getString(R.string.chat_outfit_by, Formats.handle(m.outfit.author.username))
+                : "");
         int color =
             DsTheme.color(
                 requireContext(),
@@ -656,7 +661,11 @@ public class ChatFragment extends BaseFragment {
             return true;
           });
       h.bubble.setContentDescription(
-          (m.isMine ? "Вы: " : peer.name + ": ") + (hasText ? m.text : "образ") + ", " + time);
+          getString(
+              R.string.chat_bubble_description,
+              m.isMine ? getString(R.string.chat_you) : peer.name,
+              hasText ? m.text : getString(R.string.chat_outfit_word),
+              time));
     }
 
     @Override

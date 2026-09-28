@@ -51,7 +51,7 @@ public class ItemSheet extends DsBottomSheetDialogFragment {
     ((TextView) v.findViewById(R.id.meta)).setText(meta);
     TextView price = v.findViewById(R.id.price);
     if (!TextUtils.isEmpty(item.price)) {
-      price.setText(item.price.replace(".00", "") + " ₽");
+      price.setText(getString(R.string.price_rub, item.price.replace(".00", "")));
       price.setVisibility(View.VISIBLE);
     }
     TextView description = v.findViewById(R.id.description);

@@ -105,7 +105,7 @@ public class OutfitCanvasView extends View {
         getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_stroke_thin));
     handleStroke.setColor(selection);
     handleRadius = 5 * d;
-    setContentDescription("Холст образа");
+    setContentDescription(context.getString(app.outfitshare.R.string.canvas_description));
     taps =
         new GestureDetector(
             context,

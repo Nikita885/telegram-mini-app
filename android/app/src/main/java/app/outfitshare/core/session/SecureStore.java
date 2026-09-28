@@ -30,6 +30,14 @@ public final class SecureStore {
   }
 
   public void put(String key, @Nullable String value) {
+    put(key, value, false);
+  }
+
+  /**
+   * @param durable write to disk before returning. Used for tokens: a rotated refresh token that is
+   *     lost when the process dies right after would make the next start present the old one.
+   */
+  public void put(String key, @Nullable String value, boolean durable) {
     if (value == null) {
       prefs.edit().remove(key).apply();
       return;
@@ -40,7 +48,13 @@ public final class SecureStore {
       byte[] iv = cipher.getIV();
       byte[] data = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
       ByteBuffer buf = ByteBuffer.allocate(iv.length + data.length).put(iv).put(data);
-      prefs.edit().putString(key, Base64.encodeToString(buf.array(), Base64.NO_WRAP)).apply();
+      SharedPreferences.Editor editor =
+          prefs.edit().putString(key, Base64.encodeToString(buf.array(), Base64.NO_WRAP));
+      if (durable) {
+        editor.commit();
+      } else {
+        editor.apply();
+      }
     } catch (Exception e) {
       prefs.edit().remove(key).apply();
     }

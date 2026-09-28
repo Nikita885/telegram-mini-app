@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English texts of the design-system components (Russian is the default in values/). -->
+<resources>
+    <string name="ds_action_retry">Retry</string>
+    <string name="ds_action_undo">Undo</string>
+    <string name="ds_action_cancel">Cancel</string>
+    <string name="ds_action_close">Close</string>
+    <string name="ds_action_open_settings">Open settings</string>
+    <string name="ds_action_allow">Allow</string>
+    <string name="ds_state_loading">Loading…</string>
+    <string name="ds_state_error_title">Could not load</string>
+    <string name="ds_state_error_message">Check your connection and try again.</string>
+    <string name="ds_state_offline_title">No connection</string>
+    <string name="ds_state_offline_message">Everything will refresh once you are back online.</string>
+    <string name="ds_state_no_permission_title">No access</string>
+    <string name="ds_offline_banner">Offline — showing saved content</string>
+    <string name="ds_offline_banner_back_online">Back online</string>
+    <string name="ds_a11y_avatar">Avatar: %1$s</string>
+    <string name="ds_a11y_avatar_unknown">Avatar</string>
+    <string name="ds_a11y_online">online</string>
+    <string name="ds_a11y_with_online">%1$s, online</string>
+    <string name="ds_a11y_like">Like</string>
+    <string name="ds_a11y_unlike">Unlike</string>
+    <string name="ds_a11y_label_with_count">%1$s. %2$s</string>
+    <string name="ds_a11y_liked">liked</string>
+    <string name="ds_a11y_not_liked">not liked</string>
+    <string name="ds_a11y_outfit_by">Outfit by %1$s</string>
+    <string name="ds_a11y_open_comments">Comments</string>
+    <string name="ds_a11y_selected">selected</string>
+    <string name="ds_a11y_not_selected">not selected</string>
+    <string name="ds_a11y_add_item">Add to the outfit</string>
+    <string name="ds_a11y_more">More</string>
+    <plurals name="ds_a11y_likes_count">
+        <item quantity="one">%d like</item>
+        <item quantity="other">%d likes</item>
+    </plurals>
+    <plurals name="ds_a11y_unread_count">
+        <item quantity="one">%d unread</item>
+        <item quantity="other">%d unread</item>
+    </plurals>
+    <string name="ds_count_thousands">%1$sK</string>
+    <string name="ds_count_millions">%1$sM</string>
+</resources>
