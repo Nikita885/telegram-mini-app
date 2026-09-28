@@ -245,6 +245,46 @@ docker compose logs bot          # "Bot @<имя> started"
 
 - Ошибка `Conflict: terminated by other getUpdates request` значит, что этот токен использует ещё
   один процесс (старая версия или локальный запуск). Остановите его.
+- Повторяется `getMe: ConnectionError — retrying` — сервер не достаёт до `api.telegram.org`
+  (у российских хостингов Telegram часто заблокирован). Проверка: `curl -4 -m 10 -sI https://api.telegram.org`.
+  Решение — раздел 9а.
+
+### 9а. Если Telegram заблокирован на сервере: webhook-режим
+
+Telegram сам присылает события на `https://moiservis.pro/tg/webhook/`, а бот отвечает в том же
+HTTP-ответе — исходящих соединений к Telegram сервер не делает вообще.
+
+```bash
+cd /opt/outfitshare
+echo "TG_WEBHOOK_SECRET=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env
+docker compose up -d
+docker compose logs bot --tail 3                          # "Webhook mode: ..."
+docker compose exec web python manage.py telegram_webhook   # напечатает две ссылки
+```
+
+Первую ссылку («установить») откройте в браузере **там, где Telegram работает** (телефон с VPN,
+компьютер не в России) — ответ `{"ok":true,...}`. Вторая («проверить») покажет `pending_update_count`
+и `last_error_message`, если Telegram не может достучаться до сервера. Ссылки содержат токен — не
+публикуйте их.
+
+Не работает только загрузка фото профиля «из Telegram» (сервер не может скачать фото) — приложение
+предложит выбрать фото из галереи. Вернуться к обычному режиму: убрать `TG_WEBHOOK_SECRET` из `.env`,
+`docker compose up -d` — бот сам снимет webhook, как только Telegram станет доступен.
+
+**Альтернатива — прокси.** Если есть HTTP- или SOCKS5-прокси за рубежом, бот может ходить через него
+в обычном режиме: создайте `docker-compose.override.yml`
+
+```yaml
+services:
+  bot:
+    environment:
+      HTTPS_PROXY: socks5h://<логин>:<пароль>@<адрес>:<порт>   # или http://...
+  web:
+    environment:
+      HTTPS_PROXY: socks5h://<логин>:<пароль>@<адрес>:<порт>
+```
+
+и выполните `docker compose up -d`.
 - **Mini App в Telegram:** @BotFather → `/mybots` → бот → *Bot Settings* → *Menu Button* →
   URL `https://moiservis.pro/authorize/`. Если Mini App настроен через *Configure Mini App*, укажите
   тот же адрес.

@@ -41,6 +41,8 @@ PUBLIC_BASE_URL = env("PUBLIC_BASE_URL", f"https://{DOMAIN}").rstrip("/")
 
 TG_BOT_TOKEN = env("TG_BOT_TOKEN", "")
 TG_BOT_USERNAME = env("TG_BOT_USERNAME", "").lstrip("@")
+# Webhook mode (mobile/webhook.py): set to a random string when the server cannot reach api.telegram.org.
+TG_WEBHOOK_SECRET = env("TG_WEBHOOK_SECRET", "")
 
 INSTALLED_APPS = [
     "daphne",

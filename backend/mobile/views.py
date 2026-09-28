@@ -307,16 +307,22 @@ def _telegram_avatar(user) -> Image.Image:
     if not token:
         raise ApiError("bot_not_configured", "Бот не настроен", 503)
     base = f"https://api.telegram.org/bot{token}"
-    photos = requests.get(
-        f"{base}/getUserProfilePhotos", params={"user_id": user.telegram_id, "limit": 1}, timeout=10
-    ).json()
-    if not photos.get("ok") or not photos["result"]["total_count"]:
-        raise ApiError("no_telegram_photo", "В Telegram нет фото профиля или оно скрыто", 404)
-    file_id = photos["result"]["photos"][0][-1]["file_id"]
-    info = requests.get(f"{base}/getFile", params={"file_id": file_id}, timeout=10).json()
-    if not info.get("ok"):
-        raise ApiError("telegram_error", "Telegram не отдал фото", 502)
-    resp = requests.get(f"https://api.telegram.org/file/bot{token}/{info['result']['file_path']}", timeout=20)
+    try:
+        photos = requests.get(
+            f"{base}/getUserProfilePhotos", params={"user_id": user.telegram_id, "limit": 1}, timeout=10
+        ).json()
+        if not photos.get("ok") or not photos["result"]["total_count"]:
+            raise ApiError("no_telegram_photo", "В Telegram нет фото профиля или оно скрыто", 404)
+        file_id = photos["result"]["photos"][0][-1]["file_id"]
+        info = requests.get(f"{base}/getFile", params={"file_id": file_id}, timeout=10).json()
+        if not info.get("ok"):
+            raise ApiError("telegram_error", "Telegram не отдал фото", 502)
+        resp = requests.get(f"https://api.telegram.org/file/bot{token}/{info['result']['file_path']}", timeout=20)
+    except (requests.RequestException, ValueError):
+        # No details: the request URL contains the bot token.
+        raise ApiError(
+            "telegram_unavailable", "Telegram сейчас недоступен с сервера — загрузите фото из галереи", 503
+        ) from None
     image = Image.open(BytesIO(resp.content))
     image.load()
     return image
