@@ -11,7 +11,8 @@ public class OutfitGeometryTest {
 
   @Test
   public void fittedLayerCoversWholeCanvas() {
-    assertArrayEquals(new float[] {750f, 1000f}, OutfitGeometry.baseSize(true, 750, 1000, 750, 1000), 0.001f);
+    assertArrayEquals(
+        new float[] {750f, 1000f}, OutfitGeometry.baseSize(true, 750, 1000, 750, 1000), 0.001f);
   }
 
   @Test

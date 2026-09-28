@@ -113,8 +113,10 @@ public final class Realtime {
         return;
       }
       String event = root.has("event") ? root.get("event").getAsString() : "";
-      JsonObject payload = root.has("payload") && root.get("payload").isJsonObject()
-          ? root.getAsJsonObject("payload") : new JsonObject();
+      JsonObject payload =
+          root.has("payload") && root.get("payload").isJsonObject()
+              ? root.getAsJsonObject("payload")
+              : new JsonObject();
       main.post(
           () -> {
             for (Listener l : listeners) {
@@ -136,7 +138,8 @@ public final class Realtime {
     }
 
     @Override
-    public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, @Nullable Response response) {
+    public void onFailure(
+        @NonNull WebSocket webSocket, @NonNull Throwable t, @Nullable Response response) {
       main.post(Realtime.this::scheduleReconnect);
     }
   }

@@ -55,24 +55,25 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
   @Nullable private Dto.Dialog actionTarget;
   private RecyclerView list;
 
-  private final Realtime.Listener realtime = (event, payload) -> {
-    switch (event) {
-      case "message.new":
-      case "message.edited":
-      case "message.deleted":
-      case "dialog.read":
-        load();
-        break;
-      case "typing":
-        long dialogId = payload.has("dialog_id") ? payload.get("dialog_id").getAsLong() : 0;
-        typingUntil.put(dialogId, System.currentTimeMillis() + 4000);
-        rebuild();
-        handler.postDelayed(this::rebuild, 4100);
-        break;
-      default:
-        break;
-    }
-  };
+  private final Realtime.Listener realtime =
+      (event, payload) -> {
+        switch (event) {
+          case "message.new":
+          case "message.edited":
+          case "message.deleted":
+          case "dialog.read":
+            load();
+            break;
+          case "typing":
+            long dialogId = payload.has("dialog_id") ? payload.get("dialog_id").getAsLong() : 0;
+            typingUntil.put(dialogId, System.currentTimeMillis() + 4000);
+            rebuild();
+            handler.postDelayed(this::rebuild, 4100);
+            break;
+          default:
+            break;
+        }
+      };
 
   public DialogsFragment() {
     super(R.layout.fragment_list);
@@ -85,14 +86,19 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
     MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
     toolbar.setNavigationIcon(null);
     toolbar.setTitle(R.string.dialogs_title);
-    toolbar.setTitleTextAppearance(requireContext(), app.outfitshare.core.designsystem.R.style.TextAppearance_Ds_HeadlineMedium);
-    toolbar.getMenu().add(R.string.action_new_message)
+    toolbar.setTitleTextAppearance(
+        requireContext(),
+        app.outfitshare.core.designsystem.R.style.TextAppearance_Ds_HeadlineMedium);
+    toolbar
+        .getMenu()
+        .add(R.string.action_new_message)
         .setIcon(app.outfitshare.core.designsystem.R.drawable.ds_ic_edit)
         .setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
-    toolbar.setOnMenuItemClickListener(item -> {
-      nav().push(SearchFragment.forQuery("@"));
-      return true;
-    });
+    toolbar.setOnMenuItemClickListener(
+        item -> {
+          nav().push(SearchFragment.forQuery("@"));
+          return true;
+        });
 
     stateView = view.findViewById(R.id.state);
     refresh = view.findViewById(R.id.refresh);
@@ -102,15 +108,20 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
     adapter = new Adapter();
     list.setAdapter(adapter);
     refresh.setOnRefreshListener(this::load);
-    stateView.setOnActionClickListener(v -> {
-      if (stateView.getState().getKind() == ScreenState.Kind.EMPTY) {
-        nav().push(SearchFragment.forQuery("@"));
-      } else {
-        load();
-      }
-    });
+    stateView.setOnActionClickListener(
+        v -> {
+          if (stateView.getState().getKind() == ScreenState.Kind.EMPTY) {
+            nav().push(SearchFragment.forQuery("@"));
+          } else {
+            load();
+          }
+        });
     offline.setOnRetryClickListener(v -> load());
-    getChildFragmentManager().setFragmentResultListener(ACTIONS, getViewLifecycleOwner(), (k, r) -> onAction(r.getString(ActionSheet.RESULT_ID)));
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            ACTIONS,
+            getViewLifecycleOwner(),
+            (k, r) -> onAction(r.getString(ActionSheet.RESULT_ID)));
     stateView.setState(ScreenState.loading());
     load();
   }
@@ -136,26 +147,32 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
   }
 
   private void load() {
-    Calls.run(api().dialogs(), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      refresh.setRefreshing(false);
-      if (!r.ok() || r.data == null) {
-        if (dialogs.isEmpty()) {
-          stateView.setState(States.failure(r.error, "Диалоги не загрузились"));
-        }
-        return;
-      }
-      offline.setOffline(r.fromCache);
-      offline.setVisibility(r.fromCache ? View.VISIBLE : View.GONE);
-      dialogs = r.data.results;
-      rebuild();
-      stateView.setState(dialogs.isEmpty()
-          ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_messages,
-              "Пока нет диалогов", "Напишите автору образа или поделитесь своим — прямо из просмотра.", "Найти людей")
-          : ScreenState.content());
-    });
+    Calls.run(
+        api().dialogs(),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          refresh.setRefreshing(false);
+          if (!r.ok() || r.data == null) {
+            if (dialogs.isEmpty()) {
+              stateView.setState(States.failure(r.error, "Диалоги не загрузились"));
+            }
+            return;
+          }
+          offline.setOffline(r.fromCache);
+          offline.setVisibility(r.fromCache ? View.VISIBLE : View.GONE);
+          dialogs = r.data.results;
+          rebuild();
+          stateView.setState(
+              dialogs.isEmpty()
+                  ? States.empty(
+                      app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_messages,
+                      "Пока нет диалогов",
+                      "Напишите автору образа или поделитесь своим — прямо из просмотра.",
+                      "Найти людей")
+                  : ScreenState.content());
+        });
   }
 
   private void rebuild() {
@@ -241,14 +258,20 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
       r.title.setText(d.user.name);
       if (d.typing) {
         SpannableString s = new SpannableString(getString(R.string.chat_typing));
-        s.setSpan(new ForegroundColorSpan(DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorAccent)),
-            0, s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        s.setSpan(
+            new ForegroundColorSpan(
+                DsTheme.color(
+                    requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorAccent)),
+            0,
+            s.length(),
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         r.sub.setText(s);
         r.sub.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
       } else if (d.lastMessage != null) {
         String prefix = d.lastMessage.isMine ? "Вы: " : "";
         r.sub.setText(prefix + d.lastMessage.text);
-        r.sub.setCompoundDrawablesRelativeWithIntrinsicBounds(d.lastMessage.isOutfit ? R.drawable.badge_hanger_small : 0, 0, 0, 0);
+        r.sub.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            d.lastMessage.isOutfit ? R.drawable.badge_hanger_small : 0, 0, 0, 0);
       } else {
         r.sub.setText("");
       }
@@ -256,18 +279,35 @@ public class DialogsFragment extends BaseFragment implements ShellFragment.Resel
       r.unread.setVisibility(d.unreadCount > 0 ? View.VISIBLE : View.GONE);
       r.unread.setText(String.valueOf(d.unreadCount));
       r.unread.setContentDescription(d.unreadCount + " непрочитанных");
-      r.read.setVisibility(d.unreadCount == 0 && d.lastMessage != null && d.lastMessage.isMine && d.lastMessage.isRead
-          ? View.VISIBLE : View.GONE);
+      r.read.setVisibility(
+          d.unreadCount == 0
+                  && d.lastMessage != null
+                  && d.lastMessage.isMine
+                  && d.lastMessage.isRead
+              ? View.VISIBLE
+              : View.GONE);
       r.itemView.setOnClickListener(v -> nav().push(ChatFragment.forDialog(d)));
-      r.itemView.setOnLongClickListener(v -> {
-        actionTarget = d;
-        ArrayList<ActionSheet.Row> actions = new ArrayList<>();
-        actions.add(new ActionSheet.Row("pin", app.outfitshare.core.designsystem.R.drawable.ds_ic_north_west,
-            d.pinned ? "Открепить" : "Закрепить", null, false));
-        actions.add(new ActionSheet.Row("delete", app.outfitshare.core.designsystem.R.drawable.ds_ic_delete, "Удалить диалог", null, true));
-        ActionSheet.show(getChildFragmentManager(), ACTIONS, d.user.name, actions);
-        return true;
-      });
+      r.itemView.setOnLongClickListener(
+          v -> {
+            actionTarget = d;
+            ArrayList<ActionSheet.Row> actions = new ArrayList<>();
+            actions.add(
+                new ActionSheet.Row(
+                    "pin",
+                    app.outfitshare.core.designsystem.R.drawable.ds_ic_north_west,
+                    d.pinned ? "Открепить" : "Закрепить",
+                    null,
+                    false));
+            actions.add(
+                new ActionSheet.Row(
+                    "delete",
+                    app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
+                    "Удалить диалог",
+                    null,
+                    true));
+            ActionSheet.show(getChildFragmentManager(), ACTIONS, d.user.name, actions);
+            return true;
+          });
     }
 
     @Override

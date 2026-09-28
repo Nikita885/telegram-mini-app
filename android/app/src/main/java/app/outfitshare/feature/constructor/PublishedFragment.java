@@ -25,11 +25,13 @@ public class PublishedFragment extends BaseFragment {
     return create("outfit", outfitId, imageUrl, null);
   }
 
-  public static PublishedFragment studioItem(long itemId, @Nullable String previewUrl, String name) {
+  public static PublishedFragment studioItem(
+      long itemId, @Nullable String previewUrl, String name) {
     return create("studio", itemId, previewUrl, name);
   }
 
-  private static PublishedFragment create(String mode, long id, @Nullable String image, @Nullable String name) {
+  private static PublishedFragment create(
+      String mode, long id, @Nullable String image, @Nullable String name) {
     PublishedFragment f = new PublishedFragment();
     Bundle args = new Bundle();
     args.putString(ARG_MODE, mode);
@@ -55,27 +57,32 @@ public class PublishedFragment extends BaseFragment {
     MaterialButton secondary = view.findViewById(R.id.secondary);
     if (studio) {
       ((TextView) view.findViewById(R.id.kicker)).setText(R.string.studio_published);
-      ((TextView) view.findViewById(R.id.headline)).setText(args.getString(ARG_NAME) + " — уже в конструкторе");
+      ((TextView) view.findViewById(R.id.headline))
+          .setText(args.getString(ARG_NAME) + " — уже в конструкторе");
       primary.setText(R.string.studio_shoot_next);
       primary.setIconResource(app.outfitshare.core.designsystem.R.drawable.ds_ic_camera);
       secondary.setText(R.string.studio_to_queue);
-      primary.setOnClickListener(v -> {
-        nav().back();
-        nav().present(new StudioCameraFragment());
-      });
+      primary.setOnClickListener(
+          v -> {
+            nav().back();
+            nav().present(new StudioCameraFragment());
+          });
       secondary.setOnClickListener(v -> nav().back());
       view.findViewById(R.id.close).setOnClickListener(v -> nav().back());
     } else {
       long id = args.getLong(ARG_ID);
-      primary.setOnClickListener(v -> {
-        nav().popInclusive(ConstructorFragment.class.getSimpleName());
-        nav().push(OutfitFragment.newInstance(id));
-      });
-      secondary.setOnClickListener(v -> {
-        nav().popInclusive(ConstructorFragment.class.getSimpleName());
-        nav().present(new ConstructorFragment());
-      });
-      view.findViewById(R.id.close).setOnClickListener(v -> nav().popInclusive(ConstructorFragment.class.getSimpleName()));
+      primary.setOnClickListener(
+          v -> {
+            nav().popInclusive(ConstructorFragment.class.getSimpleName());
+            nav().push(OutfitFragment.newInstance(id));
+          });
+      secondary.setOnClickListener(
+          v -> {
+            nav().popInclusive(ConstructorFragment.class.getSimpleName());
+            nav().present(new ConstructorFragment());
+          });
+      view.findViewById(R.id.close)
+          .setOnClickListener(v -> nav().popInclusive(ConstructorFragment.class.getSimpleName()));
     }
   }
 }

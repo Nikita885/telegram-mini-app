@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.theme.DsTheme;
 
 /** Mockup `.pager`: 6 dp dots, the current one a 20 dp pill. */
@@ -28,7 +27,8 @@ public class PagerDots extends View {
     wide = 20 * d;
     gap = 6 * d;
     on.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorOnSurface));
-    off.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorOutlineVariant));
+    off.setColor(
+        DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorOutlineVariant));
     setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
   }
 

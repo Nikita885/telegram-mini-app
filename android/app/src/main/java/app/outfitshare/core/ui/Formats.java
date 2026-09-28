@@ -18,7 +18,8 @@ public final class Formats {
   private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm", RU);
   private static final DateTimeFormatter DAY_MONTH = DateTimeFormatter.ofPattern("d MMM", RU);
   private static final DateTimeFormatter DAY_MONTH_FULL = DateTimeFormatter.ofPattern("d MMMM", RU);
-  private static final DateTimeFormatter DAY_MONTH_YEAR = DateTimeFormatter.ofPattern("d MMMM yyyy", RU);
+  private static final DateTimeFormatter DAY_MONTH_YEAR =
+      DateTimeFormatter.ofPattern("d MMMM yyyy", RU);
   private static final DateTimeFormatter WEEKDAY = DateTimeFormatter.ofPattern("EE", RU);
 
   private Formats() {}

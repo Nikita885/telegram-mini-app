@@ -39,7 +39,8 @@ public class FollowsFragment extends BaseFragment {
   private String kind;
   private String query = "";
 
-  public static FollowsFragment newInstance(long userId, @Nullable String handle, boolean followers) {
+  public static FollowsFragment newInstance(
+      long userId, @Nullable String handle, boolean followers) {
     FollowsFragment f = new FollowsFragment();
     Bundle args = new Bundle();
     args.putLong(ARG_ID, userId);
@@ -70,84 +71,98 @@ public class FollowsFragment extends BaseFragment {
     list.setLayoutManager(lm);
     adapter = new PeopleAdapter(u -> nav().push(UserFragment.newInstance(u.id)));
     list.setAdapter(adapter);
-    list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-        if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 5) {
-          paging.loadMore();
-        }
-      }
-    });
+    list.addOnScrollListener(
+        new RecyclerView.OnScrollListener() {
+          @Override
+          public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+            if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 5) {
+              paging.loadMore();
+            }
+          }
+        });
 
     TabLayout tabs = view.findViewById(R.id.tabs);
     tabs.addTab(tabs.newTab().setText(R.string.follows_followers));
     tabs.addTab(tabs.newTab().setText(R.string.follows_following));
-    Calls.run(api().user(userId), r -> {
-      if (isAdded() && r.ok() && r.data != null) {
-        setTabText(tabs, 0, getString(R.string.follows_followers), r.data.followersCount);
-        setTabText(tabs, 1, getString(R.string.follows_following), r.data.followingCount);
-      }
-    });
-
-    kind = args.getBoolean(ARG_FOLLOWERS) ? "followers" : "following";
-    paging = new Paging<>(cursor -> api().connections(userId, kind, query.isEmpty() ? null : query, cursor),
-        new Paging.Listener<Dto.User>() {
-          @Override
-          public void onPage(List<Dto.User> all, boolean reset, boolean fromCache) {
-            adapter.submit(all);
-            stateView.setState(all.isEmpty()
-                ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_people,
-                    query.isEmpty() ? "Пока никого" : "Никого не нашли",
-                    query.isEmpty() ? "Поделитесь профилем — подписчики появятся здесь." : null, null)
-                : ScreenState.content());
-          }
-
-          @Override
-          public void onError(ApiError error, boolean firstPage) {
-            if (firstPage) {
-              stateView.setState(States.failure(error, "Список не загрузился"));
-            }
+    Calls.run(
+        api().user(userId),
+        r -> {
+          if (isAdded() && r.ok() && r.data != null) {
+            setTabText(tabs, 0, getString(R.string.follows_followers), r.data.followersCount);
+            setTabText(tabs, 1, getString(R.string.follows_following), r.data.followingCount);
           }
         });
+
+    kind = args.getBoolean(ARG_FOLLOWERS) ? "followers" : "following";
+    paging =
+        new Paging<>(
+            cursor -> api().connections(userId, kind, query.isEmpty() ? null : query, cursor),
+            new Paging.Listener<Dto.User>() {
+              @Override
+              public void onPage(List<Dto.User> all, boolean reset, boolean fromCache) {
+                adapter.submit(all);
+                stateView.setState(
+                    all.isEmpty()
+                        ? States.empty(
+                            app.outfitshare.core.designsystem.R.drawable.ds_illustration_people,
+                            query.isEmpty() ? "Пока никого" : "Никого не нашли",
+                            query.isEmpty()
+                                ? "Поделитесь профилем — подписчики появятся здесь."
+                                : null,
+                            null)
+                        : ScreenState.content());
+              }
+
+              @Override
+              public void onError(ApiError error, boolean firstPage) {
+                if (firstPage) {
+                  stateView.setState(States.failure(error, "Список не загрузился"));
+                }
+              }
+            });
     TabLayout.Tab initial = tabs.getTabAt(args.getBoolean(ARG_FOLLOWERS) ? 0 : 1);
     if (initial != null) {
       initial.select();
     }
-    tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab t) {
-        kind = t.getPosition() == 0 ? "followers" : "following";
-        reload();
-      }
+    tabs.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab t) {
+            kind = t.getPosition() == 0 ? "followers" : "following";
+            reload();
+          }
 
-      @Override
-      public void onTabUnselected(TabLayout.Tab t) {}
+          @Override
+          public void onTabUnselected(TabLayout.Tab t) {}
 
-      @Override
-      public void onTabReselected(TabLayout.Tab t) {}
-    });
+          @Override
+          public void onTabReselected(TabLayout.Tab t) {}
+        });
 
     EditText search = view.findViewById(R.id.search_input);
     search.setHint(R.string.search_in_list);
     View clear = view.findViewById(R.id.search_clear);
     clear.setOnClickListener(v -> search.setText(""));
-    search.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+    search.addTextChangedListener(
+        new TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void onTextChanged(CharSequence s, int a, int b, int c) {}
+          @Override
+          public void onTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void afterTextChanged(Editable s) {
-        clear.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-        handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(() -> {
-          query = s.toString().trim();
-          reload();
-        }, 300);
-      }
-    });
+          @Override
+          public void afterTextChanged(Editable s) {
+            clear.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
+            handler.removeCallbacksAndMessages(null);
+            handler.postDelayed(
+                () -> {
+                  query = s.toString().trim();
+                  reload();
+                },
+                300);
+          }
+        });
     reload();
   }
 

@@ -19,7 +19,9 @@ import app.outfitshare.core.ui.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Outfit cards: full width in the feed, compact in 2-column grids (search, similar, collections). */
+/**
+ * Outfit cards: full width in the feed, compact in 2-column grids (search, similar, collections).
+ */
 public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder> {
 
   public interface Listener {
@@ -67,7 +69,9 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     OutfitCardView card = new OutfitCardView(parent.getContext());
-    card.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    card.setLayoutParams(
+        new RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     return new Holder(card);
   }
 
@@ -92,7 +96,10 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
       meta = Formats.ago(o.createdAt) + " · ремикс " + Formats.handle(o.remixOf.author.username);
     } else {
       int n = o.items.size();
-      meta = Formats.ago(o.createdAt) + " · " + card.getResources().getQuantityString(R.plurals.items_count, n, n);
+      meta =
+          Formats.ago(o.createdAt)
+              + " · "
+              + card.getResources().getQuantityString(R.plurals.items_count, n, n);
     }
     card.setAuthor(o.author.id, displayName(o.author), compact ? null : meta);
     card.setBadge(o.remixOf != null ? "Ремикс" : null);
@@ -102,7 +109,8 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
       card.setCaption(null);
     } else {
       card.setCaption(Text.caption(card.getContext(), o.description, o.hashtags, listener::onTag));
-      TextView caption = card.findViewById(app.outfitshare.core.designsystem.R.id.ds_outfit_caption);
+      TextView caption =
+          card.findViewById(app.outfitshare.core.designsystem.R.id.ds_outfit_caption);
       if (caption != null) {
         caption.setMovementMethod(LinkMovementMethod.getInstance());
       }
@@ -140,7 +148,9 @@ public class OutfitAdapter extends ListAdapter<Dto.Outfit, OutfitAdapter.Holder>
 
         @Override
         public boolean areContentsTheSame(@NonNull Dto.Outfit a, @NonNull Dto.Outfit b) {
-          return a.likesCount == b.likesCount && a.isLiked == b.isLiked && a.commentsCount == b.commentsCount
+          return a.likesCount == b.likesCount
+              && a.isLiked == b.isLiked
+              && a.commentsCount == b.commentsCount
               && a.isSaved == b.isSaved;
         }
       };

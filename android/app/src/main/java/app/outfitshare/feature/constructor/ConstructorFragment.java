@@ -50,8 +50,13 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   private static final String DRAFT_PREFS = "constructor_draft";
 
   /** Catalog tabs → category slugs (comma-separated for the API). */
-  private static final String[] TAB_TITLES = {"Все", "Верх", "Низ", "Платья", "Обувь", "Аксессуары"};
-  private static final String[] TAB_CATEGORIES = {null, "top,shirt", "pants,skirt", "dress", "shoes", "accessories,hat"};
+  private static final String[] TAB_TITLES = {
+    "Все", "Верх", "Низ", "Платья", "Обувь", "Аксессуары"
+  };
+
+  private static final String[] TAB_CATEGORIES = {
+    null, "top,shirt", "pants,skirt", "dress", "shoes", "accessories,hat"
+  };
 
   private final List<Layer> layers = new ArrayList<>();
   private final Map<Long, Dto.Item> knownItems = new HashMap<>();
@@ -59,6 +64,7 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   private final Map<String, Dto.Mannequin> mannequins = new HashMap<>();
   private final Deque<List<Layer.State>> undo = new ArrayDeque<>();
   private final Deque<List<Layer.State>> redo = new ArrayDeque<>();
+
   @SuppressWarnings("unchecked")
   private final Paging<Dto.Item>[] catalog = new Paging[TAB_TITLES.length];
 
@@ -119,41 +125,44 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     mannequinChip.setOnClickListener(v -> setGender("female".equals(gender) ? "male" : "female"));
     layersChip.setOnClickListener(v -> LayersSheet.show(getChildFragmentManager()));
 
-    canvas.setListener(new OutfitCanvasView.Listener() {
-      @Override
-      public void onBeforeChange() {
-        pushUndo();
-      }
+    canvas.setListener(
+        new OutfitCanvasView.Listener() {
+          @Override
+          public void onBeforeChange() {
+            pushUndo();
+          }
 
-      @Override
-      public void onChanged() {
-        refreshChrome();
-      }
+          @Override
+          public void onChanged() {
+            refreshChrome();
+          }
 
-      @Override
-      public void onSelectionChanged(@Nullable Layer layer) {}
+          @Override
+          public void onSelectionChanged(@Nullable Layer layer) {}
 
-      @Override
-      public void onLongPress(Layer layer) {
-        showLayerActions(layer);
-      }
-    });
+          @Override
+          public void onLongPress(Layer layer) {
+            showLayerActions(layer);
+          }
+        });
 
     RecyclerView grid = view.findViewById(R.id.catalog);
     grid.setLayoutManager(new GridLayoutManager(requireContext(), 3));
-    int gap = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_2);
+    int gap =
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_2);
     grid.addItemDecoration(Spacing.grid(gap, gap));
     adapter = new ItemsAdapter(0, false, this::toggleItem);
     grid.setAdapter(adapter);
-    grid.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-        GridLayoutManager lm = (GridLayoutManager) rv.getLayoutManager();
-        if (lm != null && lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 6) {
-          catalog[tab].loadMore();
-        }
-      }
-    });
+    grid.addOnScrollListener(
+        new RecyclerView.OnScrollListener() {
+          @Override
+          public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+            GridLayoutManager lm = (GridLayoutManager) rv.getLayoutManager();
+            if (lm != null && lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 6) {
+              catalog[tab].loadMore();
+            }
+          }
+        });
 
     TabLayout tabs = view.findViewById(R.id.categories);
     for (String t : TAB_TITLES) {
@@ -162,23 +171,27 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     for (int i = 0; i < TAB_TITLES.length; i++) {
       catalog[i] = catalogPaging(i);
     }
-    tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab t) {
-        showTab(t.getPosition());
-      }
+    tabs.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab t) {
+            showTab(t.getPosition());
+          }
 
-      @Override
-      public void onTabUnselected(TabLayout.Tab t) {}
+          @Override
+          public void onTabUnselected(TabLayout.Tab t) {}
 
-      @Override
-      public void onTabReselected(TabLayout.Tab t) {}
-    });
+          @Override
+          public void onTabReselected(TabLayout.Tab t) {}
+        });
     catalogState.setOnActionClickListener(v -> catalog[tab].refresh());
     offline.setOnRetryClickListener(v -> catalog[tab].refresh());
 
-    getChildFragmentManager().setFragmentResultListener(LAYER_ACTIONS, getViewLifecycleOwner(),
-        (k, r) -> onLayerAction(r.getString(ActionSheet.RESULT_ID)));
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            LAYER_ACTIONS,
+            getViewLifecycleOwner(),
+            (k, r) -> onLayerAction(r.getString(ActionSheet.RESULT_ID)));
 
     loadMannequins();
     restoreInitialLayers();
@@ -204,10 +217,14 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
             offline.setVisibility(fromCache ? View.VISIBLE : View.GONE);
             adapter.submit(all);
             syncSelection();
-            catalogState.setState(all.isEmpty()
-                ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_search,
-                    "Пока пусто", "Вещи этой категории скоро появятся в каталоге.", null)
-                : ScreenState.content());
+            catalogState.setState(
+                all.isEmpty()
+                    ? States.empty(
+                        app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_search,
+                        "Пока пусто",
+                        "Вещи этой категории скоро появятся в каталоге.",
+                        null)
+                    : ScreenState.content());
           }
 
           @Override
@@ -244,15 +261,17 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   // ── Mannequin ────────────────────────────────────────────────────────────
 
   private void loadMannequins() {
-    Calls.run(api().mannequins(), r -> {
-      if (!isAdded() || !r.ok() || r.data == null) {
-        return;
-      }
-      for (Dto.Mannequin m : r.data.results) {
-        mannequins.put(m.gender, m);
-      }
-      applyMannequin();
-    });
+    Calls.run(
+        api().mannequins(),
+        r -> {
+          if (!isAdded() || !r.ok() || r.data == null) {
+            return;
+          }
+          for (Dto.Mannequin m : r.data.results) {
+            mannequins.put(m.gender, m);
+          }
+          applyMannequin();
+        });
   }
 
   private void setGender(String g) {
@@ -283,20 +302,27 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   }
 
   private void applyMannequin() {
-    mannequinChip.setText("female".equals(gender) ? R.string.constructor_female : R.string.constructor_male);
+    mannequinChip.setText(
+        "female".equals(gender) ? R.string.constructor_female : R.string.constructor_male);
     Dto.Mannequin m = mannequins.get(gender);
     if (m == null || m.canvasUrl == null) {
       return;
     }
-    Glide.with(this).asBitmap().load(m.canvasUrl).disallowHardwareConfig().into(new CustomTarget<Bitmap>() {
-      @Override
-      public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
-        canvas.setMannequin(resource, m.width, m.height, m.anchors, gender);
-      }
+    Glide.with(this)
+        .asBitmap()
+        .load(m.canvasUrl)
+        .disallowHardwareConfig()
+        .into(
+            new CustomTarget<Bitmap>() {
+              @Override
+              public void onResourceReady(
+                  @NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
+                canvas.setMannequin(resource, m.width, m.height, m.anchors, gender);
+              }
 
-      @Override
-      public void onLoadCleared(@Nullable Drawable placeholder) {}
-    });
+              @Override
+              public void onLoadCleared(@Nullable Drawable placeholder) {}
+            });
   }
 
   // ── Layers ───────────────────────────────────────────────────────────────
@@ -326,11 +352,14 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
     commitLayers();
     loadBitmap(layer, true);
     if (!replaced.isEmpty()) {
-      DsSnackbar.undo(requireView(), replaced.get(0).item.name + " убрана из образа", this::undo, null);
+      DsSnackbar.undo(
+          requireView(), replaced.get(0).item.name + " убрана из образа", this::undo, null);
     }
   }
 
-  /** Zone rules: one head, one pair of shoes, one bottom; a dress replaces the bottom; tops stack. */
+  /**
+   * Zone rules: one head, one pair of shoes, one bottom; a dress replaces the bottom; tops stack.
+   */
   private List<Layer> replacedBy(Dto.Item item) {
     List<Layer> out = new ArrayList<>();
     String zone = item.zone == null ? "accessory" : item.zone;
@@ -349,7 +378,9 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
           replace = z.equals("full") || z.equals("lower") || "shirt".equals(l.item.category);
           break;
         case "upper":
-          replace = (item.category != null && item.category.equals(l.item.category)) || ("shirt".equals(item.category) && z.equals("full"));
+          replace =
+              (item.category != null && item.category.equals(l.item.category))
+                  || ("shirt".equals(item.category) && z.equals("full"));
           break;
         default:
           replace = false;
@@ -402,30 +433,37 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
       return;
     }
     int max = layer.fitted ? canvas.canvasHeight() : 900;
-    Glide.with(this).asBitmap().load(url).disallowHardwareConfig().override(max, max)
-        .into(new CustomTarget<Bitmap>() {
-          @Override
-          public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
-            bitmaps.put(url, resource);
-            if (url.equals(layer.imageUrl(gender))) {
-              layer.bitmap = resource;
-              if (drop) {
-                canvas.dropIn(layer);
+    Glide.with(this)
+        .asBitmap()
+        .load(url)
+        .disallowHardwareConfig()
+        .override(max, max)
+        .into(
+            new CustomTarget<Bitmap>() {
+              @Override
+              public void onResourceReady(
+                  @NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
+                bitmaps.put(url, resource);
+                if (url.equals(layer.imageUrl(gender))) {
+                  layer.bitmap = resource;
+                  if (drop) {
+                    canvas.dropIn(layer);
+                  }
+                  canvas.invalidate();
+                }
               }
-              canvas.invalidate();
-            }
-          }
 
-          @Override
-          public void onLoadCleared(@Nullable Drawable placeholder) {}
+              @Override
+              public void onLoadCleared(@Nullable Drawable placeholder) {}
 
-          @Override
-          public void onLoadFailed(@Nullable Drawable errorDrawable) {
-            if (isAdded()) {
-              DsSnackbar.error(requireView(), "Не удалось загрузить вещь", () -> loadBitmap(layer, drop));
-            }
-          }
-        });
+              @Override
+              public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                if (isAdded()) {
+                  DsSnackbar.error(
+                      requireView(), "Не удалось загрузить вещь", () -> loadBitmap(layer, drop));
+                }
+              }
+            });
   }
 
   private void commitLayers() {
@@ -514,14 +552,50 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
   private void showLayerActions(Layer layer) {
     ArrayList<ActionSheet.Row> rows = new ArrayList<>();
     int icons = 0;
-    rows.add(new ActionSheet.Row("front", app.outfitshare.core.designsystem.R.drawable.ds_ic_layers, "Поднять слой", null, false));
-    rows.add(new ActionSheet.Row("back", app.outfitshare.core.designsystem.R.drawable.ds_ic_layers, "Опустить слой", null, false));
-    rows.add(new ActionSheet.Row("flip", app.outfitshare.core.designsystem.R.drawable.ds_ic_swap, "Отразить", null, false));
+    rows.add(
+        new ActionSheet.Row(
+            "front",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_layers,
+            "Поднять слой",
+            null,
+            false));
+    rows.add(
+        new ActionSheet.Row(
+            "back",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_layers,
+            "Опустить слой",
+            null,
+            false));
+    rows.add(
+        new ActionSheet.Row(
+            "flip",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_swap,
+            "Отразить",
+            null,
+            false));
     if (layer.canFit(gender)) {
-      rows.add(new ActionSheet.Row("home", app.outfitshare.core.designsystem.R.drawable.ds_ic_magnet, "Вернуть на манекен", "Сядет по опорным точкам", false));
+      rows.add(
+          new ActionSheet.Row(
+              "home",
+              app.outfitshare.core.designsystem.R.drawable.ds_ic_magnet,
+              "Вернуть на манекен",
+              "Сядет по опорным точкам",
+              false));
     }
-    rows.add(new ActionSheet.Row("info", app.outfitshare.core.designsystem.R.drawable.ds_ic_info, "О вещи", null, false));
-    rows.add(new ActionSheet.Row("delete", app.outfitshare.core.designsystem.R.drawable.ds_ic_delete, "Убрать из образа", null, true));
+    rows.add(
+        new ActionSheet.Row(
+            "info",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_info,
+            "О вещи",
+            null,
+            false));
+    rows.add(
+        new ActionSheet.Row(
+            "delete",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
+            "Убрать из образа",
+            null,
+            true));
     ActionSheet.show(getChildFragmentManager(), LAYER_ACTIONS, layer.item.name, rows);
   }
 
@@ -727,7 +801,11 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
       d.layers.add(l.state());
       d.items.add(l.item);
     }
-    requireContext().getSharedPreferences(DRAFT_PREFS, 0).edit().putString("draft", container().gson.toJson(d)).apply();
+    requireContext()
+        .getSharedPreferences(DRAFT_PREFS, 0)
+        .edit()
+        .putString("draft", container().gson.toJson(d))
+        .apply();
   }
 
   void clearDraft() {
@@ -757,15 +835,17 @@ public class ConstructorFragment extends BaseFragment implements LayersSheet.Hos
         .message("Образ откроется здесь же в следующий раз.")
         .confirm("Сохранить")
         .cancel("Удалить")
-        .onConfirm(() -> {
-          saveDraft();
-          nav().back();
-        })
-        .onCancel(() -> {
-          layers.clear();
-          clearDraft();
-          nav().back();
-        })
+        .onConfirm(
+            () -> {
+              saveDraft();
+              nav().back();
+            })
+        .onCancel(
+            () -> {
+              layers.clear();
+              clearDraft();
+              nav().back();
+            })
         .show();
   }
 

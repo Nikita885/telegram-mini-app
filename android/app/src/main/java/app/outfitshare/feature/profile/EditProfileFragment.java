@@ -53,11 +53,14 @@ public class EditProfileFragment extends BaseFragment {
   @Override
   public void onCreate(@Nullable Bundle state) {
     super.onCreate(state);
-    picker = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-      if (uri != null) {
-        upload(uri);
-      }
-    });
+    picker =
+        registerForActivityResult(
+            new ActivityResultContracts.PickVisualMedia(),
+            uri -> {
+              if (uri != null) {
+                upload(uri);
+              }
+            });
   }
 
   @Override
@@ -82,19 +85,20 @@ public class EditProfileFragment extends BaseFragment {
       bio.setText(me.bio);
       Images.avatar(avatar, me);
     }
-    TextWatcher watcher = new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+    TextWatcher watcher =
+        new TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void onTextChanged(CharSequence s, int a, int b, int c) {}
+          @Override
+          public void onTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void afterTextChanged(Editable s) {
-        ((TextInputLayout) requireView().findViewById(R.id.username_layout)).setError(null);
-        done.setEnabled(changed());
-      }
-    };
+          @Override
+          public void afterTextChanged(Editable s) {
+            ((TextInputLayout) requireView().findViewById(R.id.username_layout)).setError(null);
+            done.setEnabled(changed());
+          }
+        };
     for (EditText e : new EditText[] {firstName, lastName, username, bio}) {
       e.addTextChangedListener(watcher);
     }
@@ -102,15 +106,21 @@ public class EditProfileFragment extends BaseFragment {
     done.setOnClickListener(v -> save());
     view.findViewById(R.id.change_photo).setOnClickListener(v -> photoSheet());
     avatar.setOnClickListener(v -> photoSheet());
-    getChildFragmentManager().setFragmentResultListener(PHOTO, getViewLifecycleOwner(), (k, r) -> onPhotoAction(r.getString(ActionSheet.RESULT_ID)));
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            PHOTO,
+            getViewLifecycleOwner(),
+            (k, r) -> onPhotoAction(r.getString(ActionSheet.RESULT_ID)));
   }
 
   private boolean changed() {
     if (me == null) {
       return true;
     }
-    return !text(firstName).equals(nz(me.firstName)) || !text(lastName).equals(nz(me.lastName))
-        || !text(username).equals(nz(me.username)) || !text(bio).equals(nz(me.bio));
+    return !text(firstName).equals(nz(me.firstName))
+        || !text(lastName).equals(nz(me.lastName))
+        || !text(username).equals(nz(me.username))
+        || !text(bio).equals(nz(me.bio));
   }
 
   private static String text(EditText e) {
@@ -128,44 +138,72 @@ public class EditProfileFragment extends BaseFragment {
     body.put("username", text(username));
     body.put("bio", text(bio));
     done.setLoading(true);
-    Calls.run(api().updateMe(body), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      done.setLoading(false);
-      if (r.ok() && r.data != null) {
-        container().session.setMe(r.data);
-        nav().back();
-        return;
-      }
-      TextInputLayout layout = requireView().findViewById(R.id.username_layout);
-      if (r.error != null && ("username_taken".equals(r.error.code) || r.error.fieldMessage("username") != null)) {
-        String msg = r.error.fieldMessage("username");
-        layout.setError(msg != null ? msg : "Имя @" + text(username) + " уже занято");
-        done.setEnabled(false);
-      } else {
-        showError(r.error, this::save);
-      }
-    });
+    Calls.run(
+        api().updateMe(body),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          done.setLoading(false);
+          if (r.ok() && r.data != null) {
+            container().session.setMe(r.data);
+            nav().back();
+            return;
+          }
+          TextInputLayout layout = requireView().findViewById(R.id.username_layout);
+          if (r.error != null
+              && ("username_taken".equals(r.error.code)
+                  || r.error.fieldMessage("username") != null)) {
+            String msg = r.error.fieldMessage("username");
+            layout.setError(msg != null ? msg : "Имя @" + text(username) + " уже занято");
+            done.setEnabled(false);
+          } else {
+            showError(r.error, this::save);
+          }
+        });
   }
 
   private void photoSheet() {
     ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-    rows.add(new ActionSheet.Row("telegram", app.outfitshare.core.designsystem.R.drawable.ds_ic_send, getString(R.string.profile_photo_telegram), null, false));
-    rows.add(new ActionSheet.Row("gallery", app.outfitshare.core.designsystem.R.drawable.ds_ic_gallery, getString(R.string.profile_photo_gallery), null, false));
+    rows.add(
+        new ActionSheet.Row(
+            "telegram",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_send,
+            getString(R.string.profile_photo_telegram),
+            null,
+            false));
+    rows.add(
+        new ActionSheet.Row(
+            "gallery",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_gallery,
+            getString(R.string.profile_photo_gallery),
+            null,
+            false));
     if (me != null && me.avatarUrl != null) {
-      rows.add(new ActionSheet.Row("delete", app.outfitshare.core.designsystem.R.drawable.ds_ic_delete, getString(R.string.profile_photo_delete), null, true));
+      rows.add(
+          new ActionSheet.Row(
+              "delete",
+              app.outfitshare.core.designsystem.R.drawable.ds_ic_delete,
+              getString(R.string.profile_photo_delete),
+              null,
+              true));
     }
-    ActionSheet.show(getChildFragmentManager(), PHOTO, getString(R.string.profile_photo_sheet), rows);
+    ActionSheet.show(
+        getChildFragmentManager(), PHOTO, getString(R.string.profile_photo_sheet), rows);
   }
 
   private void onPhotoAction(@Nullable String id) {
     if ("gallery".equals(id)) {
-      picker.launch(new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
+      picker.launch(
+          new PickVisualMediaRequest.Builder()
+              .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+              .build());
     } else if ("telegram".equals(id)) {
       Map<String, Object> body = new HashMap<>();
       body.put("source", "telegram");
-      Calls.run(api().avatarFromTelegram(body), r -> onAvatar(r.ok() && r.data != null ? r.data.avatarUrl : null, r.error));
+      Calls.run(
+          api().avatarFromTelegram(body),
+          r -> onAvatar(r.ok() && r.data != null ? r.data.avatarUrl : null, r.error));
     } else if ("delete".equals(id)) {
       Calls.run(api().deleteAvatar(), r -> onAvatar(null, r.error));
     }
@@ -180,12 +218,19 @@ public class EditProfileFragment extends BaseFragment {
       }
       int side = Math.min(bitmap.getWidth(), bitmap.getHeight());
       float k = Math.min(1f, 1024f / side);
-      Bitmap scaled = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * k), Math.round(bitmap.getHeight() * k), true);
+      Bitmap scaled =
+          Bitmap.createScaledBitmap(
+              bitmap, Math.round(bitmap.getWidth() * k), Math.round(bitmap.getHeight() * k), true);
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       scaled.compress(Bitmap.CompressFormat.JPEG, 90, out);
-      MultipartBody.Part part = MultipartBody.Part.createFormData("avatar", "avatar.jpg",
-          RequestBody.create(out.toByteArray(), MediaType.get("image/jpeg")));
-      Calls.run(api().uploadAvatar(part), r -> onAvatar(r.ok() && r.data != null ? r.data.avatarUrl : null, r.error));
+      MultipartBody.Part part =
+          MultipartBody.Part.createFormData(
+              "avatar",
+              "avatar.jpg",
+              RequestBody.create(out.toByteArray(), MediaType.get("image/jpeg")));
+      Calls.run(
+          api().uploadAvatar(part),
+          r -> onAvatar(r.ok() && r.data != null ? r.data.avatarUrl : null, r.error));
     } catch (Exception e) {
       toast("Не удалось прочитать фото");
     }

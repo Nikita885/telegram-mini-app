@@ -65,7 +65,9 @@ final class StudioText {
       return null;
     }
     Object colors = job.attributes.get("colors");
-    if (colors instanceof List && !((List<?>) colors).isEmpty() && ((List<?>) colors).get(0) instanceof Map) {
+    if (colors instanceof List
+        && !((List<?>) colors).isEmpty()
+        && ((List<?>) colors).get(0) instanceof Map) {
       Object name = ((Map<String, Object>) ((List<?>) colors).get(0)).get("name");
       return name == null ? null : String.valueOf(name);
     }

@@ -58,7 +58,8 @@ public abstract class ProfileScreen extends BaseFragment {
 
   protected abstract boolean isOwn();
 
-  protected abstract void bindButtons(Dto.Profile p, MaterialButton primary, MaterialButton secondary);
+  protected abstract void bindButtons(
+      Dto.Profile p, MaterialButton primary, MaterialButton secondary);
 
   protected abstract void bindAppBar(View root, Dto.Profile p);
 
@@ -78,7 +79,8 @@ public abstract class ProfileScreen extends BaseFragment {
     gridManager = new GridLayoutManager(requireContext(), 3);
     grid.setLayoutManager(gridManager);
     outfitsAdapter = new GridOutfitAdapter(o -> nav().push(OutfitFragment.newInstance(o.id)));
-    collectionsAdapter = new CollectionsAdapter(c -> nav().push(CollectionFragment.newInstance(c.id)));
+    collectionsAdapter =
+        new CollectionsAdapter(c -> nav().push(CollectionFragment.newInstance(c.id)));
 
     TabLayout tabs = view.findViewById(R.id.tabs);
     tabs.addTab(tabs.newTab().setText(R.string.profile_outfits));
@@ -86,33 +88,43 @@ public abstract class ProfileScreen extends BaseFragment {
     if (isOwn()) {
       tabs.addTab(tabs.newTab().setText(R.string.profile_drafts));
     }
-    tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab t) {
-        showTab(t.getPosition());
-      }
+    tabs.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab t) {
+            showTab(t.getPosition());
+          }
 
-      @Override
-      public void onTabUnselected(TabLayout.Tab t) {}
+          @Override
+          public void onTabUnselected(TabLayout.Tab t) {}
 
-      @Override
-      public void onTabReselected(TabLayout.Tab t) {}
-    });
+          @Override
+          public void onTabReselected(TabLayout.Tab t) {}
+        });
 
     NestedScrollView scroll = view.findViewById(R.id.scroll);
-    scroll.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, x, y, ox, oy) -> {
-      if (tab == TAB_OUTFITS && outfits != null && y + v.getHeight() >= v.getChildAt(0).getHeight() - v.getHeight() / 2) {
-        outfits.loadMore();
-      }
-    });
+    scroll.setOnScrollChangeListener(
+        (NestedScrollView.OnScrollChangeListener)
+            (v, x, y, ox, oy) -> {
+              if (tab == TAB_OUTFITS
+                  && outfits != null
+                  && y + v.getHeight() >= v.getChildAt(0).getHeight() - v.getHeight() / 2) {
+                outfits.loadMore();
+              }
+            });
 
-    container().outfitBus.changes().observe(getViewLifecycleOwner(), c -> {
-      if (c.deleted) {
-        outfitsAdapter.remove(c.outfitId);
-      } else if (c.created && isOwn()) {
-        reload();
-      }
-    });
+    container()
+        .outfitBus
+        .changes()
+        .observe(
+            getViewLifecycleOwner(),
+            c -> {
+              if (c.deleted) {
+                outfitsAdapter.remove(c.outfitId);
+              } else if (c.created && isOwn()) {
+                reload();
+              }
+            });
 
     stateView.setState(ScreenState.loading());
     reload();
@@ -120,44 +132,49 @@ public abstract class ProfileScreen extends BaseFragment {
 
   protected void reload() {
     long id = userId();
-    Calls.run(id < 0 ? api().me() : api().user(id), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      refresh.setRefreshing(false);
-      if (!r.ok() || r.data == null) {
-        if (profile == null) {
-          stateView.setState(States.failure(r.error, "Профиль не загрузился"));
-        } else {
-          showError(r.error, this::reload);
-        }
-        return;
-      }
-      offline.setOffline(r.fromCache);
-      offline.setVisibility(r.fromCache ? View.VISIBLE : View.GONE);
-      profile = r.data;
-      if (isOwn()) {
-        container().session.setMe(r.data);
-      }
-      bindHeader(r.data);
-      stateView.setState(ScreenState.content());
-      outfits = new Paging<>(cursor -> api().userOutfits(r.data.id, cursor), new Paging.Listener<Dto.Outfit>() {
-        @Override
-        public void onPage(List<Dto.Outfit> all, boolean reset, boolean fromCache) {
-          if (tab == TAB_OUTFITS) {
-            showOutfits(all);
+    Calls.run(
+        id < 0 ? api().me() : api().user(id),
+        r -> {
+          if (!isAdded()) {
+            return;
           }
-        }
+          refresh.setRefreshing(false);
+          if (!r.ok() || r.data == null) {
+            if (profile == null) {
+              stateView.setState(States.failure(r.error, "Профиль не загрузился"));
+            } else {
+              showError(r.error, this::reload);
+            }
+            return;
+          }
+          offline.setOffline(r.fromCache);
+          offline.setVisibility(r.fromCache ? View.VISIBLE : View.GONE);
+          profile = r.data;
+          if (isOwn()) {
+            container().session.setMe(r.data);
+          }
+          bindHeader(r.data);
+          stateView.setState(ScreenState.content());
+          outfits =
+              new Paging<>(
+                  cursor -> api().userOutfits(r.data.id, cursor),
+                  new Paging.Listener<Dto.Outfit>() {
+                    @Override
+                    public void onPage(List<Dto.Outfit> all, boolean reset, boolean fromCache) {
+                      if (tab == TAB_OUTFITS) {
+                        showOutfits(all);
+                      }
+                    }
 
-        @Override
-        public void onError(ApiError error, boolean firstPage) {
-          if (tab == TAB_OUTFITS && firstPage) {
-            tabState.setState(States.failure(error, "Образы не загрузились"));
-          }
-        }
-      });
-      showTab(tab);
-    });
+                    @Override
+                    public void onError(ApiError error, boolean firstPage) {
+                      if (tab == TAB_OUTFITS && firstPage) {
+                        tabState.setState(States.failure(error, "Образы не загрузились"));
+                      }
+                    }
+                  });
+          showTab(tab);
+        });
   }
 
   private void bindHeader(Dto.Profile p) {
@@ -165,17 +182,26 @@ public abstract class ProfileScreen extends BaseFragment {
     bindAppBar(v, p);
     AvatarView avatar = v.findViewById(R.id.avatar);
     Images.avatar(avatar, p);
-    bindCounter(v.findViewById(R.id.count_outfits), p.outfitsCount, Formats.outfitsWord(requireContext(), p.outfitsCount));
+    bindCounter(
+        v.findViewById(R.id.count_outfits),
+        p.outfitsCount,
+        Formats.outfitsWord(requireContext(), p.outfitsCount));
     bindCounter(v.findViewById(R.id.count_followers), p.followersCount, "подписчики");
     bindCounter(v.findViewById(R.id.count_following), p.followingCount, "подписки");
-    v.findViewById(R.id.count_followers).setOnClickListener(x -> nav().push(FollowsFragment.newInstance(p.id, p.username, true)));
-    v.findViewById(R.id.count_following).setOnClickListener(x -> nav().push(FollowsFragment.newInstance(p.id, p.username, false)));
+    v.findViewById(R.id.count_followers)
+        .setOnClickListener(x -> nav().push(FollowsFragment.newInstance(p.id, p.username, true)));
+    v.findViewById(R.id.count_following)
+        .setOnClickListener(x -> nav().push(FollowsFragment.newInstance(p.id, p.username, false)));
     TextView name = v.findViewById(R.id.name);
     name.setText(p.name);
     boolean staff = "admin".equals(p.role) || "moderator".equals(p.role);
-    name.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, staff ? R.drawable.badge_verified : 0, 0);
-    androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(name, android.content.res.ColorStateList.valueOf(
-        app.outfitshare.core.designsystem.theme.DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorAccent)));
+    name.setCompoundDrawablesRelativeWithIntrinsicBounds(
+        0, 0, staff ? R.drawable.badge_verified : 0, 0);
+    androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(
+        name,
+        android.content.res.ColorStateList.valueOf(
+            app.outfitshare.core.designsystem.theme.DsTheme.color(
+                requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorAccent)));
     TextView bio = v.findViewById(R.id.bio);
     bio.setText(p.bio);
     bio.setVisibility(p.bio == null || p.bio.isEmpty() ? View.GONE : View.VISIBLE);
@@ -211,11 +237,24 @@ public abstract class ProfileScreen extends BaseFragment {
       }
     } else if (index == TAB_COLLECTIONS) {
       gridManager.setSpanCount(2);
-      int gutter = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
-      int gap = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_grid_gap);
-      gridSpacing = Spacing.grid(getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5), gap);
+      int gutter =
+          getResources()
+              .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+      int gap =
+          getResources()
+              .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_grid_gap);
+      gridSpacing =
+          Spacing.grid(
+              getResources()
+                  .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5),
+              gap);
       grid.addItemDecoration(gridSpacing);
-      grid.setPadding(gutter, getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_4), gutter, 0);
+      grid.setPadding(
+          gutter,
+          getResources()
+              .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_4),
+          gutter,
+          0);
       grid.setAdapter(collectionsAdapter);
       loadCollections();
     } else {
@@ -233,8 +272,11 @@ public abstract class ProfileScreen extends BaseFragment {
   }
 
   protected ScreenState emptyOutfitsState() {
-    return States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-        "Пока нет образов", null, null);
+    return States.empty(
+        app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
+        "Пока нет образов",
+        null,
+        null);
   }
 
   private void loadCollections() {
@@ -242,20 +284,27 @@ public abstract class ProfileScreen extends BaseFragment {
       return;
     }
     tabState.setState(ScreenState.loading());
-    Calls.run(api().collections(isOwn() ? null : profile.id), r -> {
-      if (!isAdded() || tab != TAB_COLLECTIONS) {
-        return;
-      }
-      if (!r.ok() || r.data == null) {
-        tabState.setState(States.failure(r.error, "Коллекции не загрузились"));
-        return;
-      }
-      collectionsAdapter.submit(r.data.results);
-      tabState.setState(r.data.results.isEmpty()
-          ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_collections,
-              "Коллекций пока нет", null, null)
-          : ScreenState.content());
-    });
+    Calls.run(
+        api().collections(isOwn() ? null : profile.id),
+        r -> {
+          if (!isAdded() || tab != TAB_COLLECTIONS) {
+            return;
+          }
+          if (!r.ok() || r.data == null) {
+            tabState.setState(States.failure(r.error, "Коллекции не загрузились"));
+            return;
+          }
+          collectionsAdapter.submit(r.data.results);
+          tabState.setState(
+              r.data.results.isEmpty()
+                  ? States.empty(
+                      app.outfitshare.core.designsystem.R.drawable
+                          .ds_illustration_empty_collections,
+                      "Коллекций пока нет",
+                      null,
+                      null)
+                  : ScreenState.content());
+        });
   }
 
   protected void showDrafts() {}
@@ -263,7 +312,8 @@ public abstract class ProfileScreen extends BaseFragment {
   protected void shareProfile(Dto.Profile p) {
     Intent send = new Intent(Intent.ACTION_SEND);
     send.setType("text/plain");
-    send.putExtra(Intent.EXTRA_TEXT, p.name + " в Outfit Share: " + container().prefs.server() + "u/" + p.id);
+    send.putExtra(
+        Intent.EXTRA_TEXT, p.name + " в Outfit Share: " + container().prefs.server() + "u/" + p.id);
     startActivity(Intent.createChooser(send, getString(R.string.action_share)));
   }
 }

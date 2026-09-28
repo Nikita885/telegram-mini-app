@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.haptics.Haptics;
 import app.outfitshare.core.designsystem.theme.DsTheme;
 import java.util.ArrayList;
@@ -23,7 +22,8 @@ import java.util.Map;
 
 /**
  * Mockup «Студия: доводка точек»: garment keypoints dragged by finger. Marker 28 dp, touch target
- * 48 dp; the active point is accent-coloured with a loupe so the finger never hides the fabric edge.
+ * 48 dp; the active point is accent-coloured with a loupe so the finger never hides the fabric
+ * edge.
  */
 public class KeypointEditorView extends View {
 
@@ -66,7 +66,8 @@ public class KeypointEditorView extends View {
     super(context, attrs);
     float d = getResources().getDisplayMetrics().density;
     accent = DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorAccent);
-    canvasPaint.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorCanvas));
+    canvasPaint.setColor(
+        DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorCanvas));
     markerStroke.setStyle(Paint.Style.STROKE);
     markerStroke.setStrokeWidth(2 * d);
     labelBg.setColor(Color.argb(140, 0, 0, 0));
@@ -74,8 +75,13 @@ public class KeypointEditorView extends View {
     labelText.setTextSize(10 * getResources().getDisplayMetrics().scaledDensity);
     labelText.setFakeBoldText(true);
     loupeRing.setStyle(Paint.Style.STROKE);
-    markerRadius = getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_keypoint_handle) / 2f;
-    touchRadius = getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_touch_target) / 2f;
+    markerRadius =
+        getResources()
+                .getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_keypoint_handle)
+            / 2f;
+    touchRadius =
+        getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_touch_target)
+            / 2f;
     loupeRadius = 58 * d;
     setContentDescription("Опорные точки вещи");
   }
@@ -140,7 +146,10 @@ public class KeypointEditorView extends View {
       boolean isActive = e.getKey().equals(active);
       float x = offsetX + e.getValue()[0] * scale;
       float y = offsetY + e.getValue()[1] * scale;
-      markerFill.setColor(isActive ? Color.argb(90, Color.red(accent), Color.green(accent), Color.blue(accent)) : Color.argb(64, 0, 0, 0));
+      markerFill.setColor(
+          isActive
+              ? Color.argb(90, Color.red(accent), Color.green(accent), Color.blue(accent))
+              : Color.argb(64, 0, 0, 0));
       markerStroke.setColor(isActive ? accent : Color.WHITE);
       dot.setColor(isActive ? accent : Color.WHITE);
       c.drawCircle(x, y, markerRadius, markerFill);

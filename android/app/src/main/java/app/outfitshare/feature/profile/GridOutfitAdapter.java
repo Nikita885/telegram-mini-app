@@ -41,14 +41,16 @@ public class GridOutfitAdapter extends RecyclerView.Adapter<GridOutfitAdapter.Ho
   @NonNull
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid_outfit, parent, false));
+    return new Holder(
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.item_grid_outfit, parent, false));
   }
 
   @Override
   public void onBindViewHolder(@NonNull Holder h, int position) {
     Dto.Outfit o = items.get(position);
     Images.photo(h.photo, o.imageUrl);
-    h.photo.setContentDescription("Образ" + (o.description == null || o.description.isEmpty() ? "" : ": " + o.description));
+    h.photo.setContentDescription(
+        "Образ" + (o.description == null || o.description.isEmpty() ? "" : ": " + o.description));
     h.badge.setVisibility(o.remixOf != null ? View.VISIBLE : View.GONE);
     h.itemView.setOnClickListener(v -> onClick.accept(o));
   }

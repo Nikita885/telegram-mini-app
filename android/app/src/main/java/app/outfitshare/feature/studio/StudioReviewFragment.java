@@ -35,11 +35,14 @@ public class StudioReviewFragment extends BaseFragment {
   private String viewGender = "female";
   private boolean showBefore;
 
-  private final Realtime.Listener realtime = (event, payload) -> {
-    if ("studio.job".equals(event) && payload.has("id") && payload.get("id").getAsLong() == jobId) {
-      load();
-    }
-  };
+  private final Realtime.Listener realtime =
+      (event, payload) -> {
+        if ("studio.job".equals(event)
+            && payload.has("id")
+            && payload.get("id").getAsLong() == jobId) {
+          load();
+        }
+      };
 
   public static StudioReviewFragment newInstance(long jobId) {
     StudioReviewFragment f = new StudioReviewFragment();
@@ -62,33 +65,45 @@ public class StudioReviewFragment extends BaseFragment {
     toolbar.setNavigationOnClickListener(v -> nav().back());
     toolbar.getMenu().add("Переобработать");
     toolbar.getMenu().add("Удалить");
-    toolbar.setOnMenuItemClickListener(item -> {
-      if ("Удалить".contentEquals(item.getTitle())) {
-        ConfirmDialog.with(requireContext()).title("Удалить снимок?").message("Вещь не попадёт в каталог.")
-            .confirm("Удалить").cancel("Отмена").destructive()
-            .onConfirm(() -> Calls.run(api().deleteJob(jobId), r -> nav().back())).show();
-      } else {
-        Calls.run(api().retryJob(jobId), r -> load());
-      }
-      return true;
-    });
+    toolbar.setOnMenuItemClickListener(
+        item -> {
+          if ("Удалить".contentEquals(item.getTitle())) {
+            ConfirmDialog.with(requireContext())
+                .title("Удалить снимок?")
+                .message("Вещь не попадёт в каталог.")
+                .confirm("Удалить")
+                .cancel("Отмена")
+                .destructive()
+                .onConfirm(() -> Calls.run(api().deleteJob(jobId), r -> nav().back()))
+                .show();
+          } else {
+            Calls.run(api().retryJob(jobId), r -> load());
+          }
+          return true;
+        });
     MaterialButtonToggleGroup toggle = view.findViewById(R.id.before_after);
-    toggle.addOnButtonCheckedListener((g, id, checked) -> {
-      if (checked) {
-        showBefore = id == R.id.before;
-        bindImage();
-      }
-    });
-    view.findViewById(R.id.mannequin).setOnClickListener(v -> {
-      viewGender = "female".equals(viewGender) ? "male" : "female";
-      bindImage();
-    });
-    view.findViewById(R.id.keypoints).setOnClickListener(v -> nav().push(KeypointsFragment.newInstance(jobId)));
-    view.findViewById(R.id.next).setOnClickListener(v -> {
-      if (job != null) {
-        nav().push(StudioPublishFragment.newInstance(job));
-      }
-    });
+    toggle.addOnButtonCheckedListener(
+        (g, id, checked) -> {
+          if (checked) {
+            showBefore = id == R.id.before;
+            bindImage();
+          }
+        });
+    view.findViewById(R.id.mannequin)
+        .setOnClickListener(
+            v -> {
+              viewGender = "female".equals(viewGender) ? "male" : "female";
+              bindImage();
+            });
+    view.findViewById(R.id.keypoints)
+        .setOnClickListener(v -> nav().push(KeypointsFragment.newInstance(jobId)));
+    view.findViewById(R.id.next)
+        .setOnClickListener(
+            v -> {
+              if (job != null) {
+                nav().push(StudioPublishFragment.newInstance(job));
+              }
+            });
     load();
   }
 
@@ -114,24 +129,26 @@ public class StudioReviewFragment extends BaseFragment {
   }
 
   private void load() {
-    Calls.run(api().job(jobId), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      if (!r.ok() || r.data == null) {
-        showError(r.error, this::load);
-        return;
-      }
-      job = r.data;
-      if (!"unisex".equals(job.gender)) {
-        viewGender = job.gender;
-      }
-      bind();
-      if ("queued".equals(job.status) || "processing".equals(job.status)) {
-        handler.removeCallbacksAndMessages(null);
-        handler.postDelayed(this::load, 2000);
-      }
-    });
+    Calls.run(
+        api().job(jobId),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          if (!r.ok() || r.data == null) {
+            showError(r.error, this::load);
+            return;
+          }
+          job = r.data;
+          if (!"unisex".equals(job.gender)) {
+            viewGender = job.gender;
+          }
+          bind();
+          if ("queued".equals(job.status) || "processing".equals(job.status)) {
+            handler.removeCallbacksAndMessages(null);
+            handler.postDelayed(this::load, 2000);
+          }
+        });
   }
 
   private void bind() {
@@ -146,7 +163,8 @@ public class StudioReviewFragment extends BaseFragment {
     if (processing) {
       int step = StudioText.step(j.stage);
       title.setText(StudioText.stageLabel(j.stage));
-      stepsLabel.setText("Шаг " + Math.max(1, step) + " из " + StepsView.COUNT + " · обычно меньше минуты");
+      stepsLabel.setText(
+          "Шаг " + Math.max(1, step) + " из " + StepsView.COUNT + " · обычно меньше минуты");
       stepsLabel.setVisibility(View.VISIBLE);
       steps.setVisibility(View.VISIBLE);
       steps.setDone(Math.max(0, step - 1));
@@ -184,7 +202,8 @@ public class StudioReviewFragment extends BaseFragment {
     Chip mannequin = v.findViewById(R.id.mannequin);
     mannequin.setVisibility("unisex".equals(j.gender) && !processing ? View.VISIBLE : View.GONE);
     v.findViewById(R.id.next).setEnabled(!processing && !failed && !low);
-    v.findViewById(R.id.keypoints).setEnabled(!processing && !failed && j.keypoints != null && !j.keypoints.isEmpty());
+    v.findViewById(R.id.keypoints)
+        .setEnabled(!processing && !failed && j.keypoints != null && !j.keypoints.isEmpty());
     bindImage();
   }
 
@@ -236,7 +255,10 @@ public class StudioReviewFragment extends BaseFragment {
     ImageView image = requireView().findViewById(R.id.image);
     Chip mannequin = requireView().findViewById(R.id.mannequin);
     mannequin.setText("female".equals(viewGender) ? "Женский" : "Мужской");
-    String url = showBefore ? job.sourceUrl : ("female".equals(viewGender) ? job.preview.female : job.preview.male);
+    String url =
+        showBefore
+            ? job.sourceUrl
+            : ("female".equals(viewGender) ? job.preview.female : job.preview.male);
     if (!showBefore && url == null) {
       url = job.preview.female != null ? job.preview.female : job.preview.male;
     }

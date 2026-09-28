@@ -46,8 +46,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Mockup «Студия: камера». Live checks (light, background, framing) run on the preview frames;
- * the shot is queued for background upload and the pipeline takes it from there.
+ * Mockup «Студия: камера». Live checks (light, background, framing) run on the preview frames; the
+ * shot is queued for background upload and the pipeline takes it from there.
  */
 public class StudioCameraFragment extends BaseFragment {
   private final ExecutorService analysisExecutor = Executors.newSingleThreadExecutor();
@@ -72,19 +72,25 @@ public class StudioCameraFragment extends BaseFragment {
   @Override
   public void onCreate(@Nullable Bundle state) {
     super.onCreate(state);
-    permission = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
-      if (granted) {
-        stateView.setState(ScreenState.content());
-        startCamera();
-      } else {
-        showNoPermission();
-      }
-    });
-    picker = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-      if (uri != null) {
-        queueFromGallery(uri);
-      }
-    });
+    permission =
+        registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            granted -> {
+              if (granted) {
+                stateView.setState(ScreenState.content());
+                startCamera();
+              } else {
+                showNoPermission();
+              }
+            });
+    picker =
+        registerForActivityResult(
+            new ActivityResultContracts.PickVisualMedia(),
+            uri -> {
+              if (uri != null) {
+                queueFromGallery(uri);
+              }
+            });
   }
 
   @Override
@@ -105,24 +111,32 @@ public class StudioCameraFragment extends BaseFragment {
     view.findViewById(R.id.queue).setOnClickListener(v -> nav().back());
     view.findViewById(R.id.shutter).setOnClickListener(v -> shoot());
     view.findViewById(R.id.gallery).setOnClickListener(v -> pickFromGallery());
-    flashToggle.setOnClickListener(v -> {
-      flashOn = !flashOn;
-      flashToggle.setIconResource(flashOn ? app.outfitshare.core.designsystem.R.drawable.ds_ic_flash_on
-          : app.outfitshare.core.designsystem.R.drawable.ds_ic_flash_off);
-      if (capture != null) {
-        capture.setFlashMode(flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF);
-      }
-    });
+    flashToggle.setOnClickListener(
+        v -> {
+          flashOn = !flashOn;
+          flashToggle.setIconResource(
+              flashOn
+                  ? app.outfitshare.core.designsystem.R.drawable.ds_ic_flash_on
+                  : app.outfitshare.core.designsystem.R.drawable.ds_ic_flash_off);
+          if (capture != null) {
+            capture.setFlashMode(
+                flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF);
+          }
+        });
     stateView.setOnActionClickListener(v -> permission.launch(Manifest.permission.CAMERA));
     stateView.setOnSecondaryActionClickListener(v -> pickFromGallery());
 
     if (!container().session.isAdmin()) {
-      stateView.setState(States.locked("Студия — для администраторов каталога",
-          "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.", null));
+      stateView.setState(
+          States.locked(
+              "Студия — для администраторов каталога",
+              "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.",
+              null));
       return;
     }
     loadCategories();
-    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+        == PackageManager.PERMISSION_GRANTED) {
       startCamera();
     } else {
       permission.launch(Manifest.permission.CAMERA);
@@ -130,36 +144,41 @@ public class StudioCameraFragment extends BaseFragment {
   }
 
   private void showNoPermission() {
-    stateView.setState(ScreenState.builder(ScreenState.Kind.NO_PERMISSION)
-        .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera)
-        .title("Нужен доступ к камере")
-        .message("Студия снимает вещь и сразу проверяет свет и кадр. Фото не уходят никуда, кроме каталога.")
-        .action("Разрешить")
-        .secondaryAction("Выбрать из галереи")
-        .build());
+    stateView.setState(
+        ScreenState.builder(ScreenState.Kind.NO_PERMISSION)
+            .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera)
+            .title("Нужен доступ к камере")
+            .message(
+                "Студия снимает вещь и сразу проверяет свет и кадр. Фото не уходят никуда, кроме"
+                    + " каталога.")
+            .action("Разрешить")
+            .secondaryAction("Выбрать из галереи")
+            .build());
   }
 
   private void loadCategories() {
-    Calls.run(api().categories(), r -> {
-      if (!isAdded() || !r.ok() || r.data == null) {
-        return;
-      }
-      categories.removeAllViews();
-      for (Dto.Category c : r.data.results) {
-        Chip chip = new Chip(requireContext());
-        chip.setText(c.name);
-        chip.setTag(c);
-        chip.setCheckable(true);
-        chip.setId(View.generateViewId());
-        categories.addView(chip);
-        if ("top".equals(c.slug)) {
-          chip.setChecked(true);
-        }
-      }
-      if (categories.getCheckedChipId() == View.NO_ID && categories.getChildCount() > 0) {
-        ((Chip) categories.getChildAt(0)).setChecked(true);
-      }
-    });
+    Calls.run(
+        api().categories(),
+        r -> {
+          if (!isAdded() || !r.ok() || r.data == null) {
+            return;
+          }
+          categories.removeAllViews();
+          for (Dto.Category c : r.data.results) {
+            Chip chip = new Chip(requireContext());
+            chip.setText(c.name);
+            chip.setTag(c);
+            chip.setCheckable(true);
+            chip.setId(View.generateViewId());
+            categories.addView(chip);
+            if ("top".equals(c.slug)) {
+              chip.setChecked(true);
+            }
+          }
+          if (categories.getCheckedChipId() == View.NO_ID && categories.getChildCount() > 0) {
+            ((Chip) categories.getChildAt(0)).setChecked(true);
+          }
+        });
   }
 
   @Nullable
@@ -183,36 +202,49 @@ public class StudioCameraFragment extends BaseFragment {
   // ── CameraX ──────────────────────────────────────────────────────────────
 
   private void startCamera() {
-    ListenableFuture<ProcessCameraProvider> future = ProcessCameraProvider.getInstance(requireContext());
-    future.addListener(() -> {
-      if (!isAdded()) {
-        return;
-      }
-      try {
-        ProcessCameraProvider provider = future.get();
-        PreviewView view = requireView().findViewById(R.id.preview);
-        Preview preview = new Preview.Builder().build();
-        preview.setSurfaceProvider(view.getSurfaceProvider());
-        capture = new ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-            .setFlashMode(flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF)
-            .build();
-        ImageAnalysis analysis = new ImageAnalysis.Builder()
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .build();
-        analysis.setAnalyzer(analysisExecutor, this::analyze);
-        provider.unbindAll();
-        provider.bindToLifecycle(getViewLifecycleOwner(), CameraSelector.DEFAULT_BACK_CAMERA, preview, capture, analysis);
-      } catch (Exception e) {
-        stateView.setState(ScreenState.builder(ScreenState.Kind.ERROR)
-            .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_error)
-            .title("Камера недоступна")
-            .message("Выберите фото из галереи или попробуйте ещё раз.")
-            .action("Повторить")
-            .secondaryAction("Выбрать из галереи")
-            .build());
-      }
-    }, ContextCompat.getMainExecutor(requireContext()));
+    ListenableFuture<ProcessCameraProvider> future =
+        ProcessCameraProvider.getInstance(requireContext());
+    future.addListener(
+        () -> {
+          if (!isAdded()) {
+            return;
+          }
+          try {
+            ProcessCameraProvider provider = future.get();
+            PreviewView view = requireView().findViewById(R.id.preview);
+            Preview preview = new Preview.Builder().build();
+            preview.setSurfaceProvider(view.getSurfaceProvider());
+            capture =
+                new ImageCapture.Builder()
+                    .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                    .setFlashMode(
+                        flashOn ? ImageCapture.FLASH_MODE_ON : ImageCapture.FLASH_MODE_OFF)
+                    .build();
+            ImageAnalysis analysis =
+                new ImageAnalysis.Builder()
+                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    .build();
+            analysis.setAnalyzer(analysisExecutor, this::analyze);
+            provider.unbindAll();
+            provider.bindToLifecycle(
+                getViewLifecycleOwner(),
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                preview,
+                capture,
+                analysis);
+          } catch (Exception e) {
+            stateView.setState(
+                ScreenState.builder(ScreenState.Kind.ERROR)
+                    .illustration(
+                        app.outfitshare.core.designsystem.R.drawable.ds_illustration_error)
+                    .title("Камера недоступна")
+                    .message("Выберите фото из галереи или попробуйте ещё раз.")
+                    .action("Повторить")
+                    .secondaryAction("Выбрать из галереи")
+                    .build());
+          }
+        },
+        ContextCompat.getMainExecutor(requireContext()));
   }
 
   /** Luminance-only checks on the Y plane, twice a second. */
@@ -253,8 +285,12 @@ public class StudioCameraFragment extends BaseFragment {
           centerSum += v;
           centerN++;
         }
-        int l = 4 * v - (buf.get(y * rowStride + x - step) & 0xFF) - (buf.get(y * rowStride + x + step) & 0xFF)
-            - (buf.get((y - step) * rowStride + x) & 0xFF) - (buf.get((y + step) * rowStride + x) & 0xFF);
+        int l =
+            4 * v
+                - (buf.get(y * rowStride + x - step) & 0xFF)
+                - (buf.get(y * rowStride + x + step) & 0xFF)
+                - (buf.get((y - step) * rowStride + x) & 0xFF)
+                - (buf.get((y + step) * rowStride + x) & 0xFF);
         lap += l;
         lapSq += (double) l * l;
         lapN++;
@@ -263,7 +299,8 @@ public class StudioCameraFragment extends BaseFragment {
     image.close();
     double mean = n == 0 ? 0 : sum / n / 255.0;
     double borderMean = borderN == 0 ? 0 : borderSum / borderN;
-    double borderStd = borderN == 0 ? 0 : Math.sqrt(Math.max(0, borderSq / borderN - borderMean * borderMean));
+    double borderStd =
+        borderN == 0 ? 0 : Math.sqrt(Math.max(0, borderSq / borderN - borderMean * borderMean));
     double centerMean = centerN == 0 ? 0 : centerSum / centerN;
     double sharp = lapN == 0 ? 0 : lapSq / lapN - Math.pow(lap / lapN, 2);
     boolean lightOk = mean > 0.22 && mean < 0.93;
@@ -294,9 +331,13 @@ public class StudioCameraFragment extends BaseFragment {
   private void setCheck(TextView chip, boolean ok, String text) {
     chip.setText(text);
     chip.setBackgroundResource(ok ? R.drawable.bg_quality_ok : R.drawable.bg_quality_warn);
-    chip.setCompoundDrawablesRelativeWithIntrinsicBounds(ok ? R.drawable.badge_check_small : R.drawable.badge_warning, 0, 0, 0);
-    TextViewCompat.setCompoundDrawableTintList(chip, ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
-        ok ? R.color.camera_ok : R.color.camera_warn)));
+    chip.setCompoundDrawablesRelativeWithIntrinsicBounds(
+        ok ? R.drawable.badge_check_small : R.drawable.badge_warning, 0, 0, 0);
+    TextViewCompat.setCompoundDrawableTintList(
+        chip,
+        ColorStateList.valueOf(
+            ContextCompat.getColor(
+                requireContext(), ok ? R.color.camera_ok : R.color.camera_warn)));
     chip.setContentDescription((ok ? "В порядке: " : "Внимание: ") + text);
   }
 
@@ -314,7 +355,9 @@ public class StudioCameraFragment extends BaseFragment {
     flash.setAlpha(1f);
     flash.animate().alpha(0f).setDuration(300).start();
     File file = newFile();
-    capture.takePicture(new ImageCapture.OutputFileOptions.Builder(file).build(), ContextCompat.getMainExecutor(requireContext()),
+    capture.takePicture(
+        new ImageCapture.OutputFileOptions.Builder(file).build(),
+        ContextCompat.getMainExecutor(requireContext()),
         new ImageCapture.OnImageSavedCallback() {
           @Override
           public void onImageSaved(@NonNull ImageCapture.OutputFileResults results) {
@@ -341,7 +384,10 @@ public class StudioCameraFragment extends BaseFragment {
   }
 
   private void pickFromGallery() {
-    picker.launch(new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build());
+    picker.launch(
+        new PickVisualMediaRequest.Builder()
+            .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+            .build());
   }
 
   /** Gallery photos are downscaled to 2400 px before upload. */
@@ -358,7 +404,9 @@ public class StudioCameraFragment extends BaseFragment {
         return;
       }
       float k = Math.min(1f, 2400f / Math.max(bitmap.getWidth(), bitmap.getHeight()));
-      Bitmap scaled = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * k), Math.round(bitmap.getHeight() * k), true);
+      Bitmap scaled =
+          Bitmap.createScaledBitmap(
+              bitmap, Math.round(bitmap.getWidth() * k), Math.round(bitmap.getHeight() * k), true);
       File file = newFile();
       try (FileOutputStream out = new FileOutputStream(file)) {
         scaled.compress(Bitmap.CompressFormat.JPEG, 92, out);

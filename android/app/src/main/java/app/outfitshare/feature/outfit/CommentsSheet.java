@@ -75,7 +75,8 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
 
   @NonNull
   @Override
-  protected View onCreateSheetContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
+  protected View onCreateSheetContent(
+      @NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
     outfitId = requireArguments().getLong(ARG_OUTFIT);
     View v = inflater.inflate(R.layout.sheet_comments, container, false);
     stateView = v.findViewById(R.id.state);
@@ -90,18 +91,19 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
     send = v.findViewById(R.id.composer_send);
     replying = v.findViewById(R.id.replying);
     replying.setOnClickListener(x -> setReplyTo(null));
-    field.addTextChangedListener(new TextWatcher() {
-      @Override
-      public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+    field.addTextChangedListener(
+        new TextWatcher() {
+          @Override
+          public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void onTextChanged(CharSequence s, int a, int b, int c) {}
+          @Override
+          public void onTextChanged(CharSequence s, int a, int b, int c) {}
 
-      @Override
-      public void afterTextChanged(Editable s) {
-        send.setEnabled(s.toString().trim().length() > 0);
-      }
-    });
+          @Override
+          public void afterTextChanged(Editable s) {
+            send.setEnabled(s.toString().trim().length() > 0);
+          }
+        });
     send.setOnClickListener(x -> submit());
     stateView.setOnActionClickListener(x -> load());
     stateView.setState(ScreenState.loading());
@@ -124,28 +126,40 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       }
     }
     sb.append("  ").append(String.valueOf(count));
-    sb.setSpan(new ForegroundColorSpan(DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant)),
-        start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-    sb.setSpan(new android.text.style.RelativeSizeSpan(0.6f), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    sb.setSpan(
+        new ForegroundColorSpan(
+            DsTheme.color(
+                requireContext(),
+                app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant)),
+        start,
+        sb.length(),
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    sb.setSpan(
+        new android.text.style.RelativeSizeSpan(0.6f),
+        start,
+        sb.length(),
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     title.setText(sb);
     c().outfitBus.commented(outfitId, count);
   }
 
   private void load() {
-    Calls.run(c().api.api().comments(outfitId), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      if (!r.ok() || r.data == null) {
-        stateView.setState(States.failure(r.error, "Не загрузились"));
-        return;
-      }
-      comments.clear();
-      comments.addAll(threaded(r.data.results));
-      adapter.notifyDataSetChanged();
-      updateTitle();
-      showEmptyIfNeeded();
-    });
+    Calls.run(
+        c().api.api().comments(outfitId),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          if (!r.ok() || r.data == null) {
+            stateView.setState(States.failure(r.error, "Не загрузились"));
+            return;
+          }
+          comments.clear();
+          comments.addAll(threaded(r.data.results));
+          adapter.notifyDataSetChanged();
+          updateTitle();
+          showEmptyIfNeeded();
+        });
   }
 
   /** Replies right after their thread root, in time order. */
@@ -171,8 +185,12 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
 
   private void showEmptyIfNeeded() {
     if (comments.isEmpty()) {
-      stateView.setState(States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_comments,
-          "Пока тихо", "Напишите первым — автор увидит уведомление.", null));
+      stateView.setState(
+          States.empty(
+              app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_comments,
+              "Пока тихо",
+              "Напишите первым — автор увидит уведомление.",
+              null));
     } else {
       stateView.setState(ScreenState.content());
     }
@@ -199,12 +217,14 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
     local.text = text;
     local.author = c().session.currentMe();
     local.createdAt = null;
-    local.parentId = replyTo != null ? (replyTo.parentId != null ? replyTo.parentId : replyTo.id) : null;
+    local.parentId =
+        replyTo != null ? (replyTo.parentId != null ? replyTo.parentId : replyTo.id) : null;
     int insertAt = comments.size();
     if (local.parentId != null) {
       for (int i = 0; i < comments.size(); i++) {
         Dto.Comment cm = comments.get(i);
-        if (cm.id == local.parentId || (cm.parentId != null && cm.parentId.equals(local.parentId))) {
+        if (cm.id == local.parentId
+            || (cm.parentId != null && cm.parentId.equals(local.parentId))) {
           insertAt = i + 1;
         }
       }
@@ -224,19 +244,21 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       body.put("parent_id", local.parentId);
     }
     local.failed = false;
-    Calls.run(c().api.api().addComment(outfitId, body), r -> {
-      int index = comments.indexOf(local);
-      if (index < 0) {
-        return;
-      }
-      if (r.ok() && r.data != null) {
-        comments.set(index, r.data);
-      } else {
-        local.failed = true;
-      }
-      adapter.notifyItemChanged(index);
-      updateTitle();
-    });
+    Calls.run(
+        c().api.api().addComment(outfitId, body),
+        r -> {
+          int index = comments.indexOf(local);
+          if (index < 0) {
+            return;
+          }
+          if (r.ok() && r.data != null) {
+            comments.set(index, r.data);
+          } else {
+            local.failed = true;
+          }
+          adapter.notifyItemChanged(index);
+          updateTitle();
+        });
   }
 
   private void delete(Dto.Comment comment) {
@@ -256,7 +278,9 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
     adapter.notifyDataSetChanged();
     updateTitle();
     showEmptyIfNeeded();
-    DsSnackbar.undo(requireView(), "Комментарий удалён",
+    DsSnackbar.undo(
+        requireView(),
+        "Комментарий удалён",
         () -> {
           comments.addAll(Math.min(index, comments.size()), removed);
           adapter.notifyDataSetChanged();
@@ -271,50 +295,73 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
     comment.isLiked = target;
     comment.likesCount = Math.max(0, comment.likesCount + (target ? 1 : -1));
     adapter.notifyItemChanged(position);
-    Calls.run(target ? c().api.api().likeComment(comment.id) : c().api.api().unlikeComment(comment.id), r -> {
-      if (r.ok() && r.data != null) {
-        comment.likesCount = r.data.likesCount;
-      } else {
-        comment.isLiked = !target;
-        comment.likesCount = Math.max(0, comment.likesCount + (target ? -1 : 1));
-      }
-      int i = comments.indexOf(comment);
-      if (i >= 0) {
-        adapter.notifyItemChanged(i);
-      }
-    });
+    Calls.run(
+        target ? c().api.api().likeComment(comment.id) : c().api.api().unlikeComment(comment.id),
+        r -> {
+          if (r.ok() && r.data != null) {
+            comment.likesCount = r.data.likesCount;
+          } else {
+            comment.isLiked = !target;
+            comment.likesCount = Math.max(0, comment.likesCount + (target ? -1 : 1));
+          }
+          int i = comments.indexOf(comment);
+          if (i >= 0) {
+            adapter.notifyItemChanged(i);
+          }
+        });
   }
 
   private final class Adapter extends RecyclerView.Adapter<Adapter.Holder> {
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment, parent, false));
+      return new Holder(
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_comment, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull Holder h, int position) {
       Dto.Comment cm = comments.get(position);
       boolean reply = cm.parentId != null;
-      int gutter = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
-      h.itemView.setPaddingRelative(reply ? getResources().getDimensionPixelSize(R.dimen.reply_indent) : gutter,
-          h.itemView.getPaddingTop(), h.itemView.getPaddingEnd(), h.itemView.getPaddingBottom());
+      int gutter =
+          getResources()
+              .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+      h.itemView.setPaddingRelative(
+          reply ? getResources().getDimensionPixelSize(R.dimen.reply_indent) : gutter,
+          h.itemView.getPaddingTop(),
+          h.itemView.getPaddingEnd(),
+          h.itemView.getPaddingBottom());
       h.avatar.setAvatarSize(reply ? 0 : 1);
       Images.avatar(h.avatar, cm.author);
-      String handle = cm.author != null ? (cm.author.username != null && !cm.author.username.isEmpty() ? cm.author.username : cm.author.name) : "";
+      String handle =
+          cm.author != null
+              ? (cm.author.username != null && !cm.author.username.isEmpty()
+                  ? cm.author.username
+                  : cm.author.name)
+              : "";
       SpannableStringBuilder head = new SpannableStringBuilder(handle);
-      head.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, handle.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-      head.setSpan(new ForegroundColorSpan(DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurface)),
-          0, handle.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+      head.setSpan(
+          new StyleSpan(android.graphics.Typeface.BOLD),
+          0,
+          handle.length(),
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+      head.setSpan(
+          new ForegroundColorSpan(
+              DsTheme.color(
+                  requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurface)),
+          0,
+          handle.length(),
+          Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
       head.append("  ").append(cm.createdAt == null ? "сейчас" : Formats.ago(cm.createdAt));
       h.head.setText(head);
       h.badge.setVisibility(cm.isPostAuthor ? View.VISIBLE : View.GONE);
       h.text.setText(cm.text);
       h.failed.setVisibility(cm.failed ? View.VISIBLE : View.GONE);
-      h.failed.setOnClickListener(x -> {
-        post(cm);
-        notifyItemChanged(h.getBindingAdapterPosition());
-      });
+      h.failed.setOnClickListener(
+          x -> {
+            post(cm);
+            notifyItemChanged(h.getBindingAdapterPosition());
+          });
       boolean sent = cm.id > 0;
       h.reply.setVisibility(sent && !cm.failed ? View.VISIBLE : View.GONE);
       h.reply.setOnClickListener(x -> setReplyTo(cm));
@@ -324,13 +371,14 @@ public class CommentsSheet extends DsBottomSheetDialogFragment {
       h.like.setContentDescription(cm.isLiked ? "Убрать отметку «Нравится»" : "Нравится");
       h.like.setOnClickListener(x -> toggleLike(cm, h.getBindingAdapterPosition()));
       h.avatar.setOnClickListener(x -> openAuthor(cm));
-      h.itemView.setOnLongClickListener(x -> {
-        if (cm.canDelete && sent) {
-          delete(cm);
-          return true;
-        }
-        return false;
-      });
+      h.itemView.setOnLongClickListener(
+          x -> {
+            if (cm.canDelete && sent) {
+              delete(cm);
+              return true;
+            }
+            return false;
+          });
     }
 
     @Override

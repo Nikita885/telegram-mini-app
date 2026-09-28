@@ -40,6 +40,7 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
 
   @SuppressWarnings("unchecked")
   private final Paging<Dto.Outfit>[] pagings = new Paging[2];
+
   private final Handler handler = new Handler(Looper.getMainLooper());
   private OutfitAdapter adapter;
   private StateView stateView;
@@ -67,45 +68,62 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
     View bell = view.findViewById(R.id.notifications);
     View dot = view.findViewById(R.id.notifications_dot);
     bell.setOnClickListener(v -> nav().push(new NotificationsFragment()));
-    container().counters.counters().observe(getViewLifecycleOwner(), c -> {
-      dot.setVisibility(c.notifications > 0 ? View.VISIBLE : View.GONE);
-      bell.setContentDescription(c.notifications > 0 ? "Уведомления, есть новые" : "Уведомления");
-    });
+    container()
+        .counters
+        .counters()
+        .observe(
+            getViewLifecycleOwner(),
+            c -> {
+              dot.setVisibility(c.notifications > 0 ? View.VISIBLE : View.GONE);
+              bell.setContentDescription(
+                  c.notifications > 0 ? "Уведомления, есть новые" : "Уведомления");
+            });
 
-    adapter = new OutfitAdapter(false, new OutfitAdapter.Listener() {
-      @Override
-      public void onOpen(Dto.Outfit outfit, View photo) {
-        SharedElements.holdSource(FeedFragment.this);
-        nav().push(OutfitFragment.newInstance(outfit.id), photo, SharedElements.outfitPhoto(outfit.id));
-      }
+    adapter =
+        new OutfitAdapter(
+            false,
+            new OutfitAdapter.Listener() {
+              @Override
+              public void onOpen(Dto.Outfit outfit, View photo) {
+                SharedElements.holdSource(FeedFragment.this);
+                nav()
+                    .push(
+                        OutfitFragment.newInstance(outfit.id),
+                        photo,
+                        SharedElements.outfitPhoto(outfit.id));
+              }
 
-      @Override
-      public void onAuthor(Dto.User author) {
-        nav().push(UserFragment.newInstance(author.id));
-      }
+              @Override
+              public void onAuthor(Dto.User author) {
+                nav().push(UserFragment.newInstance(author.id));
+              }
 
-      @Override
-      public void onComments(Dto.Outfit outfit) {
-        CommentsSheet.show(getChildFragmentManager(), outfit.id, outfit.author.id);
-      }
+              @Override
+              public void onComments(Dto.Outfit outfit) {
+                CommentsSheet.show(getChildFragmentManager(), outfit.id, outfit.author.id);
+              }
 
-      @Override
-      public void onTag(String tag) {
-        nav().push(SearchFragment.forQuery("#" + tag));
-      }
-    });
+              @Override
+              public void onTag(String tag) {
+                nav().push(SearchFragment.forQuery("#" + tag));
+              }
+            });
     LinearLayoutManager lm = new LinearLayoutManager(requireContext());
     list.setLayoutManager(lm);
     list.setAdapter(adapter);
-    list.addItemDecoration(Spacing.vertical(getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_8)));
-    list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-        if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 3) {
-          pagings[tab].loadMore();
-        }
-      }
-    });
+    list.addItemDecoration(
+        Spacing.vertical(
+            getResources()
+                .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_8)));
+    list.addOnScrollListener(
+        new RecyclerView.OnScrollListener() {
+          @Override
+          public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+            if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 3) {
+              pagings[tab].loadMore();
+            }
+          }
+        });
 
     pagings[TAB_FOLLOWING] = paging("following");
     pagings[TAB_FOR_YOU] = paging("for_you");
@@ -113,46 +131,54 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
     TabLayout tabs = view.findViewById(R.id.tabs);
     tabs.addTab(tabs.newTab().setText(R.string.tab_following));
     tabs.addTab(tabs.newTab().setText(R.string.tab_for_you));
-    tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab t) {
-        switchTab(t.getPosition());
-      }
+    tabs.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab t) {
+            switchTab(t.getPosition());
+          }
 
-      @Override
-      public void onTabUnselected(TabLayout.Tab t) {}
+          @Override
+          public void onTabUnselected(TabLayout.Tab t) {}
 
-      @Override
-      public void onTabReselected(TabLayout.Tab t) {
-        onReselected();
-      }
-    });
+          @Override
+          public void onTabReselected(TabLayout.Tab t) {
+            onReselected();
+          }
+        });
 
     refresh.setOnRefreshListener(() -> pagings[tab].refresh());
-    stateView.setOnActionClickListener(v -> {
-      if (tab == TAB_FOLLOWING && stateView.getState().getKind() == ScreenState.Kind.EMPTY) {
-        tabs.selectTab(tabs.getTabAt(TAB_FOR_YOU));
-      } else {
-        stateView.setState(ScreenState.loading());
-        pagings[tab].refresh();
-      }
-    });
+    stateView.setOnActionClickListener(
+        v -> {
+          if (tab == TAB_FOLLOWING && stateView.getState().getKind() == ScreenState.Kind.EMPTY) {
+            tabs.selectTab(tabs.getTabAt(TAB_FOR_YOU));
+          } else {
+            stateView.setState(ScreenState.loading());
+            pagings[tab].refresh();
+          }
+        });
     stateView.setOnSecondaryActionClickListener(v -> nav().push(SearchFragment.forQuery("@")));
     offline.setOnRetryClickListener(v -> pagings[tab].refresh());
-    newPosts.setOnClickListener(v -> {
-      newPosts.setVisibility(View.GONE);
-      list.scrollToPosition(0);
-      pagings[tab].refresh();
-    });
+    newPosts.setOnClickListener(
+        v -> {
+          newPosts.setVisibility(View.GONE);
+          list.scrollToPosition(0);
+          pagings[tab].refresh();
+        });
 
-    container().outfitBus.changes().observe(getViewLifecycleOwner(), c -> {
-      if (c.liked != null) {
-        adapter.applyLike(c.outfitId, c.liked, c.likesCount);
-      }
-      if (c.deleted || c.created) {
-        pagings[tab].refresh();
-      }
-    });
+    container()
+        .outfitBus
+        .changes()
+        .observe(
+            getViewLifecycleOwner(),
+            c -> {
+              if (c.liked != null) {
+                adapter.applyLike(c.outfitId, c.liked, c.likesCount);
+              }
+              if (c.deleted || c.created) {
+                pagings[tab].refresh();
+              }
+            });
 
     switchTab(TAB_FOLLOWING);
     handler.postDelayed(this::checkNewPosts, NEW_POSTS_CHECK_MS);
@@ -160,11 +186,15 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
 
   private Paging<Dto.Outfit> paging(String kind) {
     return new Paging<>(
-        cursor -> "for_you".equals(kind) ? api().feed(kind, cursor, null) : api().feed(kind, null, cursor),
+        cursor ->
+            "for_you".equals(kind)
+                ? api().feed(kind, cursor, null)
+                : api().feed(kind, null, cursor),
         new Paging.Listener<Dto.Outfit>() {
           @Override
           public void onPage(List<Dto.Outfit> all, boolean reset, boolean fromCache) {
-            if (pagings[tab] == null || !kind.equals(tab == TAB_FOR_YOU ? "for_you" : "following")) {
+            if (pagings[tab] == null
+                || !kind.equals(tab == TAB_FOR_YOU ? "for_you" : "following")) {
               return;
             }
             render(all, fromCache);
@@ -201,18 +231,20 @@ public class FeedFragment extends BaseFragment implements ShellFragment.Reselect
     adapter.submit(items);
     if (items.isEmpty()) {
       if (tab == TAB_FOLLOWING) {
-        stateView.setState(States.empty(
-            app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
-            "Здесь будут образы тех, на кого вы подпишетесь",
-            "Загляните в рекомендации или найдите друзей из Telegram.",
-            "Смотреть «Для вас»",
-            "Найти людей"));
+        stateView.setState(
+            States.empty(
+                app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
+                "Здесь будут образы тех, на кого вы подпишетесь",
+                "Загляните в рекомендации или найдите друзей из Telegram.",
+                "Смотреть «Для вас»",
+                "Найти людей"));
       } else {
-        stateView.setState(States.empty(
-            app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
-            "Пока нет образов",
-            "Соберите первый — он появится у всех в ленте.",
-            null));
+        stateView.setState(
+            States.empty(
+                app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_feed,
+                "Пока нет образов",
+                "Соберите первый — он появится у всех в ленте.",
+                null));
       }
     } else {
       stateView.setState(ScreenState.content());

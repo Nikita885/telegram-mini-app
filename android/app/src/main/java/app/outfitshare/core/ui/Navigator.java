@@ -9,8 +9,8 @@ import androidx.fragment.app.FragmentTransaction;
 import app.outfitshare.R;
 
 /**
- * Screen stack on top of the root screen (onboarding/login or the tabbed shell).
- * Pushed screens hide the one below instead of replacing it, so lists keep scroll and state.
+ * Screen stack on top of the root screen (onboarding/login or the tabbed shell). Pushed screens
+ * hide the one below instead of replacing it, so lists keep scroll and state.
  */
 public final class Navigator {
   private final FragmentManager fm;
@@ -57,7 +57,10 @@ public final class Navigator {
         fm.beginTransaction()
             .setReorderingAllowed(true)
             .setCustomAnimations(
-                R.anim.modal_enter, R.anim.screen_fade_out, R.anim.screen_fade_in, R.anim.modal_exit);
+                R.anim.modal_enter,
+                R.anim.screen_fade_out,
+                R.anim.screen_fade_in,
+                R.anim.modal_exit);
     Fragment top = fm.findFragmentById(container);
     if (top != null) {
       tx.hide(top);
@@ -73,7 +76,9 @@ public final class Navigator {
     return false;
   }
 
-  /** Pop everything down to and including the screen pushed under `name` (its class simple name). */
+  /**
+   * Pop everything down to and including the screen pushed under `name` (its class simple name).
+   */
   public void popInclusive(String name) {
     fm.popBackStackImmediate(name, FragmentManager.POP_BACK_STACK_INCLUSIVE);
   }

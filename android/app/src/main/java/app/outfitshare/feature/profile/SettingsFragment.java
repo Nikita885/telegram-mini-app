@@ -56,22 +56,50 @@ public class SettingsFragment extends BaseFragment {
 
     ListRowView theme = view.findViewById(R.id.theme);
     theme.setValue(themeLabel(container().prefs.theme()));
-    theme.setOnClickListener(v -> {
-      ThemeMode current = container().prefs.theme();
-      ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-      rows.add(new ActionSheet.Row(ThemeMode.SYSTEM.key(), 0, getString(R.string.settings_theme_system), "Переключается вместе с телефоном", false, current == ThemeMode.SYSTEM));
-      rows.add(new ActionSheet.Row(ThemeMode.LIGHT.key(), 0, getString(R.string.settings_theme_light), "Молочный фон, графитовый текст", false, current == ThemeMode.LIGHT));
-      rows.add(new ActionSheet.Row(ThemeMode.DARK.key(), 0, getString(R.string.settings_theme_dark), "Графитовый фон — бережёт глаза вечером", false, current == ThemeMode.DARK));
-      ActionSheet.show(getChildFragmentManager(), THEME, getString(R.string.settings_theme), rows);
-    });
-    getChildFragmentManager().setFragmentResultListener(THEME, getViewLifecycleOwner(), (k, r) -> {
-      ThemeMode mode = ThemeMode.fromKey(r.getString(ActionSheet.RESULT_ID));
-      container().prefs.setTheme(mode);
-      theme.setValue(themeLabel(mode));
-      mode.apply();
-    });
+    theme.setOnClickListener(
+        v -> {
+          ThemeMode current = container().prefs.theme();
+          ArrayList<ActionSheet.Row> rows = new ArrayList<>();
+          rows.add(
+              new ActionSheet.Row(
+                  ThemeMode.SYSTEM.key(),
+                  0,
+                  getString(R.string.settings_theme_system),
+                  "Переключается вместе с телефоном",
+                  false,
+                  current == ThemeMode.SYSTEM));
+          rows.add(
+              new ActionSheet.Row(
+                  ThemeMode.LIGHT.key(),
+                  0,
+                  getString(R.string.settings_theme_light),
+                  "Молочный фон, графитовый текст",
+                  false,
+                  current == ThemeMode.LIGHT));
+          rows.add(
+              new ActionSheet.Row(
+                  ThemeMode.DARK.key(),
+                  0,
+                  getString(R.string.settings_theme_dark),
+                  "Графитовый фон — бережёт глаза вечером",
+                  false,
+                  current == ThemeMode.DARK));
+          ActionSheet.show(
+              getChildFragmentManager(), THEME, getString(R.string.settings_theme), rows);
+        });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            THEME,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              ThemeMode mode = ThemeMode.fromKey(r.getString(ActionSheet.RESULT_ID));
+              container().prefs.setTheme(mode);
+              theme.setValue(themeLabel(mode));
+              mode.apply();
+            });
 
-    SharedPreferences notif = requireContext().getSharedPreferences("notif_settings", Context.MODE_PRIVATE);
+    SharedPreferences notif =
+        requireContext().getSharedPreferences("notif_settings", Context.MODE_PRIVATE);
     bindToggle(view.findViewById(R.id.notif_likes), notif, "likes");
     bindToggle(view.findViewById(R.id.notif_follows), notif, "follows");
     bindToggle(view.findViewById(R.id.notif_messages), notif, "messages");
@@ -81,22 +109,28 @@ public class SettingsFragment extends BaseFragment {
     studio.setOnClickListener(v -> nav().push(new StudioQueueFragment()));
 
     ListRowView server = view.findViewById(R.id.server);
-    server.setValue(container().prefs.server().replace("https://", "").replace("http://", "").replace("/", ""));
+    server.setValue(
+        container().prefs.server().replace("https://", "").replace("http://", "").replace("/", ""));
 
-    view.findViewById(R.id.logout).setOnClickListener(v -> ConfirmDialog.with(requireContext())
-        .title(getString(R.string.settings_logout_title))
-        .message(getString(R.string.settings_logout_text))
-        .confirm(getString(R.string.settings_logout))
-        .cancel("Отмена")
-        .destructive()
-        .onConfirm(this::logout)
-        .show());
+    view.findViewById(R.id.logout)
+        .setOnClickListener(
+            v ->
+                ConfirmDialog.with(requireContext())
+                    .title(getString(R.string.settings_logout_title))
+                    .message(getString(R.string.settings_logout_text))
+                    .confirm(getString(R.string.settings_logout))
+                    .cancel("Отмена")
+                    .destructive()
+                    .onConfirm(this::logout)
+                    .show());
 
-    ((TextView) view.findViewById(R.id.version)).setText("Outfit Share " + BuildConfig.VERSION_NAME);
+    ((TextView) view.findViewById(R.id.version))
+        .setText("Outfit Share " + BuildConfig.VERSION_NAME);
   }
 
   private void bindToggle(ListRowView row, SharedPreferences prefs, String key) {
-    row.setToggle(prefs.getBoolean(key, true), (r, checked) -> prefs.edit().putBoolean(key, checked).apply());
+    row.setToggle(
+        prefs.getBoolean(key, true), (r, checked) -> prefs.edit().putBoolean(key, checked).apply());
   }
 
   private String themeLabel(ThemeMode mode) {

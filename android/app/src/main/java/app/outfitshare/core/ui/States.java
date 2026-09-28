@@ -2,7 +2,6 @@ package app.outfitshare.core.ui;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.component.state.ScreenState;
 import app.outfitshare.core.net.ApiError;
 
@@ -10,14 +9,29 @@ import app.outfitshare.core.net.ApiError;
 public final class States {
   private States() {}
 
-  public static ScreenState empty(@DrawableRes int art, String title, @Nullable String text, @Nullable String action) {
-    return ScreenState.builder(ScreenState.Kind.EMPTY).illustration(art).title(title).message(text).action(action).build();
+  public static ScreenState empty(
+      @DrawableRes int art, String title, @Nullable String text, @Nullable String action) {
+    return ScreenState.builder(ScreenState.Kind.EMPTY)
+        .illustration(art)
+        .title(title)
+        .message(text)
+        .action(action)
+        .build();
   }
 
   public static ScreenState empty(
-      @DrawableRes int art, String title, @Nullable String text, @Nullable String action, @Nullable String secondary) {
+      @DrawableRes int art,
+      String title,
+      @Nullable String text,
+      @Nullable String action,
+      @Nullable String secondary) {
     return ScreenState.builder(ScreenState.Kind.EMPTY)
-        .illustration(art).title(title).message(text).action(action).secondaryAction(secondary).build();
+        .illustration(art)
+        .title(title)
+        .message(text)
+        .action(action)
+        .secondaryAction(secondary)
+        .build();
   }
 
   /** Network failure: offline (no cache) or a server error with the screen's own title. */
@@ -47,6 +61,10 @@ public final class States {
 
   public static ScreenState locked(String title, String text, @Nullable String action) {
     return ScreenState.builder(ScreenState.Kind.NO_PERMISSION)
-        .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_locked).title(title).message(text).action(action).build();
+        .illustration(app.outfitshare.core.designsystem.R.drawable.ds_illustration_locked)
+        .title(title)
+        .message(text)
+        .action(action)
+        .build();
   }
 }

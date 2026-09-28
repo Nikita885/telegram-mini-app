@@ -47,17 +47,27 @@ public class UserFragment extends ProfileScreen {
       return;
     }
     super.onViewCreated(view, state);
-    getChildFragmentManager().setFragmentResultListener(MORE, getViewLifecycleOwner(), (k, r) -> {
-      if ("report".equals(r.getString(ActionSheet.RESULT_ID)) && profile != null) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("target_type", "user");
-        body.put("target_id", profile.id);
-        body.put("reason", "Жалоба из приложения");
-        Calls.run(api().report(body), x -> toast(x.ok() ? "Спасибо, модераторы посмотрят" : "Не удалось отправить жалобу"));
-      } else if ("share".equals(r.getString(ActionSheet.RESULT_ID)) && profile != null) {
-        shareProfile(profile);
-      }
-    });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            MORE,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              if ("report".equals(r.getString(ActionSheet.RESULT_ID)) && profile != null) {
+                Map<String, Object> body = new HashMap<>();
+                body.put("target_type", "user");
+                body.put("target_id", profile.id);
+                body.put("reason", "Жалоба из приложения");
+                Calls.run(
+                    api().report(body),
+                    x ->
+                        toast(
+                            x.ok()
+                                ? "Спасибо, модераторы посмотрят"
+                                : "Не удалось отправить жалобу"));
+              } else if ("share".equals(r.getString(ActionSheet.RESULT_ID)) && profile != null) {
+                shareProfile(profile);
+              }
+            });
   }
 
   @Override
@@ -65,16 +75,30 @@ public class UserFragment extends ProfileScreen {
     View back = root.findViewById(R.id.back);
     back.setVisibility(View.VISIBLE);
     back.setOnClickListener(v -> nav().back());
-    ((TextView) root.findViewById(R.id.handle_title)).setText(p.username == null || p.username.isEmpty() ? p.name : p.username);
+    ((TextView) root.findViewById(R.id.handle_title))
+        .setText(p.username == null || p.username.isEmpty() ? p.name : p.username);
     MaterialButton menu = root.findViewById(R.id.menu);
     menu.setIconResource(app.outfitshare.core.designsystem.R.drawable.ds_ic_more_vert);
     menu.setContentDescription(getString(R.string.action_more));
-    menu.setOnClickListener(v -> {
-      ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-      rows.add(new ActionSheet.Row("share", app.outfitshare.core.designsystem.R.drawable.ds_ic_share, "Поделиться профилем", null, false));
-      rows.add(new ActionSheet.Row("report", app.outfitshare.core.designsystem.R.drawable.ds_ic_flag, "Пожаловаться", null, true));
-      ActionSheet.show(getChildFragmentManager(), MORE, null, rows);
-    });
+    menu.setOnClickListener(
+        v -> {
+          ArrayList<ActionSheet.Row> rows = new ArrayList<>();
+          rows.add(
+              new ActionSheet.Row(
+                  "share",
+                  app.outfitshare.core.designsystem.R.drawable.ds_ic_share,
+                  "Поделиться профилем",
+                  null,
+                  false));
+          rows.add(
+              new ActionSheet.Row(
+                  "report",
+                  app.outfitshare.core.designsystem.R.drawable.ds_ic_flag,
+                  "Пожаловаться",
+                  null,
+                  true));
+          ActionSheet.show(getChildFragmentManager(), MORE, null, rows);
+        });
   }
 
   @Override
@@ -96,19 +120,24 @@ public class UserFragment extends ProfileScreen {
     boolean target = !p.isFollowing;
     p.isFollowing = target;
     ButtonStyles.follow(button, target);
-    Calls.run(target ? api().follow(p.id) : api().unfollow(p.id), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      if (r.ok() && r.data != null) {
-        p.followersCount = r.data.followersCount;
-        ((TextView) requireView().findViewById(R.id.count_followers).findViewById(R.id.counter_value))
-            .setText(app.outfitshare.core.ui.Formats.count(p.followersCount));
-      } else {
-        p.isFollowing = !target;
-        ButtonStyles.follow(button, !target);
-        showError(r.error, null);
-      }
-    });
+    Calls.run(
+        target ? api().follow(p.id) : api().unfollow(p.id),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          if (r.ok() && r.data != null) {
+            p.followersCount = r.data.followersCount;
+            ((TextView)
+                    requireView()
+                        .findViewById(R.id.count_followers)
+                        .findViewById(R.id.counter_value))
+                .setText(app.outfitshare.core.ui.Formats.count(p.followersCount));
+          } else {
+            p.isFollowing = !target;
+            ButtonStyles.follow(button, !target);
+            showError(r.error, null);
+          }
+        });
   }
 }

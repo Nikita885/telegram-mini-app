@@ -66,7 +66,10 @@ public interface Api {
 
   @GET("api/v1/users/{id}/{kind}/")
   Call<Dto.Page<Dto.User>> connections(
-      @Path("id") long id, @Path("kind") String kind, @Query("q") String q, @Query("before") String before);
+      @Path("id") long id,
+      @Path("kind") String kind,
+      @Query("q") String q,
+      @Query("before") String before);
 
   @POST("api/v1/users/{id}/follow/")
   Call<Dto.FollowResult> follow(@Path("id") long id);

@@ -58,36 +58,42 @@ public class CollectionFragment extends BaseFragment {
     RecyclerView list = view.findViewById(R.id.list);
     GridLayoutManager lm = new GridLayoutManager(requireContext(), 2);
     header = new HeaderAdapter();
-    adapter = new OutfitAdapter(true, new OutfitAdapter.Listener() {
-      @Override
-      public void onOpen(Dto.Outfit outfit, View photo) {
-        nav().push(OutfitFragment.newInstance(outfit.id));
-      }
+    adapter =
+        new OutfitAdapter(
+            true,
+            new OutfitAdapter.Listener() {
+              @Override
+              public void onOpen(Dto.Outfit outfit, View photo) {
+                nav().push(OutfitFragment.newInstance(outfit.id));
+              }
 
-      @Override
-      public void onAuthor(Dto.User author) {
-        nav().push(UserFragment.newInstance(author.id));
-      }
+              @Override
+              public void onAuthor(Dto.User author) {
+                nav().push(UserFragment.newInstance(author.id));
+              }
 
-      @Override
-      public void onComments(Dto.Outfit outfit) {
-        CommentsSheet.show(getChildFragmentManager(), outfit.id, outfit.author.id);
-      }
+              @Override
+              public void onComments(Dto.Outfit outfit) {
+                CommentsSheet.show(getChildFragmentManager(), outfit.id, outfit.author.id);
+              }
 
-      @Override
-      public void onTag(String tag) {
-        nav().push(SearchFragment.forQuery("#" + tag));
-      }
-    });
-    lm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-      @Override
-      public int getSpanSize(int position) {
-        return position == 0 ? 2 : 1;
-      }
-    });
+              @Override
+              public void onTag(String tag) {
+                nav().push(SearchFragment.forQuery("#" + tag));
+              }
+            });
+    lm.setSpanSizeLookup(
+        new GridLayoutManager.SpanSizeLookup() {
+          @Override
+          public int getSpanSize(int position) {
+            return position == 0 ? 2 : 1;
+          }
+        });
     list.setLayoutManager(lm);
     list.setAdapter(new ConcatAdapter(header, adapter));
-    int gap = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_grid_gap);
+    int gap =
+        getResources()
+            .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_grid_gap);
     list.addItemDecoration(Spacing.grid(gap, gap));
     stateView.setState(ScreenState.loading());
     load();
@@ -95,43 +101,58 @@ public class CollectionFragment extends BaseFragment {
 
   private void load() {
     long id = requireArguments().getLong(ARG_ID);
-    Calls.run(api().collection(id, null), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      if (!r.ok() || r.data == null) {
-        stateView.setState(States.failure(r.error, "Коллекция не загрузилась"));
-        return;
-      }
-      Dto.Collection c = r.data.collection;
-      header.bind(c);
-      adapter.submit(r.data.results);
-      stateView.setState(r.data.results.isEmpty()
-          ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_collections,
-              "Сохраняйте образы", "Нажмите на закладку под образом — он попадёт сюда.", null)
-          : ScreenState.content());
-      MaterialToolbar toolbar = requireView().findViewById(R.id.toolbar);
-      toolbar.getMenu().clear();
-      if (!c.isDefault) {
-        toolbar.getMenu().add("Удалить коллекцию").setOnMenuItemClickListener(item -> {
-          ConfirmDialog.with(requireContext())
-              .title("Удалить коллекцию?")
-              .message("Образы останутся у авторов, пропадёт только подборка.")
-              .confirm("Удалить")
-              .cancel("Отмена")
-              .destructive()
-              .onConfirm(() -> Calls.run(api().deleteCollection(id), x -> {
-                if (x.ok()) {
-                  nav().back();
-                } else {
-                  showError(x.error, null);
-                }
-              }))
-              .show();
-          return true;
+    Calls.run(
+        api().collection(id, null),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          if (!r.ok() || r.data == null) {
+            stateView.setState(States.failure(r.error, "Коллекция не загрузилась"));
+            return;
+          }
+          Dto.Collection c = r.data.collection;
+          header.bind(c);
+          adapter.submit(r.data.results);
+          stateView.setState(
+              r.data.results.isEmpty()
+                  ? States.empty(
+                      app.outfitshare.core.designsystem.R.drawable
+                          .ds_illustration_empty_collections,
+                      "Сохраняйте образы",
+                      "Нажмите на закладку под образом — он попадёт сюда.",
+                      null)
+                  : ScreenState.content());
+          MaterialToolbar toolbar = requireView().findViewById(R.id.toolbar);
+          toolbar.getMenu().clear();
+          if (!c.isDefault) {
+            toolbar
+                .getMenu()
+                .add("Удалить коллекцию")
+                .setOnMenuItemClickListener(
+                    item -> {
+                      ConfirmDialog.with(requireContext())
+                          .title("Удалить коллекцию?")
+                          .message("Образы останутся у авторов, пропадёт только подборка.")
+                          .confirm("Удалить")
+                          .cancel("Отмена")
+                          .destructive()
+                          .onConfirm(
+                              () ->
+                                  Calls.run(
+                                      api().deleteCollection(id),
+                                      x -> {
+                                        if (x.ok()) {
+                                          nav().back();
+                                        } else {
+                                          showError(x.error, null);
+                                        }
+                                      }))
+                          .show();
+                      return true;
+                    });
+          }
         });
-      }
-    });
   }
 
   private final class HeaderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -145,7 +166,9 @@ public class CollectionFragment extends BaseFragment {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_large_title, parent, false);
+      View v =
+          LayoutInflater.from(parent.getContext())
+              .inflate(R.layout.view_large_title, parent, false);
       return new RecyclerView.ViewHolder(v) {};
     }
 
@@ -155,8 +178,11 @@ public class CollectionFragment extends BaseFragment {
         return;
       }
       int n = collection.count;
-      ((TextView) h.itemView.findViewById(R.id.kicker)).setText(
-          "Коллекция · " + getResources().getQuantityString(R.plurals.outfits_count, n, n) + (collection.isPrivate ? " · приватная" : ""));
+      ((TextView) h.itemView.findViewById(R.id.kicker))
+          .setText(
+              "Коллекция · "
+                  + getResources().getQuantityString(R.plurals.outfits_count, n, n)
+                  + (collection.isPrivate ? " · приватная" : ""));
       ((TextView) h.itemView.findViewById(R.id.title)).setText(collection.title);
     }
 

@@ -43,7 +43,10 @@ final class LayerBounds {
         }
       }
     }
-    RectF r = maxX < 0 ? new RectF(0, 0, w, h) : new RectF(minX, minY, Math.min(w, maxX + step), Math.min(h, maxY + step));
+    RectF r =
+        maxX < 0
+            ? new RectF(0, 0, w, h)
+            : new RectF(minX, minY, Math.min(w, maxX + step), Math.min(h, maxY + step));
     CACHE.put(b, r);
     return r;
   }

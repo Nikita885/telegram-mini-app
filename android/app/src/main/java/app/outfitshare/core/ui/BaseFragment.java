@@ -9,9 +9,9 @@ import androidx.fragment.app.Fragment;
 import app.outfitshare.App;
 import app.outfitshare.MainActivity;
 import app.outfitshare.core.AppContainer;
+import app.outfitshare.core.designsystem.component.snackbar.DsSnackbar;
 import app.outfitshare.core.net.Api;
 import app.outfitshare.core.net.ApiError;
-import app.outfitshare.core.designsystem.component.snackbar.DsSnackbar;
 
 /** Shared plumbing for every screen. */
 public abstract class BaseFragment extends Fragment {
@@ -39,7 +39,8 @@ public abstract class BaseFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    // Pushed screens are stacked with add(): block touches from falling through to the screen below.
+    // Pushed screens are stacked with add(): block touches from falling through to the screen
+    // below.
     view.setClickable(true);
   }
 

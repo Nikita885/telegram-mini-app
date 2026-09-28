@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 /**
- * Broadcasts outfit changes (like, save, delete, new) so every open list stays consistent
- * without refetching: the feed updates when the same outfit is liked on its detail screen.
+ * Broadcasts outfit changes (like, save, delete, new) so every open list stays consistent without
+ * refetching: the feed updates when the same outfit is liked on its detail screen.
  */
 public final class OutfitBus {
   public static final class Change {
@@ -17,8 +17,14 @@ public final class OutfitBus {
     public final boolean deleted;
     public final boolean created;
 
-    private Change(long outfitId, Boolean liked, Integer likesCount, Boolean saved, Integer commentsCount,
-        boolean deleted, boolean created) {
+    private Change(
+        long outfitId,
+        Boolean liked,
+        Integer likesCount,
+        Boolean saved,
+        Integer commentsCount,
+        boolean deleted,
+        boolean created) {
       this.outfitId = outfitId;
       this.liked = liked;
       this.likesCount = likesCount;

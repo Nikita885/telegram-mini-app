@@ -35,9 +35,11 @@ public class ItemSheet extends DsBottomSheetDialogFragment {
 
   @NonNull
   @Override
-  protected View onCreateSheetContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
+  protected View onCreateSheetContent(
+      @NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
     View v = inflater.inflate(R.layout.sheet_item, container, false);
-    Dto.Item item = App.get().container().gson.fromJson(requireArguments().getString(ARG_ITEM), Dto.Item.class);
+    Dto.Item item =
+        App.get().container().gson.fromJson(requireArguments().getString(ARG_ITEM), Dto.Item.class);
     Images.cutout((ImageView) v.findViewById(R.id.image), item.imageUrl);
     ((TextView) v.findViewById(R.id.name)).setText(item.name);
     StringBuilder meta = new StringBuilder(item.categoryName == null ? "" : item.categoryName);
@@ -59,19 +61,24 @@ public class ItemSheet extends DsBottomSheetDialogFragment {
     }
     View buy = v.findViewById(R.id.buy);
     buy.setVisibility(TextUtils.isEmpty(item.buyLink) ? View.GONE : View.VISIBLE);
-    buy.setOnClickListener(x -> {
-      try {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(item.buyLink)));
-      } catch (ActivityNotFoundException ignored) {
-        // No browser installed.
-      }
-    });
-    v.findViewById(R.id.try_on).setOnClickListener(x -> {
-      dismiss();
-      if (getActivity() instanceof MainActivity) {
-        ((MainActivity) getActivity()).navigator().present(ConstructorFragment.withItem(item));
-      }
-    });
+    buy.setOnClickListener(
+        x -> {
+          try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(item.buyLink)));
+          } catch (ActivityNotFoundException ignored) {
+            // No browser installed.
+          }
+        });
+    v.findViewById(R.id.try_on)
+        .setOnClickListener(
+            x -> {
+              dismiss();
+              if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity())
+                    .navigator()
+                    .present(ConstructorFragment.withItem(item));
+              }
+            });
     return v;
   }
 }

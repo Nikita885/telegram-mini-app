@@ -10,7 +10,6 @@ import android.text.style.StyleSpan;
 import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.theme.DsTheme;
 import java.util.List;
 import java.util.function.Consumer;
@@ -24,7 +23,10 @@ public final class Text {
   private Text() {}
 
   public static CharSequence caption(
-      Context context, @Nullable String text, @Nullable List<String> extraTags, @Nullable Consumer<String> onTag) {
+      Context context,
+      @Nullable String text,
+      @Nullable List<String> extraTags,
+      @Nullable Consumer<String> onTag) {
     SpannableStringBuilder sb = new SpannableStringBuilder(text == null ? "" : text);
     if (extraTags != null) {
       for (String tag : extraTags) {
@@ -59,7 +61,8 @@ public final class Text {
             m.end(),
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
       } else {
-        sb.setSpan(new ForegroundColorSpan(accent), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(
+            new ForegroundColorSpan(accent), m.start(), m.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
       }
     }
     return sb;
@@ -68,7 +71,11 @@ public final class Text {
   /** "<b>name</b> rest" with the name in semibold (notifications). */
   public static CharSequence boldLead(String lead, String rest) {
     SpannableStringBuilder sb = new SpannableStringBuilder(lead);
-    sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, lead.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+    sb.setSpan(
+        new StyleSpan(android.graphics.Typeface.BOLD),
+        0,
+        lead.length(),
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     sb.append(rest);
     return sb;
   }

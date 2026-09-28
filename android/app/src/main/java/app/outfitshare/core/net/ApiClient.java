@@ -26,7 +26,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Retrofit/OkHttp setup: bearer token, transparent refresh on 401, and an HTTP cache that serves
- * the last response for GET requests while offline (screens show "офлайн — показываем сохранённое").
+ * the last response for GET requests while offline (screens show "офлайн — показываем
+ * сохранённое").
  */
 public final class ApiClient {
   public static final String FROM_CACHE_HEADER = "X-From-Cache";
@@ -96,7 +97,10 @@ public final class ApiClient {
   private Response authorize(Interceptor.Chain chain) throws IOException {
     Request request = chain.request();
     String token = session.access();
-    Request.Builder builder = request.newBuilder().header("User-Agent", "OutfitShare-Android/" + BuildConfig.VERSION_NAME);
+    Request.Builder builder =
+        request
+            .newBuilder()
+            .header("User-Agent", "OutfitShare-Android/" + BuildConfig.VERSION_NAME);
     if (token != null && !isPublicAuthPath(request.url().encodedPath())) {
       builder.header("Authorization", "Bearer " + token);
     }
@@ -105,7 +109,9 @@ public final class ApiClient {
 
   /** Endpoints that must not carry a (possibly expired) access token. */
   private static boolean isPublicAuthPath(String path) {
-    return path.contains("/auth/refresh/") || path.contains("/auth/telegram/") || path.contains("/auth/dev/")
+    return path.contains("/auth/refresh/")
+        || path.contains("/auth/telegram/")
+        || path.contains("/auth/dev/")
         || path.contains("/auth/logout/");
   }
 
@@ -117,8 +123,10 @@ public final class ApiClient {
     }
     if (!isOnline()) {
       Request cached =
-          request.newBuilder()
-              .cacheControl(new CacheControl.Builder().onlyIfCached().maxStale(30, TimeUnit.DAYS).build())
+          request
+              .newBuilder()
+              .cacheControl(
+                  new CacheControl.Builder().onlyIfCached().maxStale(30, TimeUnit.DAYS).build())
               .build();
       Response response = chain.proceed(cached);
       if (response.code() == 504) {
@@ -137,9 +145,14 @@ public final class ApiClient {
    */
   private static Response storeGetResponses(Interceptor.Chain chain) throws IOException {
     Response response = chain.proceed(chain.request());
-    if ("GET".equals(chain.request().method()) && response.isSuccessful()
+    if ("GET".equals(chain.request().method())
+        && response.isSuccessful()
         && chain.request().url().encodedPath().startsWith("/api/")) {
-      return response.newBuilder().removeHeader("Pragma").header("Cache-Control", "public, max-age=0").build();
+      return response
+          .newBuilder()
+          .removeHeader("Pragma")
+          .header("Cache-Control", "public, max-age=0")
+          .build();
     }
     return response;
   }
@@ -156,7 +169,11 @@ public final class ApiClient {
         String sent = response.request().header("Authorization");
         // Another request already refreshed the token: retry with the new one.
         if (current != null && sent != null && !sent.equals("Bearer " + current)) {
-          return response.request().newBuilder().header("Authorization", "Bearer " + current).build();
+          return response
+              .request()
+              .newBuilder()
+              .header("Authorization", "Bearer " + current)
+              .build();
         }
         String refresh = session.refresh();
         if (refresh == null) {
@@ -167,7 +184,11 @@ public final class ApiClient {
         retrofit2.Response<Dto.Tokens> result = api.refresh(body).execute();
         if (result.isSuccessful() && result.body() != null) {
           session.setTokens(result.body().access, result.body().refresh);
-          return response.request().newBuilder().header("Authorization", "Bearer " + result.body().access).build();
+          return response
+              .request()
+              .newBuilder()
+              .header("Authorization", "Bearer " + result.body().access)
+              .build();
         }
         if (result.code() == 401 || result.code() == 403) {
           session.clear();

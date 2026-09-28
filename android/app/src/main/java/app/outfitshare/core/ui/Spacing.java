@@ -25,7 +25,11 @@ public final class Spacing extends RecyclerView.ItemDecoration {
   }
 
   @Override
-  public void getItemOffsets(@NonNull Rect out, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+  public void getItemOffsets(
+      @NonNull Rect out,
+      @NonNull View view,
+      @NonNull RecyclerView parent,
+      @NonNull RecyclerView.State state) {
     int pos = parent.getChildAdapterPosition(view);
     if (pos == RecyclerView.NO_POSITION) {
       return;

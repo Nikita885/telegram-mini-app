@@ -33,13 +33,18 @@ public class MainActivity extends AppCompatActivity {
       showStart();
       handleDeepLink(getIntent());
     }
-    container.session.signedOut().observe(
-        this,
-        out -> {
-          if (Boolean.TRUE.equals(out) && getSupportFragmentManager().findFragmentByTag("root") instanceof ShellFragment) {
-            navigator.setRoot(new LoginFragment());
-          }
-        });
+    container
+        .session
+        .signedOut()
+        .observe(
+            this,
+            out -> {
+              if (Boolean.TRUE.equals(out)
+                  && getSupportFragmentManager().findFragmentByTag("root")
+                      instanceof ShellFragment) {
+                navigator.setRoot(new LoginFragment());
+              }
+            });
   }
 
   public Navigator navigator() {

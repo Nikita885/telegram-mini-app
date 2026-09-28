@@ -13,10 +13,13 @@ public final class Layer {
   public float rotation;
   public int z;
   public boolean flipped;
+
   /** Drawn from the fitted (canvas-sized) image instead of the free cutout. */
   public boolean fitted;
+
   public boolean hidden;
   @Nullable public transient Bitmap bitmap;
+
   /** 0 → 1 while the "drop onto the mannequin" animation runs. */
   public transient float drop = 1f;
 

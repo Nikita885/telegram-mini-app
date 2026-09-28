@@ -30,7 +30,8 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
 
   @Override
   protected void bindAppBar(View root, Dto.Profile p) {
-    ((TextView) root.findViewById(R.id.handle_title)).setText(p.username == null || p.username.isEmpty() ? p.name : p.username);
+    ((TextView) root.findViewById(R.id.handle_title))
+        .setText(p.username == null || p.username.isEmpty() ? p.name : p.username);
     View add = root.findViewById(R.id.add);
     add.setVisibility(View.VISIBLE);
     add.setOnClickListener(v -> nav().present(new ConstructorFragment()));
@@ -50,33 +51,51 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
 
   @Override
   protected ScreenState emptyOutfitsState() {
-    return States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-        "Соберите первый образ", "Вещи из каталога сами сядут на манекен.", "Открыть конструктор");
+    return States.empty(
+        app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
+        "Соберите первый образ",
+        "Вещи из каталога сами сядут на манекен.",
+        "Открыть конструктор");
   }
 
   @Override
-  public void onViewCreated(@androidx.annotation.NonNull View view, @androidx.annotation.Nullable android.os.Bundle state) {
+  public void onViewCreated(
+      @androidx.annotation.NonNull View view,
+      @androidx.annotation.Nullable android.os.Bundle state) {
     super.onViewCreated(view, state);
-    tabState.setOnActionClickListener(v -> {
-      if (tab == TAB_OUTFITS) {
-        nav().present(new ConstructorFragment());
-      } else {
-        showTab(tab);
-      }
-    });
-    container().session.me().observe(getViewLifecycleOwner(), me -> {
-      if (me != null && profile != null && me.id == profile.id && (me.name != null && !me.name.equals(profile.name)
-          || me.bio != null && !me.bio.equals(profile.bio) || me.avatarUrl != null && !me.avatarUrl.equals(profile.avatarUrl))) {
-        reload();
-      }
-    });
+    tabState.setOnActionClickListener(
+        v -> {
+          if (tab == TAB_OUTFITS) {
+            nav().present(new ConstructorFragment());
+          } else {
+            showTab(tab);
+          }
+        });
+    container()
+        .session
+        .me()
+        .observe(
+            getViewLifecycleOwner(),
+            me -> {
+              if (me != null
+                  && profile != null
+                  && me.id == profile.id
+                  && (me.name != null && !me.name.equals(profile.name)
+                      || me.bio != null && !me.bio.equals(profile.bio)
+                      || me.avatarUrl != null && !me.avatarUrl.equals(profile.avatarUrl))) {
+                reload();
+              }
+            });
   }
 
   /** Local draft kept by the constructor (not yet published). */
   @Override
   protected void showDrafts() {
     grid.setAdapter(null);
-    String json = requireContext().getSharedPreferences("constructor_draft", Context.MODE_PRIVATE).getString("draft", null);
+    String json =
+        requireContext()
+            .getSharedPreferences("constructor_draft", Context.MODE_PRIVATE)
+            .getString("draft", null);
     int count = 0;
     if (json != null) {
       try {
@@ -86,15 +105,22 @@ public class ProfileFragment extends ProfileScreen implements ShellFragment.Rese
       }
     }
     if (count == 0) {
-      tabState.setState(States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
-          "Черновиков нет", "Незаконченный образ сохранится здесь сам.", "Открыть конструктор"));
+      tabState.setState(
+          States.empty(
+              app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_outfits,
+              "Черновиков нет",
+              "Незаконченный образ сохранится здесь сам.",
+              "Открыть конструктор"));
       return;
     }
     tabState.setState(ScreenState.content());
     ListRowView row = new ListRowView(requireContext());
-    row.setIcon(ContextCompat.getDrawable(requireContext(), app.outfitshare.core.designsystem.R.drawable.ds_ic_draft));
+    row.setIcon(
+        ContextCompat.getDrawable(
+            requireContext(), app.outfitshare.core.designsystem.R.drawable.ds_ic_draft));
     row.setTitle("Без названия");
-    row.setSubtitle("Черновик · " + getResources().getQuantityString(R.plurals.items_count, count, count));
+    row.setSubtitle(
+        "Черновик · " + getResources().getQuantityString(R.plurals.items_count, count, count));
     row.setShowChevron(true);
     row.setOnClickListener(v -> nav().present(new ConstructorFragment()));
     gridManager.setSpanCount(1);

@@ -56,13 +56,16 @@ public class NotificationsFragment extends BaseFragment {
     MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
     toolbar.setTitle(R.string.notifications_title);
     toolbar.setNavigationOnClickListener(v -> nav().back());
-    toolbar.getMenu().add(R.string.action_read_all)
+    toolbar
+        .getMenu()
+        .add(R.string.action_read_all)
         .setIcon(app.outfitshare.core.designsystem.R.drawable.ds_ic_done_all)
         .setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_ALWAYS);
-    toolbar.setOnMenuItemClickListener(item -> {
-      markAllRead();
-      return true;
-    });
+    toolbar.setOnMenuItemClickListener(
+        item -> {
+          markAllRead();
+          return true;
+        });
     stateView = view.findViewById(R.id.state);
     refresh = view.findViewById(R.id.refresh);
     offline = view.findViewById(R.id.offline);
@@ -71,43 +74,53 @@ public class NotificationsFragment extends BaseFragment {
     list.setLayoutManager(lm);
     adapter = new Adapter();
     list.setAdapter(adapter);
-    list.addOnScrollListener(new RecyclerView.OnScrollListener() {
-      @Override
-      public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
-        if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 4) {
-          paging.loadMore();
-        }
-      }
-    });
+    list.addOnScrollListener(
+        new RecyclerView.OnScrollListener() {
+          @Override
+          public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
+            if (lm.findLastVisibleItemPosition() >= adapter.getItemCount() - 4) {
+              paging.loadMore();
+            }
+          }
+        });
     stateView.setOnActionClickListener(v -> paging.refresh());
     offline.setOnRetryClickListener(v -> paging.refresh());
     refresh.setOnRefreshListener(() -> paging.refresh());
 
-    paging = new Paging<>(cursor -> api().notifications(cursor), new Paging.Listener<Dto.Notification>() {
-      @Override
-      public void onPage(List<Dto.Notification> all, boolean reset, boolean fromCache) {
-        refresh.setRefreshing(false);
-        offline.setOffline(fromCache);
-        offline.setVisibility(fromCache ? View.VISIBLE : View.GONE);
-        group(all);
-        stateView.setState(all.isEmpty()
-            ? States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_empty_notifications,
-                "Пока тихо", "Здесь появятся лайки, комментарии, подписки и новости Студии.", null)
-            : ScreenState.content());
-        if (reset && !fromCache) {
-          // Seen: the bell dot goes away, the unread dots stay until the next visit.
-          Calls.run(api().readNotifications(), r -> container().counters.clearNotifications());
-        }
-      }
+    paging =
+        new Paging<>(
+            cursor -> api().notifications(cursor),
+            new Paging.Listener<Dto.Notification>() {
+              @Override
+              public void onPage(List<Dto.Notification> all, boolean reset, boolean fromCache) {
+                refresh.setRefreshing(false);
+                offline.setOffline(fromCache);
+                offline.setVisibility(fromCache ? View.VISIBLE : View.GONE);
+                group(all);
+                stateView.setState(
+                    all.isEmpty()
+                        ? States.empty(
+                            app.outfitshare.core.designsystem.R.drawable
+                                .ds_illustration_empty_notifications,
+                            "Пока тихо",
+                            "Здесь появятся лайки, комментарии, подписки и новости Студии.",
+                            null)
+                        : ScreenState.content());
+                if (reset && !fromCache) {
+                  // Seen: the bell dot goes away, the unread dots stay until the next visit.
+                  Calls.run(
+                      api().readNotifications(), r -> container().counters.clearNotifications());
+                }
+              }
 
-      @Override
-      public void onError(ApiError error, boolean firstPage) {
-        refresh.setRefreshing(false);
-        if (firstPage) {
-          stateView.setState(States.failure(error, "Не загрузились"));
-        }
-      }
-    });
+              @Override
+              public void onError(ApiError error, boolean firstPage) {
+                refresh.setRefreshing(false);
+                if (firstPage) {
+                  stateView.setState(States.failure(error, "Не загрузились"));
+                }
+              }
+            });
     stateView.setState(ScreenState.loading());
     paging.refresh();
   }
@@ -196,7 +209,8 @@ public class NotificationsFragment extends BaseFragment {
       Row r = (Row) h;
       r.unread.setVisibility(n.isRead ? View.INVISIBLE : View.VISIBLE);
       Images.avatar(r.avatar, n.actor);
-      String who = n.actor.username != null && !n.actor.username.isEmpty() ? n.actor.username : n.actor.name;
+      String who =
+          n.actor.username != null && !n.actor.username.isEmpty() ? n.actor.username : n.actor.name;
       r.text.setText(Text.boldLead(who, describe(n)));
       r.time.setText(Formats.ago(n.createdAt));
       boolean hasOutfit = n.outfit != null && n.outfit.imageUrl != null;
@@ -208,21 +222,23 @@ public class NotificationsFragment extends BaseFragment {
       r.action.setVisibility(follow ? View.VISIBLE : View.GONE);
       if (follow) {
         ButtonStyles.follow(r.action, n.actor.isFollowing);
-        r.action.setOnClickListener(v -> {
-          boolean target = !n.actor.isFollowing;
-          n.actor.isFollowing = target;
-          ButtonStyles.follow(r.action, target);
-          Calls.run(target ? api().follow(n.actor.id) : api().unfollow(n.actor.id), x -> {});
-        });
+        r.action.setOnClickListener(
+            v -> {
+              boolean target = !n.actor.isFollowing;
+              n.actor.isFollowing = target;
+              ButtonStyles.follow(r.action, target);
+              Calls.run(target ? api().follow(n.actor.id) : api().unfollow(n.actor.id), x -> {});
+            });
       }
       r.avatar.setOnClickListener(v -> nav().push(UserFragment.newInstance(n.actor.id)));
-      r.itemView.setOnClickListener(v -> {
-        if (n.outfit != null) {
-          nav().push(OutfitFragment.newInstance(n.outfit.id));
-        } else {
-          nav().push(UserFragment.newInstance(n.actor.id));
-        }
-      });
+      r.itemView.setOnClickListener(
+          v -> {
+            if (n.outfit != null) {
+              nav().push(OutfitFragment.newInstance(n.outfit.id));
+            } else {
+              nav().push(UserFragment.newInstance(n.actor.id));
+            }
+          });
     }
 
     @Override

@@ -37,7 +37,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/** Mockup «Студия: очередь»: uploads with %, pipeline steps, ready with fit score, errors with action. */
+/**
+ * Mockup «Студия: очередь»: uploads with %, pipeline steps, ready with fit score, errors with
+ * action.
+ */
 public class StudioQueueFragment extends BaseFragment {
   private static final String[] GROUPS = {"active", "review", "failed"};
   private static final long POLL_MS = 2500;
@@ -52,11 +55,12 @@ public class StudioQueueFragment extends BaseFragment {
   private TabLayout tabs;
   private int tab;
 
-  private final Realtime.Listener realtime = (event, payload) -> {
-    if ("studio.job".equals(event)) {
-      load();
-    }
-  };
+  private final Realtime.Listener realtime =
+      (event, payload) -> {
+        if ("studio.job".equals(event)) {
+          load();
+        }
+      };
 
   public StudioQueueFragment() {
     super(R.layout.fragment_studio_queue);
@@ -76,8 +80,11 @@ public class StudioQueueFragment extends BaseFragment {
     offline.setVisibility(online ? View.GONE : View.VISIBLE);
 
     if (!container().session.isAdmin()) {
-      stateView.setState(States.locked("Студия — для администраторов каталога",
-          "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.", null));
+      stateView.setState(
+          States.locked(
+              "Студия — для администраторов каталога",
+              "Здесь фотографируют и публикуют вещи. Если вы стилист или магазин — напишите нам.",
+              null));
       view.findViewById(R.id.shoot).setVisibility(View.GONE);
       return;
     }
@@ -88,38 +95,44 @@ public class StudioQueueFragment extends BaseFragment {
     list.setAdapter(adapter);
     refresh.setOnRefreshListener(this::load);
     stateView.setOnActionClickListener(v -> nav().present(new StudioCameraFragment()));
-    view.findViewById(R.id.shoot).setOnClickListener(v -> nav().present(new StudioCameraFragment()));
+    view.findViewById(R.id.shoot)
+        .setOnClickListener(v -> nav().present(new StudioCameraFragment()));
 
     tabs = view.findViewById(R.id.tabs);
     tabs.addTab(tabs.newTab().setText(R.string.studio_tab_active));
     tabs.addTab(tabs.newTab().setText(R.string.studio_tab_ready));
     tabs.addTab(tabs.newTab().setText(R.string.studio_tab_failed));
-    tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-      @Override
-      public void onTabSelected(TabLayout.Tab t) {
-        tab = t.getPosition();
-        stateView.setState(ScreenState.loading());
-        load();
-      }
+    tabs.addOnTabSelectedListener(
+        new TabLayout.OnTabSelectedListener() {
+          @Override
+          public void onTabSelected(TabLayout.Tab t) {
+            tab = t.getPosition();
+            stateView.setState(ScreenState.loading());
+            load();
+          }
 
-      @Override
-      public void onTabUnselected(TabLayout.Tab t) {}
+          @Override
+          public void onTabUnselected(TabLayout.Tab t) {}
 
-      @Override
-      public void onTabReselected(TabLayout.Tab t) {}
-    });
+          @Override
+          public void onTabReselected(TabLayout.Tab t) {}
+        });
 
-    WorkManager.getInstance(requireContext()).getWorkInfosByTagLiveData(UploadWorker.TAG).observe(getViewLifecycleOwner(), infos -> {
-      uploads.clear();
-      for (WorkInfo i : infos) {
-        if (!i.getState().isFinished()) {
-          uploads.add(i);
-        } else if (i.getState() == WorkInfo.State.SUCCEEDED) {
-          load();
-        }
-      }
-      rebuild();
-    });
+    WorkManager.getInstance(requireContext())
+        .getWorkInfosByTagLiveData(UploadWorker.TAG)
+        .observe(
+            getViewLifecycleOwner(),
+            infos -> {
+              uploads.clear();
+              for (WorkInfo i : infos) {
+                if (!i.getState().isFinished()) {
+                  uploads.add(i);
+                } else if (i.getState() == WorkInfo.State.SUCCEEDED) {
+                  load();
+                }
+              }
+              rebuild();
+            });
 
     stateView.setState(ScreenState.loading());
     load();
@@ -157,26 +170,31 @@ public class StudioQueueFragment extends BaseFragment {
     if (tabs == null) {
       return;
     }
-    Calls.run(api().jobs(GROUPS[tab]), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      refresh.setRefreshing(false);
-      if (!r.ok() || r.data == null) {
-        if (jobs.isEmpty() && uploads.isEmpty()) {
-          stateView.setState(States.failure(r.error, "Очередь не загрузилась"));
-        }
-        return;
-      }
-      jobs.clear();
-      jobs.addAll(r.data.results);
-      if (r.data.totals != null) {
-        setCount(0, getString(R.string.studio_tab_active), total(r.data.totals, "active") + uploads.size());
-        setCount(1, getString(R.string.studio_tab_ready), total(r.data.totals, "review"));
-        setCount(2, getString(R.string.studio_tab_failed), total(r.data.totals, "failed"));
-      }
-      rebuild();
-    });
+    Calls.run(
+        api().jobs(GROUPS[tab]),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          refresh.setRefreshing(false);
+          if (!r.ok() || r.data == null) {
+            if (jobs.isEmpty() && uploads.isEmpty()) {
+              stateView.setState(States.failure(r.error, "Очередь не загрузилась"));
+            }
+            return;
+          }
+          jobs.clear();
+          jobs.addAll(r.data.results);
+          if (r.data.totals != null) {
+            setCount(
+                0,
+                getString(R.string.studio_tab_active),
+                total(r.data.totals, "active") + uploads.size());
+            setCount(1, getString(R.string.studio_tab_ready), total(r.data.totals, "review"));
+            setCount(2, getString(R.string.studio_tab_failed), total(r.data.totals, "failed"));
+          }
+          rebuild();
+        });
   }
 
   private static int total(Map<String, Integer> totals, String key) {
@@ -202,10 +220,12 @@ public class StudioQueueFragment extends BaseFragment {
     rows.addAll(jobs);
     adapter.notifyDataSetChanged();
     if (rows.isEmpty()) {
-      stateView.setState(States.empty(app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera,
-          tab == 2 ? "Ошибок нет" : "Очередь пуста",
-          tab == 2 ? null : "Сфотографируйте вещь — через пару минут она сядет на манекен.",
-          tab == 2 ? null : "Открыть камеру"));
+      stateView.setState(
+          States.empty(
+              app.outfitshare.core.designsystem.R.drawable.ds_illustration_camera,
+              tab == 2 ? "Ошибок нет" : "Очередь пуста",
+              tab == 2 ? null : "Сфотографируйте вещь — через пару минут она сядет на манекен.",
+              tab == 2 ? null : "Открыть камеру"));
     } else {
       stateView.setState(ScreenState.content());
     }
@@ -221,7 +241,8 @@ public class StudioQueueFragment extends BaseFragment {
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_job, parent, false));
+      return new Holder(
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_job, parent, false));
     }
 
     @Override
@@ -232,7 +253,9 @@ public class StudioQueueFragment extends BaseFragment {
       h.chevron.setVisibility(View.GONE);
       h.action.setVisibility(View.GONE);
       h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
-      h.status.setTextColor(DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant));
+      h.status.setTextColor(
+          DsTheme.color(
+              requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant));
       h.itemView.setOnClickListener(null);
       if (o instanceof WorkInfo) {
         bindUpload(h, (WorkInfo) o);
@@ -259,10 +282,16 @@ public class StudioQueueFragment extends BaseFragment {
       long sent = info.getProgress().getLong(UploadWorker.KEY_SENT, 0);
       long total = info.getProgress().getLong(UploadWorker.KEY_TOTAL, 0);
       if (info.getState() == WorkInfo.State.ENQUEUED && progress == 0) {
-        h.status.setText(container().api.isOnline() ? "Ждёт отправки" : "Загрузка на паузе — нет сети");
+        h.status.setText(
+            container().api.isOnline() ? "Ждёт отправки" : "Загрузка на паузе — нет сети");
       } else {
-        h.status.setText(String.format(Locale.forLanguageTag("ru"), "Загрузка · %d %% · %.1f из %.1f МБ",
-            progress, sent / 1048576f, total / 1048576f));
+        h.status.setText(
+            String.format(
+                Locale.forLanguageTag("ru"),
+                "Загрузка · %d %% · %.1f из %.1f МБ",
+                progress,
+                sent / 1048576f,
+                total / 1048576f));
       }
       h.progress.setVisibility(View.VISIBLE);
       h.progress.setProgressCompat(progress, true);
@@ -273,46 +302,71 @@ public class StudioQueueFragment extends BaseFragment {
       h.title.setText(j.categoryName);
       switch (j.status) {
         case "queued":
-        case "processing": {
-          int step = StudioText.step(j.stage);
-          h.status.setText(StudioText.stageLabel(j.stage) + " · шаг " + Math.max(1, step) + " из " + StepsView.COUNT);
-          h.steps.setVisibility(View.VISIBLE);
-          h.steps.setDone(Math.max(0, step - 1));
-          h.itemView.setOnClickListener(v -> nav().push(StudioReviewFragment.newInstance(j.id)));
-          break;
-        }
-        case "review": {
-          boolean low = StudioText.lowFit(j);
-          int color = DsTheme.color(requireContext(), low
-              ? app.outfitshare.core.designsystem.R.attr.dsColorWarning : app.outfitshare.core.designsystem.R.attr.dsColorSuccess);
-          h.status.setText((low ? "Низкая посадка · " : "Готово к проверке · посадка ") + StudioText.fitPercent(j) + " %");
-          h.status.setTextColor(color);
-          h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(low ? R.drawable.badge_warning : R.drawable.badge_check_small, 0, 0, 0);
-          androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(h.status, android.content.res.ColorStateList.valueOf(color));
-          h.chevron.setVisibility(View.VISIBLE);
-          h.itemView.setOnClickListener(v -> nav().push(StudioReviewFragment.newInstance(j.id)));
-          break;
-        }
-        case "failed": {
-          int color = DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorDanger);
-          h.status.setText(j.error == null || j.error.isEmpty() ? "Не удалось обработать" : j.error);
-          h.status.setTextColor(color);
-          h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.badge_error, 0, 0, 0);
-          androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(h.status, android.content.res.ColorStateList.valueOf(color));
-          h.action.setVisibility(View.VISIBLE);
-          boolean reshoot = j.attributes != null && j.attributes.get("error_code") != null
-              && !"crash".equals(String.valueOf(j.attributes.get("error_code")));
-          h.action.setText(reshoot ? "Переснять" : "Повторить");
-          h.action.setOnClickListener(v -> {
-            if (reshoot) {
-              Calls.run(api().deleteJob(j.id), r -> load());
-              nav().present(new StudioCameraFragment());
-            } else {
-              Calls.run(api().retryJob(j.id), r -> load());
-            }
-          });
-          break;
-        }
+        case "processing":
+          {
+            int step = StudioText.step(j.stage);
+            h.status.setText(
+                StudioText.stageLabel(j.stage)
+                    + " · шаг "
+                    + Math.max(1, step)
+                    + " из "
+                    + StepsView.COUNT);
+            h.steps.setVisibility(View.VISIBLE);
+            h.steps.setDone(Math.max(0, step - 1));
+            h.itemView.setOnClickListener(v -> nav().push(StudioReviewFragment.newInstance(j.id)));
+            break;
+          }
+        case "review":
+          {
+            boolean low = StudioText.lowFit(j);
+            int color =
+                DsTheme.color(
+                    requireContext(),
+                    low
+                        ? app.outfitshare.core.designsystem.R.attr.dsColorWarning
+                        : app.outfitshare.core.designsystem.R.attr.dsColorSuccess);
+            h.status.setText(
+                (low ? "Низкая посадка · " : "Готово к проверке · посадка ")
+                    + StudioText.fitPercent(j)
+                    + " %");
+            h.status.setTextColor(color);
+            h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                low ? R.drawable.badge_warning : R.drawable.badge_check_small, 0, 0, 0);
+            androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(
+                h.status, android.content.res.ColorStateList.valueOf(color));
+            h.chevron.setVisibility(View.VISIBLE);
+            h.itemView.setOnClickListener(v -> nav().push(StudioReviewFragment.newInstance(j.id)));
+            break;
+          }
+        case "failed":
+          {
+            int color =
+                DsTheme.color(
+                    requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorDanger);
+            h.status.setText(
+                j.error == null || j.error.isEmpty() ? "Не удалось обработать" : j.error);
+            h.status.setTextColor(color);
+            h.status.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.badge_error, 0, 0, 0);
+            androidx.core.widget.TextViewCompat.setCompoundDrawableTintList(
+                h.status, android.content.res.ColorStateList.valueOf(color));
+            h.action.setVisibility(View.VISIBLE);
+            boolean reshoot =
+                j.attributes != null
+                    && j.attributes.get("error_code") != null
+                    && !"crash".equals(String.valueOf(j.attributes.get("error_code")));
+            h.action.setText(reshoot ? "Переснять" : "Повторить");
+            h.action.setOnClickListener(
+                v -> {
+                  if (reshoot) {
+                    Calls.run(api().deleteJob(j.id), r -> load());
+                    nav().present(new StudioCameraFragment());
+                  } else {
+                    Calls.run(api().retryJob(j.id), r -> load());
+                  }
+                });
+            break;
+          }
         default:
           h.status.setText("Опубликовано");
       }

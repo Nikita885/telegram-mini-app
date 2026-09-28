@@ -32,7 +32,8 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
   @NonNull
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_collection, parent, false));
+    return new Holder(
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.item_collection, parent, false));
   }
 
   @Override
@@ -42,9 +43,12 @@ public class CollectionsAdapter extends RecyclerView.Adapter<CollectionsAdapter.
       Images.photo(h.covers[i], i < c.covers.size() ? c.covers.get(i) : null);
     }
     h.title.setText(c.title);
-    h.title.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, c.isPrivate ? R.drawable.badge_lock : 0, 0);
-    h.count.setText(h.itemView.getResources().getQuantityString(R.plurals.outfits_count, c.count, c.count));
-    h.itemView.setContentDescription(c.title + (c.isPrivate ? ", приватная" : "") + ", " + h.count.getText());
+    h.title.setCompoundDrawablesRelativeWithIntrinsicBounds(
+        0, 0, c.isPrivate ? R.drawable.badge_lock : 0, 0);
+    h.count.setText(
+        h.itemView.getResources().getQuantityString(R.plurals.outfits_count, c.count, c.count));
+    h.itemView.setContentDescription(
+        c.title + (c.isPrivate ? ", приватная" : "") + ", " + h.count.getText());
     h.itemView.setOnClickListener(v -> onClick.accept(c));
   }
 

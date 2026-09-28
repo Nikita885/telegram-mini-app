@@ -42,42 +42,51 @@ public class ShareToDialogSheet extends DsBottomSheetDialogFragment {
 
   @NonNull
   @Override
-  protected View onCreateSheetContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
+  protected View onCreateSheetContent(
+      @NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
     NestedScrollView scroll = new NestedScrollView(requireContext());
     LinearLayout list = new LinearLayout(requireContext());
     list.setOrientation(LinearLayout.VERTICAL);
-    int pad = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5);
+    int pad =
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5);
     list.setPadding(0, 0, 0, pad);
     scroll.addView(list);
     TextView loading = new TextView(requireContext());
     loading.setText(app.outfitshare.core.designsystem.R.string.ds_state_loading);
-    int gutter = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+    int gutter =
+        getResources()
+            .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
     loading.setPadding(gutter, pad, gutter, pad);
     list.addView(loading);
 
     long outfitId = requireArguments().getLong(ARG_OUTFIT);
-    Calls.run(App.get().container().api.api().dialogs(), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      list.removeAllViews();
-      if (!r.ok() || r.data == null || r.data.results.isEmpty()) {
-        loading.setText(r.ok() ? "Пока нет диалогов — напишите кому-нибудь из профиля" : "Диалоги не загрузились");
-        list.addView(loading);
-        return;
-      }
-      for (Dto.Dialog d : r.data.results) {
-        ListRowView row = new ListRowView(requireContext());
-        AvatarView avatar = new AvatarView(requireContext());
-        avatar.setAvatarSize(1);
-        Images.avatar(avatar, d.user);
-        row.setLeadingView(avatar);
-        row.setTitle(d.user.name);
-        row.setSubtitle(Formats.handle(d.user.username));
-        row.setOnClickListener(v -> send(d, outfitId));
-        list.addView(row);
-      }
-    });
+    Calls.run(
+        App.get().container().api.api().dialogs(),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          list.removeAllViews();
+          if (!r.ok() || r.data == null || r.data.results.isEmpty()) {
+            loading.setText(
+                r.ok()
+                    ? "Пока нет диалогов — напишите кому-нибудь из профиля"
+                    : "Диалоги не загрузились");
+            list.addView(loading);
+            return;
+          }
+          for (Dto.Dialog d : r.data.results) {
+            ListRowView row = new ListRowView(requireContext());
+            AvatarView avatar = new AvatarView(requireContext());
+            avatar.setAvatarSize(1);
+            Images.avatar(avatar, d.user);
+            row.setLeadingView(avatar);
+            row.setTitle(d.user.name);
+            row.setSubtitle(Formats.handle(d.user.username));
+            row.setOnClickListener(v -> send(d, outfitId));
+            list.addView(row);
+          }
+        });
     return scroll;
   }
 
@@ -86,10 +95,13 @@ public class ShareToDialogSheet extends DsBottomSheetDialogFragment {
     body.put("outfit_id", outfitId);
     View anchor = requireParentFragment().getView();
     dismiss();
-    Calls.run(App.get().container().api.api().sendMessage(d.id, body), r -> {
-      if (anchor != null) {
-        DsSnackbar.message(anchor, r.ok() ? "Отправлено: " + d.user.name : "Не удалось отправить");
-      }
-    });
+    Calls.run(
+        App.get().container().api.api().sendMessage(d.id, body),
+        r -> {
+          if (anchor != null) {
+            DsSnackbar.message(
+                anchor, r.ok() ? "Отправлено: " + d.user.name : "Не удалось отправить");
+          }
+        });
   }
 }

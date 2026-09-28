@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.theme.DsTheme;
 
 /** Mockup `.steps`: five segments of the pipeline, finished ones in the accent colour. */
@@ -22,7 +21,9 @@ public class StepsView extends View {
   public StepsView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     on.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorAccent));
-    off.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSurfaceContainerHighest));
+    off.setColor(
+        DsTheme.color(
+            context, app.outfitshare.core.designsystem.R.attr.dsColorSurfaceContainerHighest));
     gap = 4 * getResources().getDisplayMetrics().density;
   }
 

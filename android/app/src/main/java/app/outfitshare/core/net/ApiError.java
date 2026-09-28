@@ -24,7 +24,8 @@ public final class ApiError {
   public final String message;
   @Nullable public final Map<String, Object> fields;
 
-  private ApiError(Kind kind, int status, String code, String message, @Nullable Map<String, Object> fields) {
+  private ApiError(
+      Kind kind, int status, String code, String message, @Nullable Map<String, Object> fields) {
     this.kind = kind;
     this.status = status;
     this.code = code;
@@ -50,7 +51,8 @@ public final class ApiError {
   static ApiError from(Response<?> response, Gson gson) {
     int status = response.code();
     String code = "http_" + status;
-    String message = status >= 500 ? "Сервер не ответил. Попробуйте ещё раз" : "Не получилось выполнить запрос";
+    String message =
+        status >= 500 ? "Сервер не ответил. Попробуйте ещё раз" : "Не получилось выполнить запрос";
     Map<String, Object> fields = null;
     try (okhttp3.ResponseBody body = response.errorBody()) {
       if (body != null) {

@@ -8,15 +8,18 @@ import android.text.style.MetricAffectingSpan;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
-import app.outfitshare.core.designsystem.R;
 
 /** «Outfit <em>Share</em>»: display medium + display italic, as in the mockups' .wordmark. */
 public final class Wordmark {
   private Wordmark() {}
 
   public static void apply(TextView view) {
-    Typeface medium = ResourcesCompat.getFont(view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_medium);
-    Typeface italic = ResourcesCompat.getFont(view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_italic);
+    Typeface medium =
+        ResourcesCompat.getFont(
+            view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_medium);
+    Typeface italic =
+        ResourcesCompat.getFont(
+            view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_italic);
     SpannableStringBuilder sb = new SpannableStringBuilder("Outfit Share");
     sb.setSpan(new FontSpan(medium), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     sb.setSpan(new FontSpan(italic), 7, 12, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -26,7 +29,9 @@ public final class Wordmark {
 
   /** Multi-line cover variant: "Outfit" / "Share" (splash cover). */
   public static void applyCover(TextView view) {
-    Typeface italic = ResourcesCompat.getFont(view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_italic);
+    Typeface italic =
+        ResourcesCompat.getFont(
+            view.getContext(), app.outfitshare.core.designsystem.R.font.ds_display_italic);
     SpannableStringBuilder sb = new SpannableStringBuilder("Outfit\nShare");
     sb.setSpan(new FontSpan(italic), 7, 12, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
     view.setText(sb);

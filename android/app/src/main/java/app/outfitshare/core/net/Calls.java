@@ -18,6 +18,7 @@ public final class Calls {
   public static final class Result<T> {
     @Nullable public final T data;
     @Nullable public final ApiError error;
+
     /** Served from the offline cache: show the "офлайн" banner. */
     public final boolean fromCache;
 
@@ -49,7 +50,8 @@ public final class Calls {
               boolean cached = response.headers().get(ApiClient.FROM_CACHE_HEADER) != null;
               onResult.onResult(Result.success(response.body(), cached));
             } else {
-              onResult.onResult(Result.failure(ApiError.from(response, App.get().container().api.gson())));
+              onResult.onResult(
+                  Result.failure(ApiError.from(response, App.get().container().api.gson())));
             }
           }
 

@@ -31,7 +31,8 @@ public final class OutfitActions {
             outfit.isLiked = wasLiked;
             outfit.likesCount = before;
             c.outfitBus.liked(outfit.id, wasLiked, before);
-            DsSnackbar.error(anchor, "Не удалось отметить образ", () -> setLiked(anchor, outfit, liked));
+            DsSnackbar.error(
+                anchor, "Не удалось отметить образ", () -> setLiked(anchor, outfit, liked));
           }
         });
   }
@@ -49,9 +50,11 @@ public final class OutfitActions {
             outfit.isSaved = !target;
             c.outfitBus.saved(outfit.id, !target);
             onChanged.run();
-            DsSnackbar.error(anchor, "Не удалось сохранить", () -> toggleSaved(anchor, outfit, onChanged));
+            DsSnackbar.error(
+                anchor, "Не удалось сохранить", () -> toggleSaved(anchor, outfit, onChanged));
           } else {
-            DsSnackbar.message(anchor, target ? "Сохранено в «Сохранённое»" : "Убрано из сохранённого");
+            DsSnackbar.message(
+                anchor, target ? "Сохранено в «Сохранённое»" : "Убрано из сохранённого");
           }
         });
   }

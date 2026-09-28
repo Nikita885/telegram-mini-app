@@ -19,7 +19,9 @@ final class SingleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     if (view.getParent() instanceof ViewGroup) {
       ((ViewGroup) view.getParent()).removeView(view);
     }
-    view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    view.setLayoutParams(
+        new RecyclerView.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     return new RecyclerView.ViewHolder(view) {};
   }
 

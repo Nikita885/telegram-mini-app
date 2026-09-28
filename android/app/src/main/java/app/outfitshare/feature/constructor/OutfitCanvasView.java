@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import app.outfitshare.core.designsystem.R;
 import app.outfitshare.core.designsystem.haptics.Haptics;
 import app.outfitshare.core.designsystem.motion.Motion;
 import app.outfitshare.core.designsystem.theme.DsTheme;
@@ -30,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The constructor's studio "paper": mannequin + garment layers. Tap selects, one finger moves,
- * two fingers scale/rotate. A fitted garment released near its body pose snaps onto it (SNAP haptic).
+ * The constructor's studio "paper": mannequin + garment layers. Tap selects, one finger moves, two
+ * fingers scale/rotate. A fitted garment released near its body pose snaps onto it (SNAP haptic).
  */
 public class OutfitCanvasView extends View {
 
@@ -87,49 +86,63 @@ public class OutfitCanvasView extends View {
   public OutfitCanvasView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
     canvasColor = DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorCanvas);
-    int mannequinColor = DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorMannequin);
-    mannequinPaint.setColorFilter(new PorterDuffColorFilter(mannequinColor, PorterDuff.Mode.SRC_IN));
-    int selection = DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSelection);
+    int mannequinColor =
+        DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorMannequin);
+    mannequinPaint.setColorFilter(
+        new PorterDuffColorFilter(mannequinColor, PorterDuff.Mode.SRC_IN));
+    int selection =
+        DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSelection);
     guideColor = DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSnapGuide);
     float d = getResources().getDisplayMetrics().density;
     framePaint.setStyle(Paint.Style.STROKE);
-    framePaint.setStrokeWidth(getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_stroke_thin));
+    framePaint.setStrokeWidth(
+        getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_stroke_thin));
     framePaint.setColor(selection);
-    handleFill.setColor(DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSurface));
+    handleFill.setColor(
+        DsTheme.color(context, app.outfitshare.core.designsystem.R.attr.dsColorSurface));
     handleStroke.setStyle(Paint.Style.STROKE);
-    handleStroke.setStrokeWidth(getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_stroke_thin));
+    handleStroke.setStrokeWidth(
+        getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_size_stroke_thin));
     handleStroke.setColor(selection);
     handleRadius = 5 * d;
     setContentDescription("Холст образа");
-    taps = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-      @Override
-      public boolean onDown(@NonNull MotionEvent e) {
-        return true;
-      }
+    taps =
+        new GestureDetector(
+            context,
+            new GestureDetector.SimpleOnGestureListener() {
+              @Override
+              public boolean onDown(@NonNull MotionEvent e) {
+                return true;
+              }
 
-      @Override
-      public boolean onSingleTapUp(@NonNull MotionEvent e) {
-        select(hit(e.getX(), e.getY()));
-        performClick();
-        return true;
-      }
+              @Override
+              public boolean onSingleTapUp(@NonNull MotionEvent e) {
+                select(hit(e.getX(), e.getY()));
+                performClick();
+                return true;
+              }
 
-      @Override
-      public void onLongPress(@NonNull MotionEvent e) {
-        Layer l = hit(e.getX(), e.getY());
-        if (l != null && listener != null) {
-          select(l);
-          listener.onLongPress(l);
-        }
-      }
-    });
+              @Override
+              public void onLongPress(@NonNull MotionEvent e) {
+                Layer l = hit(e.getX(), e.getY());
+                if (l != null && listener != null) {
+                  select(l);
+                  listener.onLongPress(l);
+                }
+              }
+            });
   }
 
   public void setListener(@Nullable Listener listener) {
     this.listener = listener;
   }
 
-  public void setMannequin(@Nullable Bitmap bitmap, int width, int height, @Nullable Map<String, List<Float>> anchors, String gender) {
+  public void setMannequin(
+      @Nullable Bitmap bitmap,
+      int width,
+      int height,
+      @Nullable Map<String, List<Float>> anchors,
+      String gender) {
     this.mannequin = bitmap;
     this.canvasW = width;
     this.canvasH = height;
@@ -170,7 +183,9 @@ public class OutfitCanvasView extends View {
     }
   }
 
-  /** "Падение" of a newly added layer: from above with a spring overshoot, SNAP haptic on landing. */
+  /**
+   * "Падение" of a newly added layer: from above with a spring overshoot, SNAP haptic on landing.
+   */
   public void dropIn(Layer layer) {
     if (!Motion.animationsEnabled()) {
       layer.drop = 1f;
@@ -180,12 +195,15 @@ public class OutfitCanvasView extends View {
     }
     layer.drop = 0f;
     ValueAnimator a = ValueAnimator.ofFloat(0f, 1f);
-    a.setDuration(getResources().getInteger(app.outfitshare.core.designsystem.R.integer.ds_motion_duration_long));
+    a.setDuration(
+        getResources()
+            .getInteger(app.outfitshare.core.designsystem.R.integer.ds_motion_duration_long));
     a.setInterpolator(new OvershootInterpolator(1.4f));
-    a.addUpdateListener(v -> {
-      layer.drop = (float) v.getAnimatedValue();
-      invalidate();
-    });
+    a.addUpdateListener(
+        v -> {
+          layer.drop = (float) v.getAnimatedValue();
+          invalidate();
+        });
     postDelayed(() -> Haptics.perform(this, Haptics.Event.SNAP), (long) (a.getDuration() * 0.6f));
     a.start();
   }
@@ -206,16 +224,19 @@ public class OutfitCanvasView extends View {
       return;
     }
     ValueAnimator a = ValueAnimator.ofFloat(0f, 1f);
-    a.setDuration(getResources().getInteger(app.outfitshare.core.designsystem.R.integer.ds_motion_duration_medium));
+    a.setDuration(
+        getResources()
+            .getInteger(app.outfitshare.core.designsystem.R.integer.ds_motion_duration_medium));
     a.setInterpolator(new OvershootInterpolator(1.1f));
-    a.addUpdateListener(v -> {
-      float t = (float) v.getAnimatedValue();
-      layer.x = fx + (0.5f - fx) * t;
-      layer.y = fy + (0.5f - fy) * t;
-      layer.scale = fs + (1f - fs) * t;
-      layer.rotation = fr * (1f - t);
-      invalidate();
-    });
+    a.addUpdateListener(
+        v -> {
+          float t = (float) v.getAnimatedValue();
+          layer.x = fx + (0.5f - fx) * t;
+          layer.y = fy + (0.5f - fy) * t;
+          layer.scale = fs + (1f - fs) * t;
+          layer.rotation = fr * (1f - t);
+          invalidate();
+        });
     a.start();
   }
 
@@ -229,7 +250,8 @@ public class OutfitCanvasView extends View {
     c.translate(fit[1], fit[2]);
     c.scale(fit[0], fit[0]);
     if (mannequin != null) {
-      matrix.setScale(canvasW / (float) mannequin.getWidth(), canvasH / (float) mannequin.getHeight());
+      matrix.setScale(
+          canvasW / (float) mannequin.getWidth(), canvasH / (float) mannequin.getHeight());
       c.drawBitmap(mannequin, matrix, mannequinPaint);
     }
     if (dragging && selected != null && selected.fitted) {
@@ -244,7 +266,11 @@ public class OutfitCanvasView extends View {
       }
       layerMatrix(l, matrix);
       if (l.drop < 1f) {
-        float offset = (1f - l.drop) * -getResources().getDimension(app.outfitshare.core.designsystem.R.dimen.ds_motion_drop_offset) / fit[0];
+        float offset =
+            (1f - l.drop)
+                * -getResources()
+                    .getDimension(app.outfitshare.core.designsystem.R.dimen.ds_motion_drop_offset)
+                / fit[0];
         matrix.postTranslate(0, offset);
         bitmapPaint.setAlpha((int) (255 * Math.min(1f, Math.max(0f, l.drop * 1.5f))));
       } else {
@@ -263,10 +289,13 @@ public class OutfitCanvasView extends View {
     int iw = b == null ? 1 : b.getWidth();
     int ih = b == null ? 1 : b.getHeight();
     float[] base = OutfitGeometry.baseSize(l.fitted, canvasW, canvasH, iw, ih);
-    OutfitGeometry.layerToCanvas(out, l.x, l.y, l.scale, l.rotation, l.flipped, base[0], base[1], iw, ih, canvasW, canvasH);
+    OutfitGeometry.layerToCanvas(
+        out, l.x, l.y, l.scale, l.rotation, l.flipped, base[0], base[1], iw, ih, canvasW, canvasH);
   }
 
-  /** Selection frame around the visible garment (fitted layers: its opaque bounds, not the canvas). */
+  /**
+   * Selection frame around the visible garment (fitted layers: its opaque bounds, not the canvas).
+   */
   private void drawFrame(Canvas c, Layer l, float[] fit) {
     Bitmap b = l.bitmap;
     if (b == null) {
@@ -337,10 +366,19 @@ public class OutfitCanvasView extends View {
     float y = (p.get(1) + q.get(1)) / 2f * canvasH;
     float h = halfHeight * canvasH;
     oval.set(Math.min(x0, x1) - h, y - h, Math.max(x0, x1) + h, y + h);
-    int base = Color.argb(110, Color.red(guideColor), Color.green(guideColor), Color.blue(guideColor));
-    guidePaint.setShader(new RadialGradient(oval.centerX(), oval.centerY(), Math.max(oval.width(), oval.height()) / 2f,
-        new int[] {base, Color.argb(0, Color.red(guideColor), Color.green(guideColor), Color.blue(guideColor))},
-        new float[] {0.55f, 1f}, Shader.TileMode.CLAMP));
+    int base =
+        Color.argb(110, Color.red(guideColor), Color.green(guideColor), Color.blue(guideColor));
+    guidePaint.setShader(
+        new RadialGradient(
+            oval.centerX(),
+            oval.centerY(),
+            Math.max(oval.width(), oval.height()) / 2f,
+            new int[] {
+              base,
+              Color.argb(0, Color.red(guideColor), Color.green(guideColor), Color.blue(guideColor))
+            },
+            new float[] {0.55f, 1f},
+            Shader.TileMode.CLAMP));
     c.save();
     c.scale(1f, oval.height() / oval.width(), oval.centerX(), oval.centerY());
     c.drawCircle(oval.centerX(), oval.centerY(), oval.width() / 2f, guidePaint);
@@ -370,7 +408,8 @@ public class OutfitCanvasView extends View {
       point[0] = cx;
       point[1] = cy;
       inverse.mapPoints(point);
-      if (LayerBounds.isOpaqueNear(b, (int) point[0], (int) point[1], Math.max(4, b.getWidth() / 60))) {
+      if (LayerBounds.isOpaqueNear(
+          b, (int) point[0], (int) point[1], Math.max(4, b.getWidth() / 60))) {
         return l;
       }
     }
@@ -388,18 +427,19 @@ public class OutfitCanvasView extends View {
   public boolean onTouchEvent(MotionEvent e) {
     taps.onTouchEvent(e);
     switch (e.getActionMasked()) {
-      case MotionEvent.ACTION_DOWN: {
-        Layer l = hit(e.getX(), e.getY());
-        if (l != null) {
-          select(l);
+      case MotionEvent.ACTION_DOWN:
+        {
+          Layer l = hit(e.getX(), e.getY());
+          if (l != null) {
+            select(l);
+          }
+          activePointers = 1;
+          lastX = e.getX();
+          lastY = e.getY();
+          gestureChanged = false;
+          getParent().requestDisallowInterceptTouchEvent(selected != null);
+          return true;
         }
-        activePointers = 1;
-        lastX = e.getX();
-        lastY = e.getY();
-        gestureChanged = false;
-        getParent().requestDisallowInterceptTouchEvent(selected != null);
-        return true;
-      }
       case MotionEvent.ACTION_POINTER_DOWN:
         activePointers = e.getPointerCount();
         if (activePointers >= 2) {
@@ -445,21 +485,27 @@ public class OutfitCanvasView extends View {
         lastY = fy;
         invalidate();
         return true;
-      case MotionEvent.ACTION_POINTER_UP: {
-        // Re-anchor on the remaining finger so the layer doesn't jump.
-        int up = e.getActionIndex();
-        int keep = up == 0 ? 1 : 0;
-        lastX = e.getX(keep);
-        lastY = e.getY(keep);
-        activePointers = e.getPointerCount() - 1;
-        return true;
-      }
+      case MotionEvent.ACTION_POINTER_UP:
+        {
+          // Re-anchor on the remaining finger so the layer doesn't jump.
+          int up = e.getActionIndex();
+          int keep = up == 0 ? 1 : 0;
+          lastX = e.getX(keep);
+          lastY = e.getY(keep);
+          activePointers = e.getPointerCount() - 1;
+          return true;
+        }
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
         dragging = false;
         if (gestureChanged && selected != null) {
-          if (selected.fitted && OutfitGeometry.nearFittedPose(selected.x, selected.y, selected.scale, selected.rotation, SNAP_TOLERANCE)
-              && (selected.x != 0.5f || selected.y != 0.5f || selected.scale != 1f || selected.rotation != 0f)) {
+          if (selected.fitted
+              && OutfitGeometry.nearFittedPose(
+                  selected.x, selected.y, selected.scale, selected.rotation, SNAP_TOLERANCE)
+              && (selected.x != 0.5f
+                  || selected.y != 0.5f
+                  || selected.scale != 1f
+                  || selected.rotation != 0f)) {
             snapHome(selected);
           }
           if (listener != null) {
@@ -500,7 +546,8 @@ public class OutfitCanvasView extends View {
     float k = width / (float) canvasW;
     c.scale(k, k);
     if (mannequin != null) {
-      matrix.setScale(canvasW / (float) mannequin.getWidth(), canvasH / (float) mannequin.getHeight());
+      matrix.setScale(
+          canvasW / (float) mannequin.getWidth(), canvasH / (float) mannequin.getHeight());
       c.drawBitmap(mannequin, matrix, mannequinPaint);
     }
     drawOrder.clear();

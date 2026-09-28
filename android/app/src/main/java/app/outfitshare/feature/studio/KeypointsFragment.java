@@ -63,55 +63,73 @@ public class KeypointsFragment extends BaseFragment {
     view.findViewById(R.id.close).setOnClickListener(v -> nav().back());
     undoBtn.setOnClickListener(v -> step(undo, redo));
     redoBtn.setOnClickListener(v -> step(redo, undo));
-    view.findViewById(R.id.reset).setOnClickListener(v -> {
-      push();
-      editor.setPoints(original);
-    });
+    view.findViewById(R.id.reset)
+        .setOnClickListener(
+            v -> {
+              push();
+              editor.setPoints(original);
+            });
     view.findViewById(R.id.done).setOnClickListener(v -> submit());
     Chip mannequin = view.findViewById(R.id.mannequin);
     ImageView preview = view.findViewById(R.id.preview);
-    mannequin.setOnCheckedChangeListener((c, checked) -> {
-      preview.setVisibility(checked ? View.VISIBLE : View.GONE);
-      if (checked && job != null) {
-        Images.photo(preview, job.preview.female != null ? job.preview.female : job.preview.male);
-      }
-    });
+    mannequin.setOnCheckedChangeListener(
+        (c, checked) -> {
+          preview.setVisibility(checked ? View.VISIBLE : View.GONE);
+          if (checked && job != null) {
+            Images.photo(
+                preview, job.preview.female != null ? job.preview.female : job.preview.male);
+          }
+        });
 
-    editor.setListener(new KeypointEditorView.Listener() {
-      @Override
-      public void onDragStart() {
-        push();
-      }
+    editor.setListener(
+        new KeypointEditorView.Listener() {
+          @Override
+          public void onDragStart() {
+            push();
+          }
 
-      @Override
-      public void onPointMoved(String name, float x, float y) {
-        hint.setText(KeypointEditorView.longLabel(name) + "   x " + Math.round(x) + " · y " + Math.round(y));
-      }
+          @Override
+          public void onPointMoved(String name, float x, float y) {
+            hint.setText(
+                KeypointEditorView.longLabel(name)
+                    + "   x "
+                    + Math.round(x)
+                    + " · y "
+                    + Math.round(y));
+          }
 
-      @Override
-      public void onDragEnd() {
-        hint.setText(R.string.studio_keypoints_hint);
-      }
-    });
+          @Override
+          public void onDragEnd() {
+            hint.setText(R.string.studio_keypoints_hint);
+          }
+        });
 
-    Calls.run(api().job(requireArguments().getLong(ARG_ID)), r -> {
-      if (!isAdded() || !r.ok() || r.data == null) {
-        showError(r.error, null);
-        return;
-      }
-      job = r.data;
-      original = toMap(job.keypoints);
-      editor.setPoints(original);
-      Glide.with(this).asBitmap().load(job.cutoutUrl).disallowHardwareConfig().into(new CustomTarget<Bitmap>() {
-        @Override
-        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
-          editor.setBitmap(resource);
-        }
+    Calls.run(
+        api().job(requireArguments().getLong(ARG_ID)),
+        r -> {
+          if (!isAdded() || !r.ok() || r.data == null) {
+            showError(r.error, null);
+            return;
+          }
+          job = r.data;
+          original = toMap(job.keypoints);
+          editor.setPoints(original);
+          Glide.with(this)
+              .asBitmap()
+              .load(job.cutoutUrl)
+              .disallowHardwareConfig()
+              .into(
+                  new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(
+                        @NonNull Bitmap resource, @Nullable Transition<? super Bitmap> t) {
+                      editor.setBitmap(resource);
+                    }
 
-        @Override
-        public void onLoadCleared(@Nullable Drawable placeholder) {}
-      });
-    });
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                  });
+        });
   }
 
   private static Map<String, float[]> toMap(@Nullable Map<String, List<Float>> kp) {
@@ -161,16 +179,18 @@ public class KeypointsFragment extends BaseFragment {
     body.put("keypoints", kp);
     DsButton done = requireView().findViewById(R.id.done);
     done.setLoading(true);
-    Calls.run(api().refitJob(job.id, body), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      done.setLoading(false);
-      if (r.ok()) {
-        nav().back();
-      } else {
-        showError(r.error, this::submit);
-      }
-    });
+    Calls.run(
+        api().refitJob(job.id, body),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          done.setLoading(false);
+          if (r.ok()) {
+            nav().back();
+          } else {
+            showError(r.error, this::submit);
+          }
+        });
   }
 }

@@ -51,8 +51,12 @@ public class PublishFragment extends BaseFragment {
   private ChipGroup tagGroup;
   private DsButton publish;
 
-  public static PublishFragment newInstance(String gender, List<Dto.Layer> layers, List<Dto.Item> items,
-      @Nullable Long remixOf, Bitmap preview) {
+  public static PublishFragment newInstance(
+      String gender,
+      List<Dto.Layer> layers,
+      List<Dto.Item> items,
+      @Nullable Long remixOf,
+      Bitmap preview) {
     PublishFragment f = new PublishFragment();
     Bundle args = new Bundle();
     args.putString(ARG_GENDER, gender);
@@ -94,14 +98,15 @@ public class PublishFragment extends BaseFragment {
 
     tagGroup = view.findViewById(R.id.tags);
     TextInputEditText tagInput = view.findViewById(R.id.tag_input);
-    tagInput.setOnEditorActionListener((v, actionId, e) -> {
-      if (actionId == EditorInfo.IME_ACTION_DONE) {
-        addTag(String.valueOf(tagInput.getText()));
-        tagInput.setText("");
-        return true;
-      }
-      return false;
-    });
+    tagInput.setOnEditorActionListener(
+        (v, actionId, e) -> {
+          if (actionId == EditorInfo.IME_ACTION_DONE) {
+            addTag(String.valueOf(tagInput.getText()));
+            tagInput.setText("");
+            return true;
+          }
+          return false;
+        });
     loadSuggestions(view.findViewById(R.id.suggestions));
 
     ListRowView collectionRow = view.findViewById(R.id.collection);
@@ -113,27 +118,37 @@ public class PublishFragment extends BaseFragment {
     ListRowView remixRow = view.findViewById(R.id.allow_remix);
     remixRow.setToggle(true, (row, checked) -> {});
 
-    getChildFragmentManager().setFragmentResultListener(VISIBILITY, getViewLifecycleOwner(), (k, r) -> {
-      visibility = r.getString(ActionSheet.RESULT_ID, "all");
-      visibilityRow.setValue(visibilityLabel(visibility));
-    });
-    getChildFragmentManager().setFragmentResultListener(COLLECTION, getViewLifecycleOwner(), (k, r) -> {
-      String id = r.getString(ActionSheet.RESULT_ID, "none");
-      collectionId = "none".equals(id) ? null : Long.parseLong(id);
-      String label = "Не добавлять";
-      for (Dto.Collection c : collections) {
-        if (collectionId != null && c.id == collectionId) {
-          label = c.title;
-        }
-      }
-      collectionRow.setValue(label);
-    });
-    Calls.run(api().collections(null), r -> {
-      if (r.ok() && r.data != null) {
-        collections.clear();
-        collections.addAll(r.data.results);
-      }
-    });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            VISIBILITY,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              visibility = r.getString(ActionSheet.RESULT_ID, "all");
+              visibilityRow.setValue(visibilityLabel(visibility));
+            });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            COLLECTION,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              String id = r.getString(ActionSheet.RESULT_ID, "none");
+              collectionId = "none".equals(id) ? null : Long.parseLong(id);
+              String label = "Не добавлять";
+              for (Dto.Collection c : collections) {
+                if (collectionId != null && c.id == collectionId) {
+                  label = c.title;
+                }
+              }
+              collectionRow.setValue(label);
+            });
+    Calls.run(
+        api().collections(null),
+        r -> {
+          if (r.ok() && r.data != null) {
+            collections.clear();
+            collections.addAll(r.data.results);
+          }
+        });
 
     publish = view.findViewById(R.id.publish);
     publish.setOnClickListener(v -> submit());
@@ -152,38 +167,80 @@ public class PublishFragment extends BaseFragment {
 
   private void pickVisibility() {
     ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-    rows.add(new ActionSheet.Row("all", app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility, "Все", "Образ увидят все в ленте «Для вас»", false, "all".equals(visibility)));
-    rows.add(new ActionSheet.Row("followers", app.outfitshare.core.designsystem.R.drawable.ds_ic_following, "Подписчики", "Только те, кто на вас подписан", false, "followers".equals(visibility)));
-    rows.add(new ActionSheet.Row("private", app.outfitshare.core.designsystem.R.drawable.ds_ic_lock, "Только я", "Образ останется в профиле скрытым", false, "private".equals(visibility)));
-    ActionSheet.show(getChildFragmentManager(), VISIBILITY, getString(R.string.publish_visibility), rows);
+    rows.add(
+        new ActionSheet.Row(
+            "all",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility,
+            "Все",
+            "Образ увидят все в ленте «Для вас»",
+            false,
+            "all".equals(visibility)));
+    rows.add(
+        new ActionSheet.Row(
+            "followers",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_following,
+            "Подписчики",
+            "Только те, кто на вас подписан",
+            false,
+            "followers".equals(visibility)));
+    rows.add(
+        new ActionSheet.Row(
+            "private",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_lock,
+            "Только я",
+            "Образ останется в профиле скрытым",
+            false,
+            "private".equals(visibility)));
+    ActionSheet.show(
+        getChildFragmentManager(), VISIBILITY, getString(R.string.publish_visibility), rows);
   }
 
   private void pickCollection() {
     ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-    rows.add(new ActionSheet.Row("none", app.outfitshare.core.designsystem.R.drawable.ds_ic_close, "Не добавлять", null, false, collectionId == null));
+    rows.add(
+        new ActionSheet.Row(
+            "none",
+            app.outfitshare.core.designsystem.R.drawable.ds_ic_close,
+            "Не добавлять",
+            null,
+            false,
+            collectionId == null));
     for (Dto.Collection c : collections) {
-      rows.add(new ActionSheet.Row(String.valueOf(c.id), c.isPrivate ? app.outfitshare.core.designsystem.R.drawable.ds_ic_lock
-          : app.outfitshare.core.designsystem.R.drawable.ds_ic_collections, c.title, null, false, collectionId != null && collectionId == c.id));
+      rows.add(
+          new ActionSheet.Row(
+              String.valueOf(c.id),
+              c.isPrivate
+                  ? app.outfitshare.core.designsystem.R.drawable.ds_ic_lock
+                  : app.outfitshare.core.designsystem.R.drawable.ds_ic_collections,
+              c.title,
+              null,
+              false,
+              collectionId != null && collectionId == c.id));
     }
-    ActionSheet.show(getChildFragmentManager(), COLLECTION, getString(R.string.publish_collection), rows);
+    ActionSheet.show(
+        getChildFragmentManager(), COLLECTION, getString(R.string.publish_collection), rows);
   }
 
   private void loadSuggestions(ChipGroup group) {
-    Calls.run(api().trendingHashtags(), r -> {
-      if (!isAdded() || !r.ok() || r.data == null) {
-        return;
-      }
-      for (Dto.Hashtag h : r.data.results) {
-        Chip chip = new Chip(requireContext(), null, com.google.android.material.R.attr.chipStyle);
-        chip.setText("+ #" + h.tag);
-        chip.setCheckable(false);
-        chip.setOnClickListener(v -> {
-          addTag(h.tag);
-          group.removeView(chip);
+    Calls.run(
+        api().trendingHashtags(),
+        r -> {
+          if (!isAdded() || !r.ok() || r.data == null) {
+            return;
+          }
+          for (Dto.Hashtag h : r.data.results) {
+            Chip chip =
+                new Chip(requireContext(), null, com.google.android.material.R.attr.chipStyle);
+            chip.setText("+ #" + h.tag);
+            chip.setCheckable(false);
+            chip.setOnClickListener(
+                v -> {
+                  addTag(h.tag);
+                  group.removeView(chip);
+                });
+            group.addView(chip);
+          }
         });
-        group.addView(chip);
-      }
-    });
   }
 
   private void addTag(String raw) {
@@ -197,17 +254,21 @@ public class PublishFragment extends BaseFragment {
     chip.setCloseIconVisible(true);
     chip.setCheckable(false);
     chip.setCloseIconContentDescription("Убрать #" + tag);
-    chip.setOnCloseIconClickListener(v -> {
-      tags.remove(tag);
-      tagGroup.removeView(chip);
-    });
+    chip.setOnCloseIconClickListener(
+        v -> {
+          tags.remove(tag);
+          tagGroup.removeView(chip);
+        });
     tagGroup.addView(chip);
   }
 
   private void submit() {
     Bundle args = requireArguments();
     List<Map<String, Object>> layers = new ArrayList<>();
-    List<Dto.Layer> parsed = container().gson.fromJson(args.getString(ARG_LAYERS), new TypeToken<List<Dto.Layer>>() {}.getType());
+    List<Dto.Layer> parsed =
+        container()
+            .gson
+            .fromJson(args.getString(ARG_LAYERS), new TypeToken<List<Dto.Layer>>() {}.getType());
     for (Dto.Layer l : parsed) {
       Map<String, Object> m = new HashMap<>();
       m.put("item_id", l.itemId);
@@ -222,40 +283,47 @@ public class PublishFragment extends BaseFragment {
     }
     Map<String, Object> body = new HashMap<>();
     body.put("mannequin", args.getString(ARG_GENDER));
-    body.put("description", String.valueOf(((TextInputEditText) requireView().findViewById(R.id.caption)).getText()).trim());
+    body.put(
+        "description",
+        String.valueOf(((TextInputEditText) requireView().findViewById(R.id.caption)).getText())
+            .trim());
     body.put("hashtags", new ArrayList<>(tags));
     body.put("visibility", visibility);
     body.put("layers", layers);
-    body.put("allow_remix", ((ListRowView) requireView().findViewById(R.id.allow_remix)).isToggleChecked());
+    body.put(
+        "allow_remix",
+        ((ListRowView) requireView().findViewById(R.id.allow_remix)).isToggleChecked());
     if (args.containsKey(ARG_REMIX)) {
       body.put("remix_of", args.getLong(ARG_REMIX));
     }
     publish.setLoading(true);
     publish.setText(R.string.publish_in_progress);
-    Calls.run(api().createOutfit(body), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      publish.setLoading(false);
-      publish.setText(R.string.publish_button);
-      if (!r.ok() || r.data == null) {
-        showError(r.error, this::submit);
-        return;
-      }
-      Haptics.perform(requireView(), Haptics.Event.PUBLISH);
-      Dto.Outfit outfit = r.data;
-      if (collectionId != null) {
-        Map<String, Object> save = new HashMap<>();
-        save.put("collection_id", collectionId);
-        Calls.run(api().save(outfit.id, save), x -> {});
-      }
-      container().outfitBus.created(outfit.id);
-      for (Fragment f : getParentFragmentManager().getFragments()) {
-        if (f instanceof ConstructorFragment) {
-          ((ConstructorFragment) f).onPublished();
-        }
-      }
-      nav().replaceTop(PublishedFragment.outfit(outfit.id, outfit.imageUrl));
-    });
+    Calls.run(
+        api().createOutfit(body),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          publish.setLoading(false);
+          publish.setText(R.string.publish_button);
+          if (!r.ok() || r.data == null) {
+            showError(r.error, this::submit);
+            return;
+          }
+          Haptics.perform(requireView(), Haptics.Event.PUBLISH);
+          Dto.Outfit outfit = r.data;
+          if (collectionId != null) {
+            Map<String, Object> save = new HashMap<>();
+            save.put("collection_id", collectionId);
+            Calls.run(api().save(outfit.id, save), x -> {});
+          }
+          container().outfitBus.created(outfit.id);
+          for (Fragment f : getParentFragmentManager().getFragments()) {
+            if (f instanceof ConstructorFragment) {
+              ((ConstructorFragment) f).onPublished();
+            }
+          }
+          nav().replaceTop(PublishedFragment.outfit(outfit.id, outfit.imageUrl));
+        });
   }
 }

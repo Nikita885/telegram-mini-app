@@ -16,8 +16,8 @@ import com.google.android.material.divider.MaterialDivider;
 import java.util.ArrayList;
 
 /**
- * List of actions in a bottom sheet (mockup «Шторка «Ещё»», «Фото профиля», «Тема»).
- * The chosen row id is delivered through the Fragment Result API under {@code requestKey}.
+ * List of actions in a bottom sheet (mockup «Шторка «Ещё»», «Фото профиля», «Тема»). The chosen row
+ * id is delivered through the Fragment Result API under {@code requestKey}.
  */
 public class ActionSheet extends DsBottomSheetDialogFragment {
   public static final String RESULT_ID = "id";
@@ -35,11 +35,18 @@ public class ActionSheet extends DsBottomSheetDialogFragment {
     final boolean danger;
     final boolean checked;
 
-    public Row(String id, @DrawableRes int icon, String title, @Nullable String subtitle, boolean danger) {
+    public Row(
+        String id, @DrawableRes int icon, String title, @Nullable String subtitle, boolean danger) {
       this(id, icon, title, subtitle, danger, false);
     }
 
-    public Row(String id, @DrawableRes int icon, String title, @Nullable String subtitle, boolean danger, boolean checked) {
+    public Row(
+        String id,
+        @DrawableRes int icon,
+        String title,
+        @Nullable String subtitle,
+        boolean danger,
+        boolean checked) {
       this.id = id;
       this.icon = icon;
       this.title = title;
@@ -49,7 +56,8 @@ public class ActionSheet extends DsBottomSheetDialogFragment {
     }
   }
 
-  public static void show(FragmentManager fm, String requestKey, @Nullable String title, ArrayList<Row> rows) {
+  public static void show(
+      FragmentManager fm, String requestKey, @Nullable String title, ArrayList<Row> rows) {
     ActionSheet sheet = new ActionSheet();
     Bundle args = new Bundle();
     args.putString(ARG_KEY, requestKey);
@@ -68,10 +76,12 @@ public class ActionSheet extends DsBottomSheetDialogFragment {
   @NonNull
   @Override
   @SuppressWarnings("unchecked")
-  protected View onCreateSheetContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
+  protected View onCreateSheetContent(
+      @NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
     LinearLayout list = new LinearLayout(requireContext());
     list.setOrientation(LinearLayout.VERTICAL);
-    int bottom = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5);
+    int bottom =
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_5);
     list.setPadding(0, 0, 0, bottom);
     ArrayList<Row> rows = (ArrayList<Row>) requireArguments().getSerializable(ARG_ROWS);
     boolean dividerAdded = false;
@@ -79,8 +89,14 @@ public class ActionSheet extends DsBottomSheetDialogFragment {
       for (Row row : rows) {
         if (row.danger && !dividerAdded && list.getChildCount() > 0) {
           MaterialDivider divider = new MaterialDivider(requireContext());
-          divider.setDividerInsetStart(getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter));
-          divider.setDividerInsetEnd(getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter));
+          divider.setDividerInsetStart(
+              getResources()
+                  .getDimensionPixelSize(
+                      app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter));
+          divider.setDividerInsetEnd(
+              getResources()
+                  .getDimensionPixelSize(
+                      app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter));
           list.addView(divider);
           dividerAdded = true;
         }
@@ -94,12 +110,14 @@ public class ActionSheet extends DsBottomSheetDialogFragment {
         if (row.checked) {
           v.setTrailingView(checkMark());
         }
-        v.setOnClickListener(x -> {
-          Bundle result = new Bundle();
-          result.putString(RESULT_ID, row.id);
-          getParentFragmentManager().setFragmentResult(requireArguments().getString(ARG_KEY), result);
-          dismiss();
-        });
+        v.setOnClickListener(
+            x -> {
+              Bundle result = new Bundle();
+              result.putString(RESULT_ID, row.id);
+              getParentFragmentManager()
+                  .setFragmentResult(requireArguments().getString(ARG_KEY), result);
+              dismiss();
+            });
         list.addView(v);
       }
     }

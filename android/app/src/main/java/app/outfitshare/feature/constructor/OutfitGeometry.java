@@ -34,8 +34,18 @@ public final class OutfitGeometry {
    * @param imageW bitmap width in pixels (the bitmap is stretched to the base box)
    */
   public static void layerToCanvas(
-      Matrix out, float x, float y, float scale, float rotation, boolean flipped,
-      float baseW, float baseH, int imageW, int imageH, int canvasW, int canvasH) {
+      Matrix out,
+      float x,
+      float y,
+      float scale,
+      float rotation,
+      boolean flipped,
+      float baseW,
+      float baseH,
+      int imageW,
+      int imageH,
+      int canvasW,
+      int canvasH) {
     out.reset();
     out.postScale(baseW / Math.max(imageW, 1), baseH / Math.max(imageH, 1));
     out.postTranslate(-baseW / 2f, -baseH / 2f);
@@ -54,7 +64,8 @@ public final class OutfitGeometry {
   }
 
   /** Whether a fitted layer is close enough to its body position to snap back onto it. */
-  public static boolean nearFittedPose(float x, float y, float scale, float rotation, float tolerance) {
+  public static boolean nearFittedPose(
+      float x, float y, float scale, float rotation, float tolerance) {
     return Math.abs(x - 0.5f) < tolerance
         && Math.abs(y - 0.5f) < tolerance
         && Math.abs(scale - 1f) < 0.15f

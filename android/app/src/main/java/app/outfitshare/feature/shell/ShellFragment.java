@@ -62,27 +62,34 @@ public class ShellFragment extends BaseFragment {
           }
         });
 
-    container().counters.counters().observe(getViewLifecycleOwner(), c -> Badges.setCount(bar, R.id.nav_dialogs, c.messages));
+    container()
+        .counters
+        .counters()
+        .observe(getViewLifecycleOwner(), c -> Badges.setCount(bar, R.id.nav_dialogs, c.messages));
 
-    requireActivity().getOnBackPressedDispatcher().addCallback(
-        getViewLifecycleOwner(),
-        new OnBackPressedCallback(true) {
-          @Override
-          public void handleOnBackPressed() {
-            if (current != R.id.nav_feed && getParentFragmentManager().getBackStackEntryCount() == 0) {
-              selectTab(R.id.nav_feed);
-            } else {
-              setEnabled(false);
-              requireActivity().getOnBackPressedDispatcher().onBackPressed();
-              setEnabled(true);
-            }
-          }
-        });
+    requireActivity()
+        .getOnBackPressedDispatcher()
+        .addCallback(
+            getViewLifecycleOwner(),
+            new OnBackPressedCallback(true) {
+              @Override
+              public void handleOnBackPressed() {
+                if (current != R.id.nav_feed
+                    && getParentFragmentManager().getBackStackEntryCount() == 0) {
+                  selectTab(R.id.nav_feed);
+                } else {
+                  setEnabled(false);
+                  requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                  setEnabled(true);
+                }
+              }
+            });
   }
 
   /**
-   * «Создать» (mockup .bottomnav__create): the 56×32 icon pill is always filled with primary and the
-   * plus is on-primary. The pill is the icon container's background, so the label stays in place.
+   * «Создать» (mockup .bottomnav__create): the 56×32 icon pill is always filled with primary and
+   * the plus is on-primary. The pill is the icon container's background, so the label stays in
+   * place.
    */
   private void styleCreateItem() {
     View item = bar.findViewById(R.id.nav_create);
@@ -90,7 +97,8 @@ public class ShellFragment extends BaseFragment {
       BottomNavigationItemView v = (BottomNavigationItemView) item;
       v.setIconTintList(null);
       v.setActiveIndicatorEnabled(false);
-      View container = v.findViewById(com.google.android.material.R.id.navigation_bar_item_icon_container);
+      View container =
+          v.findViewById(com.google.android.material.R.id.navigation_bar_item_icon_container);
       if (container != null) {
         container.setBackgroundResource(R.drawable.nav_create_pill);
       }

@@ -39,8 +39,14 @@ public class StudioPublishFragment extends BaseFragment {
   private static final String ARG_JOB = "job";
   private static final String GENDER = "gender";
   private static final String STYLE = "style";
-  private static final String[][] STYLES = {{"", "Без стиля"}, {"casual", "Casual"}, {"formal", "Formal"},
-      {"sport", "Sport"}, {"street", "Street"}, {"business", "Business"}};
+  private static final String[][] STYLES = {
+    {"", "Без стиля"},
+    {"casual", "Casual"},
+    {"formal", "Formal"},
+    {"sport", "Sport"},
+    {"street", "Street"},
+    {"business", "Business"}
+  };
 
   private Dto.GarmentJob job;
   private String gender;
@@ -76,35 +82,51 @@ public class StudioPublishFragment extends BaseFragment {
     layer.setValue(StudioText.zoneLabel(job.zone));
     ListRowView genderRow = view.findViewById(R.id.gender);
     genderRow.setValue(StudioText.genderLabel(gender));
-    genderRow.setOnClickListener(v -> {
-      ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-      for (String g : new String[] {"unisex", "female", "male"}) {
-        rows.add(new ActionSheet.Row(g, 0, StudioText.genderLabel(g), null, false, g.equals(gender)));
-      }
-      ActionSheet.show(getChildFragmentManager(), GENDER, getString(R.string.studio_gender), rows);
-    });
-    getChildFragmentManager().setFragmentResultListener(GENDER, getViewLifecycleOwner(), (k, r) -> {
-      gender = r.getString(ActionSheet.RESULT_ID, gender);
-      genderRow.setValue(StudioText.genderLabel(gender));
-    });
+    genderRow.setOnClickListener(
+        v -> {
+          ArrayList<ActionSheet.Row> rows = new ArrayList<>();
+          for (String g : new String[] {"unisex", "female", "male"}) {
+            rows.add(
+                new ActionSheet.Row(
+                    g, 0, StudioText.genderLabel(g), null, false, g.equals(gender)));
+          }
+          ActionSheet.show(
+              getChildFragmentManager(), GENDER, getString(R.string.studio_gender), rows);
+        });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            GENDER,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              gender = r.getString(ActionSheet.RESULT_ID, gender);
+              genderRow.setValue(StudioText.genderLabel(gender));
+            });
     ListRowView styleRow = view.findViewById(R.id.style);
     styleRow.setValue(STYLES[0][1]);
-    styleRow.setOnClickListener(v -> {
-      ArrayList<ActionSheet.Row> rows = new ArrayList<>();
-      for (String[] s : STYLES) {
-        rows.add(new ActionSheet.Row(s[0].isEmpty() ? "none" : s[0], 0, s[1], null, false, s[0].equals(style)));
-      }
-      ActionSheet.show(getChildFragmentManager(), STYLE, getString(R.string.studio_style), rows);
-    });
-    getChildFragmentManager().setFragmentResultListener(STYLE, getViewLifecycleOwner(), (k, r) -> {
-      String id = r.getString(ActionSheet.RESULT_ID, "none");
-      style = "none".equals(id) ? "" : id;
-      for (String[] s : STYLES) {
-        if (s[0].equals(style)) {
-          styleRow.setValue(s[1]);
-        }
-      }
-    });
+    styleRow.setOnClickListener(
+        v -> {
+          ArrayList<ActionSheet.Row> rows = new ArrayList<>();
+          for (String[] s : STYLES) {
+            rows.add(
+                new ActionSheet.Row(
+                    s[0].isEmpty() ? "none" : s[0], 0, s[1], null, false, s[0].equals(style)));
+          }
+          ActionSheet.show(
+              getChildFragmentManager(), STYLE, getString(R.string.studio_style), rows);
+        });
+    getChildFragmentManager()
+        .setFragmentResultListener(
+            STYLE,
+            getViewLifecycleOwner(),
+            (k, r) -> {
+              String id = r.getString(ActionSheet.RESULT_ID, "none");
+              style = "none".equals(id) ? "" : id;
+              for (String[] s : STYLES) {
+                if (s[0].equals(style)) {
+                  styleRow.setValue(s[1]);
+                }
+              }
+            });
 
     bindSwatches(view);
     loadCategories(view.findViewById(R.id.categories));
@@ -123,11 +145,15 @@ public class StudioPublishFragment extends BaseFragment {
     LinearLayout row = view.findViewById(R.id.swatches);
     TextView name = view.findViewById(R.id.color_name);
     Object raw = job.attributes == null ? null : job.attributes.get("colors");
-    List<Map<String, Object>> colors = raw instanceof List ? (List<Map<String, Object>>) raw : new ArrayList<>();
+    List<Map<String, Object>> colors =
+        raw instanceof List ? (List<Map<String, Object>>) raw : new ArrayList<>();
     int size = getResources().getDimensionPixelSize(R.dimen.swatch_size);
-    int gap = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_3);
-    int ring = DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurface);
-    int background = DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorBackground);
+    int gap =
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_3);
+    int ring =
+        DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurface);
+    int background =
+        DsTheme.color(requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorBackground);
     List<View> swatches = new ArrayList<>();
     for (int i = 0; i < colors.size(); i++) {
       Map<String, Object> c = colors.get(i);
@@ -145,20 +171,24 @@ public class StudioPublishFragment extends BaseFragment {
         fill = Color.GRAY;
       }
       final int f = fill;
-      swatch.setOnClickListener(v -> {
-        colorName = label;
-        name.setText(label);
-        for (View s : swatches) {
-          s.setBackground(swatchDrawable((Integer) s.getTag(), s == v, ring, background));
-          s.setSelected(s == v);
-        }
-      });
+      swatch.setOnClickListener(
+          v -> {
+            colorName = label;
+            name.setText(label);
+            for (View s : swatches) {
+              s.setBackground(swatchDrawable((Integer) s.getTag(), s == v, ring, background));
+              s.setSelected(s == v);
+            }
+          });
       swatch.setTag(f);
       swatches.add(swatch);
       row.addView(swatch);
     }
     for (int i = 0; i < swatches.size(); i++) {
-      swatches.get(i).setBackground(swatchDrawable((Integer) swatches.get(i).getTag(), i == 0, ring, background));
+      swatches
+          .get(i)
+          .setBackground(
+              swatchDrawable((Integer) swatches.get(i).getTag(), i == 0, ring, background));
     }
     if (!colors.isEmpty()) {
       colorName = String.valueOf(colors.get(0).get("name"));
@@ -181,25 +211,27 @@ public class StudioPublishFragment extends BaseFragment {
   }
 
   private void loadCategories(ChipGroup group) {
-    Calls.run(api().categories(), r -> {
-      if (!isAdded() || !r.ok() || r.data == null) {
-        return;
-      }
-      categories.clear();
-      categories.addAll(r.data.results);
-      group.removeAllViews();
-      for (Dto.Category c : categories) {
-        Chip chip = new Chip(requireContext());
-        chip.setId(View.generateViewId());
-        chip.setText(c.name);
-        chip.setTag(c.slug);
-        chip.setCheckable(true);
-        group.addView(chip);
-        if (c.slug.equals(job.category)) {
-          chip.setChecked(true);
-        }
-      }
-    });
+    Calls.run(
+        api().categories(),
+        r -> {
+          if (!isAdded() || !r.ok() || r.data == null) {
+            return;
+          }
+          categories.clear();
+          categories.addAll(r.data.results);
+          group.removeAllViews();
+          for (Dto.Category c : categories) {
+            Chip chip = new Chip(requireContext());
+            chip.setId(View.generateViewId());
+            chip.setText(c.name);
+            chip.setTag(c.slug);
+            chip.setCheckable(true);
+            group.addView(chip);
+            if (c.slug.equals(job.category)) {
+              chip.setChecked(true);
+            }
+          }
+        });
   }
 
   private void publish() {
@@ -224,7 +256,8 @@ public class StudioPublishFragment extends BaseFragment {
       body.put("color", colorName);
     }
     String brand = ((EditText) v.findViewById(R.id.brand)).getText().toString().trim();
-    String price = ((EditText) v.findViewById(R.id.price)).getText().toString().trim().replace(',', '.');
+    String price =
+        ((EditText) v.findViewById(R.id.price)).getText().toString().trim().replace(',', '.');
     String link = ((EditText) v.findViewById(R.id.link)).getText().toString().trim();
     String description = ((EditText) v.findViewById(R.id.description)).getText().toString().trim();
     body.put("brand", brand);
@@ -239,26 +272,33 @@ public class StudioPublishFragment extends BaseFragment {
     DsButton button = v.findViewById(R.id.publish);
     button.setLoading(true);
     button.setText(R.string.publish_in_progress);
-    Calls.run(api().publishJob(job.id, body), r -> {
-      if (!isAdded()) {
-        return;
-      }
-      button.setLoading(false);
-      button.setText(R.string.studio_publish_button);
-      if (!r.ok() || r.data == null) {
-        String field = r.error == null ? null : r.error.fieldMessage("buy_link");
-        if (field != null) {
-          ((TextInputLayout) v.findViewById(R.id.link_layout)).setError("Проверьте ссылку");
-        } else {
-          showError(r.error, this::publish);
-        }
-        return;
-      }
-      Haptics.perform(v, Haptics.Event.PUBLISH);
-      Dto.GarmentJob done = r.data.job;
-      String preview = done.preview.female != null ? done.preview.female : done.preview.male;
-      nav().popInclusive(StudioReviewFragment.class.getSimpleName());
-      nav().push(PublishedFragment.studioItem(r.data.item.id, preview != null ? preview : done.cutoutUrl, r.data.item.name));
-    });
+    Calls.run(
+        api().publishJob(job.id, body),
+        r -> {
+          if (!isAdded()) {
+            return;
+          }
+          button.setLoading(false);
+          button.setText(R.string.studio_publish_button);
+          if (!r.ok() || r.data == null) {
+            String field = r.error == null ? null : r.error.fieldMessage("buy_link");
+            if (field != null) {
+              ((TextInputLayout) v.findViewById(R.id.link_layout)).setError("Проверьте ссылку");
+            } else {
+              showError(r.error, this::publish);
+            }
+            return;
+          }
+          Haptics.perform(v, Haptics.Event.PUBLISH);
+          Dto.GarmentJob done = r.data.job;
+          String preview = done.preview.female != null ? done.preview.female : done.preview.male;
+          nav().popInclusive(StudioReviewFragment.class.getSimpleName());
+          nav()
+              .push(
+                  PublishedFragment.studioItem(
+                      r.data.item.id,
+                      preview != null ? preview : done.cutoutUrl,
+                      r.data.item.name));
+        });
   }
 }

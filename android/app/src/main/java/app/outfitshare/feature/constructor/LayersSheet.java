@@ -53,7 +53,8 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
 
   @NonNull
   @Override
-  protected View onCreateSheetContent(@NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
+  protected View onCreateSheetContent(
+      @NonNull LayoutInflater inflater, @NonNull ViewGroup container, @Nullable Bundle state) {
     LinearLayout root = new LinearLayout(requireContext());
     root.setOrientation(LinearLayout.VERTICAL);
     RecyclerView list = new RecyclerView(requireContext());
@@ -61,31 +62,38 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
     List<Layer> layers = host().layers();
     Adapter adapter = new Adapter(layers);
     list.setAdapter(adapter);
-    ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
-      @Override
-      public boolean onMove(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder from, @NonNull RecyclerView.ViewHolder to) {
-        Collections.swap(layers, from.getBindingAdapterPosition(), to.getBindingAdapterPosition());
-        adapter.notifyItemMoved(from.getBindingAdapterPosition(), to.getBindingAdapterPosition());
-        return true;
-      }
+    ItemTouchHelper helper =
+        new ItemTouchHelper(
+            new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+              @Override
+              public boolean onMove(
+                  @NonNull RecyclerView rv,
+                  @NonNull RecyclerView.ViewHolder from,
+                  @NonNull RecyclerView.ViewHolder to) {
+                Collections.swap(
+                    layers, from.getBindingAdapterPosition(), to.getBindingAdapterPosition());
+                adapter.notifyItemMoved(
+                    from.getBindingAdapterPosition(), to.getBindingAdapterPosition());
+                return true;
+              }
 
-      @Override
-      public void onSelectedChanged(@Nullable RecyclerView.ViewHolder vh, int actionState) {
-        if (vh != null && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-          Haptics.perform(vh.itemView, Haptics.Event.DRAG_START);
-        }
-      }
+              @Override
+              public void onSelectedChanged(@Nullable RecyclerView.ViewHolder vh, int actionState) {
+                if (vh != null && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                  Haptics.perform(vh.itemView, Haptics.Event.DRAG_START);
+                }
+              }
 
-      @Override
-      public void clearView(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh) {
-        super.clearView(rv, vh);
-        host().onReordered(layers);
-        adapter.notifyDataSetChanged();
-      }
+              @Override
+              public void clearView(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh) {
+                super.clearView(rv, vh);
+                host().onReordered(layers);
+                adapter.notifyDataSetChanged();
+              }
 
-      @Override
-      public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int direction) {}
-    });
+              @Override
+              public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int direction) {}
+            });
     helper.attachToRecyclerView(list);
     adapter.helper = helper;
     root.addView(list);
@@ -93,11 +101,19 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
     TextView hint = new TextView(requireContext());
     hint.setText(R.string.constructor_layers_hint);
     hint.setTextAppearance(app.outfitshare.core.designsystem.R.style.TextAppearance_Ds_BodySmall);
-    int gutter = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
-    int pad = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_2);
-    hint.setPadding(gutter, pad, gutter, getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_6));
-    hint.setTextColor(app.outfitshare.core.designsystem.theme.DsTheme.color(requireContext(),
-        app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant));
+    int gutter =
+        getResources()
+            .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+    int pad =
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_2);
+    hint.setPadding(
+        gutter,
+        pad,
+        gutter,
+        getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_space_6));
+    hint.setTextColor(
+        app.outfitshare.core.designsystem.theme.DsTheme.color(
+            requireContext(), app.outfitshare.core.designsystem.R.attr.dsColorOnSurfaceVariant));
     root.addView(hint);
     return root;
   }
@@ -113,7 +129,8 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layer, parent, false));
+      return new Holder(
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_layer, parent, false));
     }
 
     @Override
@@ -122,30 +139,38 @@ public class LayersSheet extends DsBottomSheetDialogFragment {
       Layer l = layers.get(position);
       Images.cutout(h.thumb, l.item.imageUrl);
       h.title.setText(l.item.name);
-      h.sub.setText((l.item.categoryName == null ? "" : l.item.categoryName) + " · слой " + (layers.size() - position));
+      h.sub.setText(
+          (l.item.categoryName == null ? "" : l.item.categoryName)
+              + " · слой "
+              + (layers.size() - position));
       h.itemView.setAlpha(l.hidden ? 0.5f : 1f);
-      h.visibility.setIconResource(l.hidden ? app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility_off
-          : app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility);
+      h.visibility.setIconResource(
+          l.hidden
+              ? app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility_off
+              : app.outfitshare.core.designsystem.R.drawable.ds_ic_visibility);
       h.visibility.setContentDescription(l.hidden ? "Показать слой" : "Скрыть слой");
-      h.visibility.setOnClickListener(v -> {
-        host().onToggleHidden(l);
-        notifyItemChanged(h.getBindingAdapterPosition());
-      });
-      h.delete.setOnClickListener(v -> {
-        int i = h.getBindingAdapterPosition();
-        host().removeLayer(l);
-        layers.remove(i);
-        notifyItemRemoved(i);
-        if (layers.isEmpty()) {
-          dismiss();
-        }
-      });
-      h.handle.setOnTouchListener((v, e) -> {
-        if (e.getActionMasked() == MotionEvent.ACTION_DOWN && helper != null) {
-          helper.startDrag(h);
-        }
-        return false;
-      });
+      h.visibility.setOnClickListener(
+          v -> {
+            host().onToggleHidden(l);
+            notifyItemChanged(h.getBindingAdapterPosition());
+          });
+      h.delete.setOnClickListener(
+          v -> {
+            int i = h.getBindingAdapterPosition();
+            host().removeLayer(l);
+            layers.remove(i);
+            notifyItemRemoved(i);
+            if (layers.isEmpty()) {
+              dismiss();
+            }
+          });
+      h.handle.setOnTouchListener(
+          (v, e) -> {
+            if (e.getActionMasked() == MotionEvent.ACTION_DOWN && helper != null) {
+              helper.startDrag(h);
+            }
+            return false;
+          });
     }
 
     @Override

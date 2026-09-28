@@ -54,10 +54,11 @@ public class LoginFragment extends BaseFragment {
     SystemBars.applyPadding(view, true, true);
     TextView wordmark = view.findViewById(R.id.wordmark);
     Wordmark.apply(wordmark);
-    wordmark.setOnLongClickListener(v -> {
-      askServer();
-      return true;
-    });
+    wordmark.setOnLongClickListener(
+        v -> {
+          askServer();
+          return true;
+        });
     telegram = view.findViewById(R.id.telegram);
     hint = view.findViewById(R.id.hint);
     reopen = view.findViewById(R.id.reopen);
@@ -114,7 +115,8 @@ public class LoginFragment extends BaseFragment {
     // Prefer the Telegram app (tg://resolve), fall back to the t.me link in a browser.
     String bot = web.getLastPathSegment();
     String start = web.getQueryParameter("start");
-    Intent tg = new Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=" + bot + "&start=" + start));
+    Intent tg =
+        new Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=" + bot + "&start=" + start));
     try {
       startActivity(tg);
     } catch (ActivityNotFoundException e) {
@@ -208,7 +210,8 @@ public class LoginFragment extends BaseFragment {
     handler.removeCallbacksAndMessages(null);
     polling = false;
     if (pending != null) {
-      // Keep polling in the background briefly: some launchers keep us paused while Telegram is on top.
+      // Keep polling in the background briefly: some launchers keep us paused while Telegram is on
+      // top.
       polling = true;
       handler.postDelayed(this::poll, POLL_MS);
     }
@@ -219,16 +222,20 @@ public class LoginFragment extends BaseFragment {
     input.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
     input.setText(container().prefs.server());
     FrameLayout box = new FrameLayout(requireContext());
-    int pad = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+    int pad =
+        getResources()
+            .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
     box.setPadding(pad, 0, pad, 0);
     box.addView(input);
     new MaterialAlertDialogBuilder(requireContext())
         .setTitle(R.string.login_server)
         .setView(box)
-        .setPositiveButton(R.string.action_done, (d, w) -> {
-          container().changeServer(input.getText().toString());
-          loadConfig();
-        })
+        .setPositiveButton(
+            R.string.action_done,
+            (d, w) -> {
+              container().changeServer(input.getText().toString());
+              loadConfig();
+            })
         .setNegativeButton(R.string.action_close, null)
         .show();
   }
@@ -238,27 +245,33 @@ public class LoginFragment extends BaseFragment {
     input.setInputType(InputType.TYPE_CLASS_NUMBER);
     input.setHint("Telegram ID");
     FrameLayout box = new FrameLayout(requireContext());
-    int pad = getResources().getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
+    int pad =
+        getResources()
+            .getDimensionPixelSize(app.outfitshare.core.designsystem.R.dimen.ds_layout_gutter);
     box.setPadding(pad, 0, pad, 0);
     box.addView(input);
     new MaterialAlertDialogBuilder(requireContext())
         .setTitle(R.string.login_dev)
         .setView(box)
-        .setPositiveButton(R.string.action_next, (d, w) -> {
-          Map<String, Object> body = new HashMap<>();
-          try {
-            body.put("telegram_id", Long.parseLong(input.getText().toString().trim()));
-          } catch (NumberFormatException e) {
-            return;
-          }
-          Calls.run(api().devLogin(body), r -> {
-            if (r.ok() && r.data != null) {
-              onTokens(r.data);
-            } else {
-              showError(r.error, null);
-            }
-          });
-        })
+        .setPositiveButton(
+            R.string.action_next,
+            (d, w) -> {
+              Map<String, Object> body = new HashMap<>();
+              try {
+                body.put("telegram_id", Long.parseLong(input.getText().toString().trim()));
+              } catch (NumberFormatException e) {
+                return;
+              }
+              Calls.run(
+                  api().devLogin(body),
+                  r -> {
+                    if (r.ok() && r.data != null) {
+                      onTokens(r.data);
+                    } else {
+                      showError(r.error, null);
+                    }
+                  });
+            })
         .setNegativeButton(R.string.action_close, null)
         .show();
   }

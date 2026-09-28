@@ -18,9 +18,15 @@ import app.outfitshare.core.ui.PagerDots;
 
 /** Three spreads; «Пропустить» always available, swipe and «Далее» are equivalent. */
 public class OnboardingFragment extends BaseFragment {
-  private static final int[] PHOTOS = {R.drawable.hero_trench, R.drawable.hero_shirt, R.drawable.hero_dress};
-  private static final int[] TITLES = {R.string.onboarding_1_title, R.string.onboarding_2_title, R.string.onboarding_3_title};
-  private static final int[] TEXTS = {R.string.onboarding_1_text, R.string.onboarding_2_text, R.string.onboarding_3_text};
+  private static final int[] PHOTOS = {
+    R.drawable.hero_trench, R.drawable.hero_shirt, R.drawable.hero_dress
+  };
+  private static final int[] TITLES = {
+    R.string.onboarding_1_title, R.string.onboarding_2_title, R.string.onboarding_3_title
+  };
+  private static final int[] TEXTS = {
+    R.string.onboarding_1_text, R.string.onboarding_2_text, R.string.onboarding_3_text
+  };
 
   public OnboardingFragment() {
     super(R.layout.fragment_onboarding);
@@ -69,7 +75,9 @@ public class OnboardingFragment extends BaseFragment {
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_onboarding_page, parent, false));
+      return new Holder(
+          LayoutInflater.from(parent.getContext())
+              .inflate(R.layout.item_onboarding_page, parent, false));
     }
 
     @Override

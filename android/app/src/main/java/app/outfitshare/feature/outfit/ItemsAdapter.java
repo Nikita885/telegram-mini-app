@@ -18,7 +18,9 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.Holder> {
   private final boolean showText;
   private final java.util.Set<Long> selected = new java.util.HashSet<>();
 
-  /** @param fixedWidthPx card width for a horizontal rail, 0 to fill the grid cell */
+  /**
+   * @param fixedWidthPx card width for a horizontal rail, 0 to fill the grid cell
+   */
   public ItemsAdapter(int fixedWidthPx, boolean showText, Consumer<Dto.Item> onClick) {
     this.fixedWidthPx = fixedWidthPx;
     this.showText = showText;
@@ -47,8 +49,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.Holder> {
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     ItemCardView card = new ItemCardView(parent.getContext());
-    card.setLayoutParams(new RecyclerView.LayoutParams(
-        fixedWidthPx > 0 ? fixedWidthPx : ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    card.setLayoutParams(
+        new RecyclerView.LayoutParams(
+            fixedWidthPx > 0 ? fixedWidthPx : ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT));
     card.setCheckable(true);
     return new Holder(card);
   }

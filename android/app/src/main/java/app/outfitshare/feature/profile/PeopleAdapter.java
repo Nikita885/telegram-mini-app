@@ -38,7 +38,8 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
   @NonNull
   @Override
   public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_person, parent, false));
+    return new Holder(
+        LayoutInflater.from(parent.getContext()).inflate(R.layout.item_person, parent, false));
   }
 
   @Override
@@ -66,7 +67,9 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
     u.isFollowing = target;
     ButtonStyles.follow(h.action, target);
     Calls.run(
-        target ? App.get().container().api.api().follow(u.id) : App.get().container().api.api().unfollow(u.id),
+        target
+            ? App.get().container().api.api().follow(u.id)
+            : App.get().container().api.api().unfollow(u.id),
         r -> {
           if (!r.ok()) {
             u.isFollowing = !target;
