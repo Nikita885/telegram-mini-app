@@ -13,13 +13,24 @@ class AppSocketTests(TransactionTestCase):
         connected, _ = await comm.connect()
         self.assertFalse(connected)
 
+    async def test_query_string_token_is_not_accepted(self):
+        from asgiref.sync import sync_to_async
+
+        user = await sync_to_async(TelegramUser.objects.create)(telegram_id=3, username="c")
+        token = (await sync_to_async(auth.issue_tokens)(user))["access"]
+        comm = WebsocketCommunicator(application, f"/ws/v1/?token={token}")
+        connected, _ = await comm.connect()
+        self.assertFalse(connected)
+
     async def test_receives_new_message_event(self):
         from asgiref.sync import sync_to_async
 
         alice = await sync_to_async(TelegramUser.objects.create)(telegram_id=1, username="a")
         bob = await sync_to_async(TelegramUser.objects.create)(telegram_id=2, username="b")
         token = (await sync_to_async(auth.issue_tokens)(bob))["access"]
-        comm = WebsocketCommunicator(application, f"/ws/v1/?token={token}")
+        comm = WebsocketCommunicator(
+            application, "/ws/v1/", headers=[(b"authorization", f"Bearer {token}".encode())]
+        )
         connected, _ = await comm.connect()
         self.assertTrue(connected)
         self.assertEqual((await comm.receive_json_from())["event"], "ready")

@@ -7,6 +7,10 @@ from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotModified
 from django.utils.http import http_date
 
+# Slim images ship no /etc/mime.types; the stdlib table misses these.
+mimetypes.add_type("image/webp", ".webp")
+mimetypes.add_type("image/avif", ".avif")
+
 
 def serve_media(request, path):
     """Whole-file response: uploads are small, and one read beats chunked streaming under ASGI."""

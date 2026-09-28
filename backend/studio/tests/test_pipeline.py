@@ -39,7 +39,8 @@ class GarmentTests(SimpleTestCase):
 
     def test_anchors_are_ordered_top_to_bottom(self):
         a = self.anchors
-        ys = [a[k][1] for k in ("head_top", "neck", "shoulder_left", "waist_left", "hips_left", "knee_left", "ankle_left")]
+        order = ("head_top", "neck", "shoulder_left", "waist_left", "hips_left", "knee_left", "ankle_left")
+        ys = [a[k][1] for k in order]
         self.assertEqual(ys, sorted(ys))
         self.assertLess(a["shoulder_left"][0], 0.5)
         self.assertGreater(a["shoulder_right"][0], 0.5)

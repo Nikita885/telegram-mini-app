@@ -214,7 +214,7 @@ def dialog(d, request, viewer, *, last_message=None, unread=0):
             else None
         ),
         "unread_count": unread,
-        "pinned": d.pinned,
+        "pinned": d.pinned_for(viewer),
         "updated_at": iso(d.updated_at),
     }
 

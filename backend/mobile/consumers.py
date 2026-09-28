@@ -1,7 +1,6 @@
 """App WebSocket: one connection per signed-in device, receives every event for its user."""
 
 import json
-from urllib.parse import parse_qs
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -14,11 +13,22 @@ from .auth import user_from_access
 from .realtime import user_group
 
 
+def bearer_token(scope) -> str:
+    """Access token from the handshake's `Authorization: Bearer …` header.
+
+    Not from the query string: URLs end up in proxy access logs, headers do not.
+    """
+    for name, value in scope.get("headers", []):
+        if name.lower() == b"authorization":
+            parts = value.decode("latin-1").split()
+            if len(parts) == 2 and parts[0] == "Bearer":
+                return parts[1]
+    return ""
+
+
 class AppConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        query = parse_qs(self.scope.get("query_string", b"").decode())
-        token = (query.get("token") or [""])[0]
-        self.user_id = await self._authenticate(token)
+        self.user_id = await self._authenticate(bearer_token(self.scope))
         if self.user_id is None:
             await self.close(code=4401)
             return

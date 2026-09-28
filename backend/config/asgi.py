@@ -1,6 +1,6 @@
 """ASGI entrypoint: HTTP via Django, WebSockets via Channels.
 
-/ws/v1/ is the mobile app socket (JWT in the query string, no browser Origin);
+/ws/v1/ is the mobile app socket (JWT in the Authorization header, no browser Origin);
 everything else is the Telegram Mini App socket (session cookie + Origin check).
 """
 

@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         if not images_path or not os.path.exists(images_path):
             self.stdout.write(self.style.ERROR(
-                f'Images directory not found. Use --path /your/path/to/images'
+                'Images directory not found. Use --path /your/path/to/images'
             ))
             return
 

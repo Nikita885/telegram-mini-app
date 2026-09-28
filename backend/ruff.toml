@@ -1,0 +1,10 @@
+# Lint for the backend apps. The legacy Mini App code (api/) predates it and is checked for errors only.
+line-length = 120
+target-version = "py312"
+extend-exclude = ["*/migrations/*"]
+
+[lint]
+select = ["E", "F", "W", "B"]
+
+[lint.per-file-ignores]
+"api/*" = ["E", "W", "B"]

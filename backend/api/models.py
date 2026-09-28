@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from django.core.files.base import ContentFile
 import io
 import os
@@ -52,6 +53,45 @@ class TelegramUser(models.Model):
     def __str__(self):
         return self.username or self.first_name or str(self.telegram_id)
 
+    @classmethod
+    def from_telegram(cls, data):
+        """Create or refresh a user from Telegram-verified data (bot update or WebApp initData).
+
+        A Telegram @username is proven by Telegram, so its owner always gets it: anyone who picked
+        the same name in the app (possibly to impersonate them) loses it at that moment. Empty values
+        from Telegram never erase what the user set in the app.
+        """
+        import random
+
+        from django.db import transaction
+
+        tg_username = (data.get('username') or '').strip() or None
+        with transaction.atomic():
+            user, created = cls.objects.get_or_create(
+                telegram_id=int(data['id']),
+                defaults={
+                    'first_name': data.get('first_name'),
+                    'last_name': data.get('last_name'),
+                    'language_code': data.get('language_code'),
+                    'avatar_random_color': '#{:06x}'.format(random.randint(0x404040, 0xC0C0C0)),
+                },
+            )
+            if tg_username:
+                cls.objects.filter(username__iexact=tg_username).exclude(pk=user.pk).update(username=None)
+            changed = []
+            for field, value in (
+                ('username', tg_username),
+                ('first_name', data.get('first_name')),
+                ('last_name', data.get('last_name')),
+                ('language_code', data.get('language_code')),
+            ):
+                if value and getattr(user, field) != value:
+                    setattr(user, field, value)
+                    changed.append(field)
+            if changed:
+                user.save(update_fields=changed)
+        return user
+
 
 class Follow(models.Model):
     follower = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='following')
@@ -72,19 +112,63 @@ class Dialog(models.Model):
     """
     Диалог между двумя пользователями.
     Для уникальности всегда храним: user1.telegram_id < user2.telegram_id.
+
+    Закрепление и удаление — у каждого участника своё: «удалить диалог» скрывает переписку только
+    у того, кто удалил (userN_cleared_at), собеседник её по-прежнему видит. Сообщения стираются из
+    базы, когда их скрыли оба.
     """
     user1 = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='dialogs_as_user1')
     user2 = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='dialogs_as_user2')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)  # обновляется при каждом новом сообщении
-    pinned = models.BooleanField(default=False)
+    user1_pinned = models.BooleanField(default=False)
+    user2_pinned = models.BooleanField(default=False)
+    user1_cleared_at = models.DateTimeField(null=True, blank=True)
+    user2_cleared_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('user1', 'user2')
-        ordering = ['-pinned', '-updated_at']  # Закрепленные сверху
+        ordering = ['-updated_at']
 
     def get_other_user(self, current_user):
         return self.user2 if self.user1 == current_user else self.user1
+
+    def _side(self, user):
+        user_id = getattr(user, 'pk', user)
+        if user_id == self.user1_id:
+            return 'user1'
+        if user_id == self.user2_id:
+            return 'user2'
+        raise ValueError(f'{user} is not a participant of {self}')
+
+    def pinned_for(self, user):
+        return getattr(self, f'{self._side(user)}_pinned')
+
+    def set_pinned(self, user, pinned):
+        field = f'{self._side(user)}_pinned'
+        setattr(self, field, bool(pinned))
+        # update() keeps updated_at (the "last activity" order) untouched.
+        Dialog.objects.filter(pk=self.pk).update(**{field: bool(pinned)})
+
+    def cleared_at_for(self, user):
+        return getattr(self, f'{self._side(user)}_cleared_at')
+
+    def visible_messages(self, user):
+        """Messages this participant still sees (newer than their last «удалить диалог»)."""
+        qs = self.messages.all()
+        cleared = self.cleared_at_for(user)
+        return qs.filter(created_at__gt=cleared) if cleared else qs
+
+    def clear_for(self, user):
+        """«Удалить диалог» for one participant; the other one keeps the conversation."""
+        side = self._side(user)
+        now = timezone.now()
+        setattr(self, f'{side}_cleared_at', now)
+        setattr(self, f'{side}_pinned', False)
+        Dialog.objects.filter(pk=self.pk).update(**{f'{side}_cleared_at': now, f'{side}_pinned': False})
+        if self.user1_cleared_at and self.user2_cleared_at:
+            # Nobody can see these any more: remove them for good.
+            self.messages.filter(created_at__lte=min(self.user1_cleared_at, self.user2_cleared_at)).delete()
 
     def __str__(self):
         return f"Dialog({self.user1} ↔ {self.user2})"
@@ -261,6 +345,15 @@ class Hashtag(models.Model):
         return f"#{self.tag}"
 
 
+def outfit_image_path(instance, filename):
+    """Media is served publicly, so outfit images get unguessable names: private and followers-only
+    outfits must not be reachable by counting ids."""
+    import secrets
+
+    ext = os.path.splitext(filename)[1].lower() or '.jpg'
+    return f'outfits/outfit_{secrets.token_urlsafe(16)}{ext}'
+
+
 class OutfitPost(models.Model):
     """Пост с образом"""
     MANNEQUIN_CHOICES = [
@@ -272,7 +365,7 @@ class OutfitPost(models.Model):
     mannequin_type = models.CharField(max_length=10, choices=MANNEQUIN_CHOICES)
     description = models.TextField(blank=True)
     hashtags = models.ManyToManyField(Hashtag, blank=True, related_name='posts')
-    final_image = models.ImageField(upload_to='outfits/', blank=True, null=True)
+    final_image = models.ImageField(upload_to=outfit_image_path, blank=True, null=True)
 
     VISIBILITY_CHOICES = [
         ('all', 'Все'),

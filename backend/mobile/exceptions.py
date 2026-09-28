@@ -51,7 +51,8 @@ def exception_handler(exc, context):
             code = str(detail)
         elif detail_code and detail_code not in ("invalid",):
             code = detail_code if code == "error" else code
-        body = {"code": code, "message": MESSAGES.get(code) or MESSAGES.get(getattr(exc, "default_code", ""), str(detail))}
+        message = MESSAGES.get(code) or MESSAGES.get(getattr(exc, "default_code", ""), str(detail))
+        body = {"code": code, "message": message}
     out = Response({"error": body}, status=response.status_code)
     for header in ("WWW-Authenticate", "Retry-After"):
         if header in response:

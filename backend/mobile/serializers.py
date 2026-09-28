@@ -9,6 +9,14 @@ from api.models import ClothingCategory, ClothingItem, OutfitPost
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_.]{3,32}$")
 
 
+class TelegramStartSerializer(serializers.Serializer):
+    # Shown by the bot next to the code, e.g. "Pixel 8 · Android 15".
+    device = serializers.CharField(required=False, allow_blank=True, max_length=60, default="")
+
+    def validate_device(self, value):
+        return " ".join(value.split())[:60]
+
+
 class TelegramPollSerializer(serializers.Serializer):
     nonce = serializers.CharField(max_length=64)
 
@@ -44,7 +52,8 @@ class LayerSerializer(serializers.Serializer):
     item_id = serializers.IntegerField()
     x = serializers.FloatField(min_value=-1.0, max_value=2.0)
     y = serializers.FloatField(min_value=-1.0, max_value=2.0)
-    scale = serializers.FloatField(min_value=0.05, max_value=8.0)
+    # Same range as the Android constructor's pinch gesture.
+    scale = serializers.FloatField(min_value=0.1, max_value=6.0)
     rotation = serializers.FloatField(min_value=-360.0, max_value=360.0, default=0.0)
     z = serializers.IntegerField(default=0)
     flipped = serializers.BooleanField(default=False)
@@ -101,7 +110,9 @@ class GarmentJobCreateSerializer(serializers.Serializer):
 
 
 class RefitSerializer(serializers.Serializer):
-    keypoints = serializers.DictField(child=serializers.ListField(child=serializers.FloatField(), min_length=2, max_length=2))
+    keypoints = serializers.DictField(
+        child=serializers.ListField(child=serializers.FloatField(), min_length=2, max_length=2)
+    )
 
 
 class PublishItemSerializer(serializers.Serializer):

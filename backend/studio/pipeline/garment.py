@@ -256,7 +256,7 @@ def pair_single_shoe(cutout: Image.Image) -> Image.Image:
 def _row_runs(mask_row):
     padded = np.concatenate([[False], mask_row, [False]])
     diff = np.diff(padded.astype(np.int8))
-    return list(zip(np.nonzero(diff == 1)[0], np.nonzero(diff == -1)[0] - 1))
+    return list(zip(np.nonzero(diff == 1)[0], np.nonzero(diff == -1)[0] - 1, strict=True))
 
 
 def _center_run(mask, y, cx):
@@ -470,10 +470,10 @@ def _coverage_score(layer_alpha: np.ndarray, zone: str, anchors: dict, profile: 
     for y in range(int(y0) + 2, int(y1)):
         if np.isnan(profile.left[y]):
             continue
-        l, r = int(profile.left[y]), int(profile.right[y])
+        left, right = int(profile.left[y]), int(profile.right[y])
         # Inner 80% of the body width: edges are allowed to show.
-        inset = int((r - l) * 0.1)
-        segment = layer_alpha[y, l + inset : r - inset]
+        inset = int((right - left) * 0.1)
+        segment = layer_alpha[y, left + inset : right - inset]
         covered += int((segment > 0.5).sum())
         total += segment.size
     return covered / total if total else 0.0

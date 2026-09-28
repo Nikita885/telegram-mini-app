@@ -32,7 +32,7 @@ def verify_telegram_init_data(init_data: str, bot_token: str):
         hashlib.sha256
     ).hexdigest()
 
-    if calculated_hash != hash_from_telegram:
+    if not hmac.compare_digest(calculated_hash, hash_from_telegram):
         return None
 
     auth_date = int(parsed.get('auth_date', 0))

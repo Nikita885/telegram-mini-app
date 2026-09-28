@@ -2,10 +2,13 @@
 
 import json
 import re
+from datetime import datetime
+from datetime import timezone as dt_timezone
 
 from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
-from django.db.models import F, Q
+from django.db.models import Case, F, Q, Value, When
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from api.models import (
@@ -202,7 +205,6 @@ def _hashtags(explicit, description):
     return unique[:15]
 
 
-@transaction.atomic
 def create_outfit(user, data):
     gender = data["mannequin"]
     layers = data["layers"]
@@ -221,43 +223,46 @@ def create_outfit(user, data):
     if data.get("remix_of"):
         remix_of = get_visible_outfit(user, data["remix_of"])
 
-    post = OutfitPost.objects.create(
-        user=user,
-        mannequin_type=gender,
-        description=data.get("description", "").strip(),
-        visibility=data.get("visibility", "all"),
-        remix_of=remix_of,
-    )
+    # Render before opening the transaction: it is the slow part and needs no database rows.
     ordered = sorted(layers, key=lambda layer: layer.get("z", 0))
-    PostClothingItem.objects.bulk_create(
-        [
-            PostClothingItem(
-                post=post,
-                clothing=items[layer["item_id"]],
-                position_x=layer["x"],
-                position_y=layer["y"],
-                scale=layer["scale"],
-                rotation=layer.get("rotation", 0.0),
-                z_index=layer.get("z", 0),
-                normalized=True,
-                flipped=layer.get("flipped", False),
-                fitted=layer.get("fitted", False),
-            )
-            for layer in ordered
-        ]
-    )
-    for tag in _hashtags(data.get("hashtags"), post.description):
-        hashtag, _ = Hashtag.objects.get_or_create(tag=tag)
-        Hashtag.objects.filter(pk=hashtag.pk).update(usage_count=F("usage_count") + 1)
-        post.hashtags.add(hashtag)
-
     mannequin = Mannequin.objects.filter(gender=gender).first()
     image = render_outfit(mannequin, [(items[layer["item_id"]], layer) for layer in ordered])
-    post.final_image.save(f"outfit_{post.pk}.jpg", ContentFile(image), save=False)
-    post.save(update_fields=["final_image"])
 
-    if remix_of is not None:
-        notify(remix_of.user, user, "remix", post=post)
+    with transaction.atomic():
+        post = OutfitPost.objects.create(
+            user=user,
+            mannequin_type=gender,
+            description=data.get("description", "").strip(),
+            visibility=data.get("visibility", "all"),
+            remix_of=remix_of,
+        )
+        PostClothingItem.objects.bulk_create(
+            [
+                PostClothingItem(
+                    post=post,
+                    clothing=items[layer["item_id"]],
+                    position_x=layer["x"],
+                    position_y=layer["y"],
+                    scale=layer["scale"],
+                    rotation=layer.get("rotation", 0.0),
+                    z_index=layer.get("z", 0),
+                    normalized=True,
+                    flipped=layer.get("flipped", False),
+                    fitted=layer.get("fitted", False),
+                )
+                for layer in ordered
+            ]
+        )
+        for tag in _hashtags(data.get("hashtags"), post.description):
+            hashtag, _ = Hashtag.objects.get_or_create(tag=tag)
+            Hashtag.objects.filter(pk=hashtag.pk).update(usage_count=F("usage_count") + 1)
+            post.hashtags.add(hashtag)
+
+        post.final_image.save("outfit.jpg", ContentFile(image), save=False)  # name: api.models.outfit_image_path
+        post.save(update_fields=["final_image"])
+
+        if remix_of is not None:
+            notify(remix_of.user, user, "remix", post=post)
     return post
 
 
@@ -278,6 +283,26 @@ def get_or_create_dialog(user, other):
     u1, u2 = (user, other) if user.telegram_id < other.telegram_id else (other, user)
     dialog, _ = Dialog.objects.get_or_create(user1=u1, user2=u2)
     return dialog
+
+
+EPOCH = datetime(1970, 1, 1, tzinfo=dt_timezone.utc)
+
+
+def dialogs_for(viewer):
+    """Viewer's dialogs annotated with their own side of the per-participant state:
+    `my_pinned` and `visible_from` (messages up to their last «удалить диалог» are hidden)."""
+    is_user1 = Q(user1=viewer)
+    return (
+        Dialog.objects.filter(Q(user1=viewer) | Q(user2=viewer))
+        .select_related("user1", "user2")
+        .annotate(
+            my_pinned=Case(When(is_user1, then=F("user1_pinned")), default=F("user2_pinned")),
+            visible_from=Coalesce(
+                Case(When(is_user1, then=F("user1_cleared_at")), default=F("user2_cleared_at")),
+                Value(EPOCH),
+            ),
+        )
+    )
 
 
 def get_dialog(user, dialog_id):
@@ -339,11 +364,13 @@ def mark_dialog_read(user, dialog):
 
 
 def unread_messages_count(user):
-    return (
-        Message.objects.filter(Q(dialog__user1=user) | Q(dialog__user2=user), is_read=False)
-        .exclude(sender=user)
-        .count()
+    mine_as_user1 = Q(dialog__user1=user) & (
+        Q(dialog__user1_cleared_at__isnull=True) | Q(created_at__gt=F("dialog__user1_cleared_at"))
     )
+    mine_as_user2 = Q(dialog__user2=user) & (
+        Q(dialog__user2_cleared_at__isnull=True) | Q(created_at__gt=F("dialog__user2_cleared_at"))
+    )
+    return Message.objects.filter(mine_as_user1 | mine_as_user2, is_read=False).exclude(sender=user).count()
 
 
 def resolve_user(user_id):

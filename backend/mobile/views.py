@@ -1,19 +1,20 @@
 """Mobile API v1 endpoints."""
 
 import json
-from collections import Counter
+import secrets
 from datetime import timedelta
 from io import BytesIO
 
 import requests
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.base import ContentFile
-from django.db.models import Count, Max, OuterRef, Q, Subquery
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from PIL import Image
 from rest_framework import status
-from rest_framework.decorators import api_view, parser_classes, permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny, BasePermission, IsAuthenticated
 from rest_framework.response import Response
@@ -23,14 +24,12 @@ from api.models import (
     ClothingCategory,
     ClothingItem,
     CommentLike,
-    Dialog,
     Follow,
     Hashtag,
     Mannequin,
     Message,
     Notification,
     OutfitPost,
-    PostClothingItem,
     PostComment,
     TelegramUser,
 )
@@ -55,6 +54,23 @@ def validated(serializer_class, data):
     serializer = serializer_class(data=data)
     serializer.is_valid(raise_exception=True)
     return serializer.validated_data
+
+
+def int_param(request, name, default=None):
+    """Integer query parameter; garbage is a 400 with a clear code, not a 500."""
+    value = request.query_params.get(name)
+    if value in (None, ""):
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ApiError("invalid_parameter", f"Некорректный параметр {name}") from exc
+
+
+def parse_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("1", "true", "yes", "on")
 
 
 def id_page(qs, request, limit=PAGE_SIZE):
@@ -118,16 +134,20 @@ def app_config(request):
 
 
 class TelegramStartView(APIView):
+    """Begin a bot sign-in: the app shows `code`, the bot asks the user to confirm the same code."""
+
     permission_classes = [AllowAny]
     throttle_scope = "auth"
 
     def post(self, request):
         if not settings.TG_BOT_USERNAME:
             raise ApiError("bot_not_configured", "Вход через Telegram не настроен на сервере", 503)
-        nonce = LoginNonce.objects.create()
+        data = validated(serializers.TelegramStartSerializer, request.data)
+        nonce = LoginNonce.objects.create(device=data.get("device", ""))
         return Response(
             {
                 "nonce": nonce.nonce,
+                "code": nonce.code,
                 "bot_url": f"https://t.me/{settings.TG_BOT_USERNAME}?start=login_{nonce.nonce}",
                 "expires_in": int(settings.LOGIN_NONCE_TTL.total_seconds()),
             },
@@ -144,9 +164,11 @@ class TelegramPollView(APIView):
         nonce = LoginNonce.objects.select_related("user").filter(nonce=data["nonce"]).first()
         if nonce is None or nonce.consumed_at is not None:
             raise ApiError("nonce_invalid", "Ссылка для входа недействительна — начните заново", 410)
+        if nonce.declined_at is not None:
+            raise ApiError("login_declined", "Вход отклонён в Telegram", 410)
         if nonce.is_expired:
             raise ApiError("nonce_expired", "Время на подтверждение вышло — начните заново", 410)
-        if nonce.user is None:
+        if nonce.user is None or nonce.confirmed_at is None:
             return Response({"status": "pending"}, status=status.HTTP_202_ACCEPTED)
         if nonce.user.is_banned:
             raise ApiError("banned", "Аккаунт заблокирован", 403)
@@ -172,27 +194,7 @@ class WebAppLoginView(APIView):
 
 
 def upsert_telegram_user(data: dict) -> TelegramUser:
-    import random
-
-    user, created = TelegramUser.objects.get_or_create(
-        telegram_id=int(data["id"]),
-        defaults={
-            "username": data.get("username"),
-            "first_name": data.get("first_name"),
-            "last_name": data.get("last_name"),
-            "language_code": data.get("language_code"),
-            "avatar_random_color": "#{:06x}".format(random.randint(0x404040, 0xC0C0C0)),
-        },
-    )
-    if not created:
-        changed = False
-        for field in ("username", "first_name", "last_name"):
-            if data.get(field) and getattr(user, field) != data.get(field):
-                setattr(user, field, data.get(field))
-                changed = True
-        if changed:
-            user.save(update_fields=["username", "first_name", "last_name"])
-    return user
+    return TelegramUser.from_telegram(data)
 
 
 class DevLoginView(APIView):
@@ -305,7 +307,9 @@ def _telegram_avatar(user) -> Image.Image:
     if not token:
         raise ApiError("bot_not_configured", "Бот не настроен", 503)
     base = f"https://api.telegram.org/bot{token}"
-    photos = requests.get(f"{base}/getUserProfilePhotos", params={"user_id": user.telegram_id, "limit": 1}, timeout=10).json()
+    photos = requests.get(
+        f"{base}/getUserProfilePhotos", params={"user_id": user.telegram_id, "limit": 1}, timeout=10
+    ).json()
     if not photos.get("ok") or not photos["result"]["total_count"]:
         raise ApiError("no_telegram_photo", "В Telegram нет фото профиля или оно скрыто", 404)
     file_id = photos["result"]["photos"][0][-1]["file_id"]
@@ -416,53 +420,77 @@ def search_users(request):
 # ── Feed & outfits ───────────────────────────────────────────────────────────
 
 
+FEED_POOL = 400
+FEED_SNAPSHOT_TTL = 15 * 60
+
+
+def rank_for_you(rows, following, now):
+    """Order (pk, user_id, created_at, likes, comments) rows: engagement with time decay, a boost
+    for followed authors, and no author more than once in any three consecutive posts."""
+
+    def score(row):
+        _, author, created_at, likes, comments = row
+        age_h = max((now - created_at).total_seconds() / 3600.0, 0.0)
+        engagement = 1 + likes * 2 + comments * 3
+        boost = 1.6 if author in following else 1.0
+        return boost * engagement / ((age_h + 2) ** 1.25)
+
+    ordered, recent_authors, backlog = [], [], []
+    for row in sorted(rows, key=score, reverse=True):
+        if row[1] in recent_authors[-2:]:
+            backlog.append(row)
+            continue
+        ordered.append(row)
+        recent_authors.append(row[1])
+        while backlog and backlog[0][1] not in recent_authors[-2:]:
+            nxt = backlog.pop(0)
+            ordered.append(nxt)
+            recent_authors.append(nxt[1])
+    ordered += backlog
+    return [row[0] for row in ordered]
+
+
 @api_view(["GET"])
 def feed(request):
     viewer = me(request)
     tab = request.query_params.get("tab", "for_you")
-    base = services.with_outfit_relations(services.visible_outfits(viewer))
+    visible = services.visible_outfits(viewer)
     if tab == "following":
-        qs = base.filter(user_id__in=services.following_ids(viewer))
+        qs = services.with_outfit_relations(visible.filter(user_id__in=services.following_ids(viewer)))
         posts, cursor = id_page(qs, request)
         return outfits_response(request, posts, cursor)
 
-    # "For you": recent pool ranked by engagement with time decay, authors interleaved.
-    try:
-        page = max(1, int(request.query_params.get("page", "1")))
-    except ValueError:
-        page = 1
-    since = request.query_params.get("since")
-    if since:
-        count = base.exclude(user=viewer).filter(pk__gt=int(since)).count()
-        return Response({"new_count": count})
-    pool = list(base.exclude(user=viewer).order_by("-pk")[:400])
+    since = int_param(request, "since")
+    if since is not None:
+        return Response({"new_count": visible.exclude(user=viewer).filter(pk__gt=since).count()})
+
+    # "For you" is ranked once per session into a snapshot of ids kept in the cache; the cursor
+    # ("<snapshot>.<page>") walks that snapshot, so pages never repeat or skip posts even though
+    # scores change while the user scrolls. Ranking reads five columns, not whole posts.
     following = services.following_ids(viewer)
-    now = timezone.now()
-
-    def score(p):
-        age_h = max((now - p.created_at).total_seconds() / 3600.0, 0.0)
-        engagement = 1 + p.likes_count * 2 + p.comments_count * 3
-        boost = 1.6 if p.user_id in following else 1.0
-        return boost * engagement / ((age_h + 2) ** 1.25)
-
-    ranked = sorted(pool, key=score, reverse=True)
-    ordered, recent_authors, backlog = [], [], []
-    for post in ranked:
-        if post.user_id in recent_authors[-2:]:
-            backlog.append(post)
-            continue
-        ordered.append(post)
-        recent_authors.append(post.user_id)
-        while backlog and backlog[0].user_id not in recent_authors[-2:]:
-            nxt = backlog.pop(0)
-            ordered.append(nxt)
-            recent_authors.append(nxt.user_id)
-    ordered += backlog
+    snapshot, page = None, 1
+    token = request.query_params.get("page") or ""
+    if "." in token:
+        key, _, number = token.partition(".")
+        if number.isdigit():
+            snapshot = cache.get(f"feed:{viewer.pk}:{key}")
+            page = max(1, int(number))
+    elif token.isdigit():
+        page = max(1, int(token))
+    if snapshot is None:
+        rows = visible.exclude(user=viewer).order_by("-pk").values_list(
+            "pk", "user_id", "created_at", "likes_count", "comments_count"
+        )[:FEED_POOL]
+        key = secrets.token_urlsafe(6)
+        snapshot = rank_for_you(list(rows), following, timezone.now())
+        cache.set(f"feed:{viewer.pk}:{key}", snapshot, FEED_SNAPSHOT_TTL)
     start = (page - 1) * PAGE_SIZE
-    chunk = ordered[start : start + PAGE_SIZE]
-    return outfits_response(
-        request, chunk, str(page + 1) if len(ordered) > start + PAGE_SIZE else None, following=following
-    )
+    ids = snapshot[start : start + PAGE_SIZE]
+    # Posts deleted or hidden since the snapshot was taken simply drop out.
+    by_id = {p.pk: p for p in services.with_outfit_relations(visible.filter(pk__in=ids))}
+    posts = [by_id[pk] for pk in ids if pk in by_id]
+    next_cursor = f"{key}.{page + 1}" if len(snapshot) > start + PAGE_SIZE else None
+    return outfits_response(request, posts, next_cursor, following=following)
 
 
 class OutfitCreateView(APIView):
@@ -500,7 +528,9 @@ def outfit_similar(request, outfit_id):
         services.visible_outfits(viewer)
         .exclude(pk=post.pk)
         .filter(items__clothing_id__in=item_ids)
-        .annotate(overlap=Count("items", filter=Q(items__clothing_id__in=item_ids)))
+        # distinct=True: the visibility filter joins the author's followers, which would otherwise
+        # multiply the count by their number.
+        .annotate(overlap=Count("items", filter=Q(items__clothing_id__in=item_ids), distinct=True))
         .order_by("-overlap", "-likes_count", "-pk")
     )
     posts = list(services.with_outfit_relations(qs)[:12])
@@ -661,7 +691,7 @@ def catalog_item(request, item_id):
 
 @api_view(["GET"])
 def catalog_item_similar(request, item_id):
-    item = get_object_or_404(ClothingItem.objects.select_related("category"), pk=item_id)
+    item = get_object_or_404(ClothingItem.objects.select_related("category"), pk=item_id, is_published=True)
     qs = (
         ClothingItem.objects.filter(is_published=True, category=item.category)
         .exclude(pk=item.pk)
@@ -704,9 +734,9 @@ def collections(request):
         collection.items_count = 0
         return Response(_collections_payload(request, [collection])[0], status=status.HTTP_201_CREATED)
     Collection.default_for(viewer)
-    owner_id = request.query_params.get("user_id")
-    qs = Collection.objects.filter(owner_id=owner_id or viewer.pk)
-    if owner_id and int(owner_id) != viewer.pk:
+    owner_id = int_param(request, "user_id", viewer.pk)
+    qs = Collection.objects.filter(owner_id=owner_id)
+    if owner_id != viewer.pk:
         qs = qs.filter(is_private=False)
     rows = list(qs.annotate(items_count=Count("items")))
     return Response({"results": _collections_payload(request, rows)})
@@ -749,16 +779,19 @@ def dialogs(request):
         data = validated(serializers.DialogCreateSerializer, request.data)
         dialog = services.get_or_create_dialog(viewer, services.resolve_user(data["user_id"]))
         return Response(presenters.dialog(dialog, request, viewer), status=status.HTTP_201_CREATED)
-    last_id = Message.objects.filter(dialog=OuterRef("pk")).order_by("-pk").values("pk")[:1]
-    qs = (
-        Dialog.objects.filter(Q(user1=viewer) | Q(user2=viewer))
-        .select_related("user1", "user2")
-        .annotate(
-            last_id=Subquery(last_id),
-            unread=Count("messages", filter=Q(messages__is_read=False) & ~Q(messages__sender=viewer)),
-        )
-        .order_by("-pinned", "-updated_at")
+    qs = services.dialogs_for(viewer)
+    last_id = (
+        Message.objects.filter(dialog=OuterRef("pk"), created_at__gt=OuterRef("visible_from"))
+        .order_by("-pk")
+        .values("pk")[:1]
     )
+    qs = qs.annotate(
+        last_id=Subquery(last_id),
+        unread=Count(
+            "messages",
+            filter=Q(messages__is_read=False, messages__created_at__gt=F("visible_from")) & ~Q(messages__sender=viewer),
+        ),
+    ).order_by("-my_pinned", "-updated_at")
     rows = list(qs[:200])
     last = Message.objects.in_bulk([d.last_id for d in rows if d.last_id])
     return Response(
@@ -766,7 +799,7 @@ def dialogs(request):
             "results": [
                 presenters.dialog(d, request, viewer, last_message=last.get(d.last_id), unread=d.unread)
                 for d in rows
-                if d.last_id or d.pinned
+                if d.last_id or d.my_pinned
             ]
         }
     )
@@ -774,17 +807,21 @@ def dialogs(request):
 
 @api_view(["DELETE"])
 def dialog_detail(request, dialog_id):
-    dialog = services.get_dialog(me(request), dialog_id)
-    dialog.delete()
+    """«Удалить диалог» — only for the viewer; the other participant keeps the conversation."""
+    viewer = me(request)
+    dialog = services.get_dialog(viewer, dialog_id)
+    dialog.clear_for(viewer)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])
 def dialog_pin(request, dialog_id):
-    dialog = services.get_dialog(me(request), dialog_id)
-    dialog.pinned = bool(request.data.get("pinned", not dialog.pinned))
-    dialog.save(update_fields=["pinned"])
-    return Response({"pinned": dialog.pinned})
+    viewer = me(request)
+    dialog = services.get_dialog(viewer, dialog_id)
+    pinned = request.data.get("pinned")
+    pinned = not dialog.pinned_for(viewer) if pinned is None else parse_bool(pinned)
+    dialog.set_pinned(viewer, pinned)
+    return Response({"pinned": pinned})
 
 
 @api_view(["POST"])
@@ -805,10 +842,10 @@ class DialogMessagesView(APIView):
     def get(self, request, dialog_id):
         viewer = me(request)
         dialog = services.get_dialog(viewer, dialog_id)
-        qs = Message.objects.filter(dialog=dialog).select_related("post__user")
-        after = request.query_params.get("after")
-        if after:
-            rows = list(qs.filter(pk__gt=int(after)).order_by("pk")[:200])
+        qs = dialog.visible_messages(viewer).select_related("post__user")
+        after = int_param(request, "after")
+        if after is not None:
+            rows = list(qs.filter(pk__gt=after).order_by("pk")[:200])
             return Response({"results": [presenters.message(m, request, viewer.pk) for m in rows], "next": None})
         rows, cursor = id_page(qs, request, limit=50)
         return Response(

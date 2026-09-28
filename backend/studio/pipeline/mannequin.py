@@ -77,7 +77,7 @@ def _runs(row: np.ndarray):
     diff = np.diff(padded.astype(np.int8))
     starts = np.nonzero(diff == 1)[0]
     ends = np.nonzero(diff == -1)[0] - 1
-    return list(zip(starts, ends))
+    return list(zip(starts, ends, strict=True))
 
 
 def compute_anchors(canvas: Image.Image):

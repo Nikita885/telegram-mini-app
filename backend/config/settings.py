@@ -67,6 +67,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "config.middleware.SameOriginUnsafeRequestsMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -107,6 +108,18 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {"hosts": [REDIS_URL]},
+        }
+    }
+
+# Cache backs DRF throttling and the "For you" feed snapshots, so it must be shared by all processes.
+if env_bool("CHANNELS_IN_MEMORY", False):
+    CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "KEY_PREFIX": "outfitshare",
         }
     }
 
@@ -215,12 +228,17 @@ REST_FRAMEWORK = {
         "write": "120/min",
         "upload": "30/min",
     },
+    # Client IP for throttling = the address the HTTPS proxy in front of us saw (last X-Forwarded-For
+    # entry). Values a client puts into X-Forwarded-For itself are ignored.
+    "NUM_PROXIES": int(env("TRUSTED_PROXIES", "1")),
     "EXCEPTION_HANDLER": "mobile.exceptions.exception_handler",
 }
 
 JWT_SIGNING_KEY = env("JWT_SIGNING_KEY", SECRET_KEY)
 JWT_ACCESS_TTL = timedelta(minutes=int(env("JWT_ACCESS_MINUTES", "30")))
 JWT_REFRESH_TTL = timedelta(days=int(env("JWT_REFRESH_DAYS", "60")))
+# A just-rotated refresh token is accepted once more within this window (lost responses on mobile).
+JWT_REFRESH_REUSE_GRACE = timedelta(seconds=int(env("JWT_REFRESH_REUSE_GRACE_SECONDS", "60")))
 LOGIN_NONCE_TTL = timedelta(minutes=5)
 
 # Lets the app sign in with just a Telegram ID. Only for local development.

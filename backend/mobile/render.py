@@ -6,9 +6,14 @@ Layer geometry (shared with the Android constructor, see OutfitGeometry.java):
   * a free layer's base box is FREE_BASE_WIDTH·W wide, height from the image aspect ratio;
   * the box is mirrored horizontally if `flipped`, scaled by `scale`, rotated `rotation` degrees
     clockwise around its centre; layers are drawn by ascending `z`.
+
+Each layer is drawn with one affine transform straight into the part of the output it covers, so
+memory and time are bounded by the output size whatever the scale — a huge `scale` can no longer make
+the server allocate a gigapixel intermediate image.
 """
 
 import io
+import math
 
 from django.conf import settings
 from PIL import Image
@@ -48,33 +53,61 @@ def render_outfit(mannequin, layers) -> bytes:
             base_w = FREE_BASE_WIDTH * width
             base_h = base_w * source.height / max(source.width, 1)
         scale = float(layer.get("scale", 1.0))
-        w = max(1, int(round(base_w * scale * k)))
-        h = max(1, int(round(base_h * scale * k)))
-        img = source.resize((w, h), Image.LANCZOS)
-        if layer.get("flipped"):
-            img = img.transpose(Image.FLIP_LEFT_RIGHT)
-        rotation = float(layer.get("rotation", 0.0))
-        if rotation:
-            img = img.rotate(-rotation, resample=Image.BICUBIC, expand=True)
-        cx = float(layer.get("x", 0.5)) * width * k
-        cy = float(layer.get("y", 0.5)) * height * k
-        _paste_clipped(out, img, cx, cy)
+        draw_layer(
+            out,
+            source,
+            box_w=base_w * scale * k,
+            box_h=base_h * scale * k,
+            cx=float(layer.get("x", 0.5)) * width * k,
+            cy=float(layer.get("y", 0.5)) * height * k,
+            rotation=float(layer.get("rotation", 0.0)),
+            flipped=bool(layer.get("flipped")),
+        )
 
     buf = io.BytesIO()
     out.convert("RGB").save(buf, format="JPEG", quality=90, optimize=True, progressive=True)
     return buf.getvalue()
 
 
-def _paste_clipped(out: Image.Image, img: Image.Image, cx: float, cy: float):
-    """Composite `img` centred at (cx, cy), clipping whatever falls outside the output."""
-    left = int(round(cx - img.width / 2))
-    top = int(round(cy - img.height / 2))
-    crop_left, crop_top = max(0, -left), max(0, -top)
-    if crop_left >= img.width or crop_top >= img.height:
+def draw_layer(out, source, *, box_w, box_h, cx, cy, rotation=0.0, flipped=False):
+    """Composite `source`, stretched to a box_w×box_h box centred at (cx, cy), onto `out` (output px).
+
+    The box is mirrored first (if `flipped`), then rotated `rotation` degrees clockwise.
+    """
+    if box_w < 1 or box_h < 1:
         return
-    part = img.crop((crop_left, crop_top, img.width, img.height))
-    dest = (max(0, left), max(0, top))
-    if dest[0] >= out.width or dest[1] >= out.height:
+    # Shrinking a large image by an affine transform alone aliases; pre-scale it to the box size first
+    # (never enlarging, so this intermediate is at most as big as the source).
+    if source.width > box_w * 1.5 or source.height > box_h * 1.5:
+        source = source.resize(
+            (max(1, min(source.width, round(box_w))), max(1, min(source.height, round(box_h)))), Image.LANCZOS
+        )
+
+    theta = math.radians(rotation)
+    cos, sin = math.cos(theta), math.sin(theta)
+    corners = []
+    for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+        x, y = sx * box_w / 2, sy * box_h / 2
+        corners.append((cx + x * cos - y * sin, cy + x * sin + y * cos))
+    left = max(0, math.floor(min(p[0] for p in corners)))
+    top = max(0, math.floor(min(p[1] for p in corners)))
+    right = min(out.width, math.ceil(max(p[0] for p in corners)))
+    bottom = min(out.height, math.ceil(max(p[1] for p in corners)))
+    if right <= left or bottom <= top:
         return
-    part = part.crop((0, 0, min(part.width, out.width - dest[0]), min(part.height, out.height - dest[1])))
-    out.alpha_composite(part, dest=dest)
+
+    # Inverse mapping: output pixel (X, Y) → source point (u, v), both in continuous pixel coordinates.
+    #   q = (X - cx, Y - cy) rotated back by -theta, un-mirrored, scaled from box units to source pixels.
+    su = source.width / box_w * (-1 if flipped else 1)
+    sv = source.height / box_h
+    a, b = su * cos, su * sin
+    d, e = -sv * sin, sv * cos
+    c = source.width / 2 - (a * cx + b * cy)
+    f = source.height / 2 - (d * cx + e * cy)
+    # The transform works on the covered region only: shift the origin to its top-left corner.
+    c += a * left + b * top
+    f += d * left + e * top
+    part = source.transform(
+        (right - left, bottom - top), Image.AFFINE, (a, b, c, d, e, f), resample=Image.BICUBIC
+    )
+    out.alpha_composite(part, dest=(left, top))

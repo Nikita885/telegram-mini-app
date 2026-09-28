@@ -1,6 +1,7 @@
 """JWT access/refresh tokens for the mobile app, bound to TelegramUser."""
 
 import uuid
+from datetime import timedelta
 
 import jwt
 from django.conf import settings
@@ -9,7 +10,7 @@ from rest_framework import authentication, exceptions
 
 from api.models import TelegramUser
 
-from .models import RefreshToken
+from .models import LoginNonce, RefreshToken
 
 ALGORITHM = "HS256"
 
@@ -61,20 +62,30 @@ def issue_tokens(user: TelegramUser) -> dict:
 
 
 def rotate_refresh(token: str) -> dict:
-    """Exchange a refresh token for a new pair; the old one is revoked (reuse → all revoked)."""
+    """Exchange a refresh token for a new pair.
+
+    The old token is revoked atomically, so two concurrent refreshes cannot both rotate it. A token
+    that was rotated a few seconds ago may be presented again (the response with the new pair got
+    lost on a flaky mobile network): within JWT_REFRESH_REUSE_GRACE it gets another pair. Any other
+    reuse of a revoked token means it leaked, and every session of the user is revoked.
+    """
     payload = decode(token, "refresh")
     record = RefreshToken.objects.select_related("user").filter(jti=payload.get("jti")).first()
     if record is None:
         raise exceptions.AuthenticationFailed("token_invalid")
-    if record.revoked_at is not None:
-        # A revoked token presented again means it leaked: log the user out everywhere.
-        RefreshToken.objects.filter(user=record.user, revoked_at__isnull=True).update(revoked_at=timezone.now())
-        raise exceptions.AuthenticationFailed("token_reused")
-    if not record.is_active or record.user.is_banned:
+    if record.user.is_banned or record.expires_at <= timezone.now():
         raise exceptions.AuthenticationFailed("token_invalid")
-    record.revoked_at = timezone.now()
-    record.save(update_fields=["revoked_at"])
-    return issue_tokens(record.user)
+    now = timezone.now()
+    rotated = RefreshToken.objects.filter(pk=record.pk, revoked_at__isnull=True).update(
+        revoked_at=now, rotated_at=now
+    )
+    if rotated:
+        return issue_tokens(record.user)
+    record.refresh_from_db(fields=["revoked_at", "rotated_at"])
+    if record.rotated_at is not None and now - record.rotated_at <= settings.JWT_REFRESH_REUSE_GRACE:
+        return issue_tokens(record.user)
+    RefreshToken.objects.filter(user=record.user, revoked_at__isnull=True).update(revoked_at=now)
+    raise exceptions.AuthenticationFailed("token_reused")
 
 
 def revoke_refresh(token: str):
@@ -83,6 +94,14 @@ def revoke_refresh(token: str):
     except jwt.InvalidTokenError:
         return
     RefreshToken.objects.filter(jti=payload.get("jti"), revoked_at__isnull=True).update(revoked_at=timezone.now())
+
+
+def cleanup_expired() -> tuple[int, int]:
+    """Drop login requests older than a day and refresh tokens past expiry (they fail JWT checks anyway)."""
+    now = timezone.now()
+    nonces, _ = LoginNonce.objects.filter(created_at__lt=now - timedelta(days=1)).delete()
+    tokens, _ = RefreshToken.objects.filter(expires_at__lt=now).delete()
+    return nonces, tokens
 
 
 def user_from_access(token: str) -> TelegramUser:

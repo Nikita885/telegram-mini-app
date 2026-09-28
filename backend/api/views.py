@@ -60,22 +60,7 @@ class AuthorizeView(APIView):
                 return Response({'error': 'No user data'}, status=400)
             user_data = json.loads(user_raw) if isinstance(user_raw, str) else user_raw
             telegram_id = user_data.get('id')
-            user, created = TelegramUser.objects.get_or_create(
-                telegram_id=telegram_id,
-                defaults={
-                    'username': user_data.get('username'),
-                    'first_name': user_data.get('first_name'),
-                    'last_name': user_data.get('last_name'),
-                    'language_code': user_data.get('language_code'),
-                    'avatar_random_color': generate_random_color(),
-                }
-            )
-            if not created:
-                user.username = user_data.get('username')
-                user.first_name = user_data.get('first_name')
-                user.last_name = user_data.get('last_name')
-                user.language_code = user_data.get('language_code')
-                user.save()
+            TelegramUser.from_telegram(user_data)
             request.session['telegram_id'] = telegram_id
             request.session.save()
             return Response({'status': 'ok'}, status=200)
@@ -198,13 +183,17 @@ class DialogListView(APIView):
 
         dialogs = Dialog.objects.filter(
             Q(user1=current_user) | Q(user2=current_user)
-        ).select_related('user1', 'user2').order_by('-pinned', '-updated_at')
+        ).select_related('user1', 'user2').order_by('-updated_at')
 
         result = []
         for d in dialogs:
             other = d.get_other_user(current_user)
-            last_msg = d.messages.order_by('-created_at').first()
-            unread = d.messages.filter(is_read=False).exclude(sender=current_user).count()
+            visible = d.visible_messages(current_user)
+            last_msg = visible.order_by('-created_at').first()
+            pinned = d.pinned_for(current_user)
+            if last_msg is None and d.cleared_at_for(current_user) and not pinned:
+                continue  # «удалён» этим пользователем и новых сообщений нет
+            unread = visible.filter(is_read=False).exclude(sender=current_user).count()
             result.append({
                 'dialog_id': d.id,
                 'other_user': serialize_user(other),
@@ -214,9 +203,10 @@ class DialogListView(APIView):
                     'is_mine': last_msg.sender == current_user,
                 } if last_msg else None,
                 'unread_count': unread,
-                'pinned': d.pinned,
+                'pinned': pinned,
                 'updated_at': int(d.updated_at.timestamp() * 1000),
             })
+        result.sort(key=lambda row: not row['pinned'])  # stable: pinned first, then by activity
         return Response({'dialogs': result})
 
 
@@ -315,9 +305,12 @@ class DialogMessagesView(APIView):
             return err
 
         after_id = request.GET.get('after')
-        qs = dialog.messages.select_related('sender').order_by('created_at')
+        qs = dialog.visible_messages(current_user).select_related('sender').order_by('created_at')
         if after_id:
-            qs = qs.filter(id__gt=int(after_id))
+            try:
+                qs = qs.filter(id__gt=int(after_id))
+            except ValueError:
+                return Response({'error': 'Invalid cursor'}, status=400)
 
         # mark incoming as read
         qs.filter(is_read=False).exclude(sender=current_user).update(is_read=True)
@@ -665,17 +658,16 @@ class DialogActionView(APIView):
         action = request.data.get('action')
         
         if action == 'pin':
-            # Переключаем состояние закрепления
-            dialog.pinned = not dialog.pinned
-            dialog.save()
+            # Закрепление — только у себя
+            dialog.set_pinned(current_user, not dialog.pinned_for(current_user))
             return Response({
                 'status': 'ok',
-                'pinned': dialog.pinned
+                'pinned': dialog.pinned_for(current_user)
             })
         
         elif action == 'delete':
-            # Полное удаление диалога и всех сообщений (cascade)
-            dialog.delete()
+            # Удаление только у себя: собеседник переписку не теряет
+            dialog.clear_for(current_user)
             return Response({'status': 'ok'})
         
         return Response({'error': 'Invalid action'}, status=400)

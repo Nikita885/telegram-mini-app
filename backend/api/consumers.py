@@ -305,7 +305,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'is_mine': True,
                     },
                     'unread_count': 0,
-                    'pinned': dialog.pinned,
+                    'pinned': dialog.pinned_for(sender),
                 },
                 'other_view': {
                     'dialog_id': dialog.id,
@@ -316,7 +316,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         'is_mine': False,
                     },
                     'unread_count': unread_count,
-                    'pinned': dialog.pinned,
+                    'pinned': dialog.pinned_for(other_user),
                 },
                 'other_user_id': other_user.telegram_id
             }
@@ -378,10 +378,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         for user in [dialog.user1, dialog.user2]:
             other = dialog.get_other_user(user)
-            unread = Message.objects.filter(
-                dialog=dialog,
-                is_read=False
-            ).exclude(sender=user).count()
+            visible = dialog.visible_messages(user)
+            last_msg = visible.order_by('-created_at').first()
+            unread = visible.filter(is_read=False).exclude(sender=user).count()
             
             result[user.telegram_id] = {
                 'dialog_id': dialog.id,
@@ -392,7 +391,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'is_mine': last_msg.sender == user if last_msg else False,
                 } if last_msg else None,
                 'unread_count': unread,
-                'pinned': dialog.pinned,
+                'pinned': dialog.pinned_for(user),
             }
         
         return result
