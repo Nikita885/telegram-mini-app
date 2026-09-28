@@ -48,3 +48,6 @@ backend/wait-for-it/
 
 # Local databases
 *.sqlite3
+
+# Written by start-all.ps1 (local Cloudflare tunnel)
+tunnel-url.txt
