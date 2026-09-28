@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from mobile import share
 from mobile.media import serve_media
 from api.views import (
     authorize_view, home_view, search_view, messages_view,
@@ -14,6 +15,10 @@ urlpatterns = [
     path('', lambda request: redirect('authorize')),
     path('admin/', admin.site.urls),
     path('health/', lambda request: JsonResponse({'status': 'ok'})),
+    # Shared links from the app (with or without the trailing slash) and Android App Links.
+    re_path(r'^o/(?P<outfit_id>\d+)/?$', share.outfit_page, name='share-outfit'),
+    re_path(r'^u/(?P<user_id>\d+)/?$', share.user_page, name='share-user'),
+    path('.well-known/assetlinks.json', share.assetlinks),
     path('api/v1/', include('mobile.urls')),
     path('api/', include('api.urls')),
 

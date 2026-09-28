@@ -241,6 +241,10 @@ JWT_REFRESH_TTL = timedelta(days=int(env("JWT_REFRESH_DAYS", "60")))
 JWT_REFRESH_REUSE_GRACE = timedelta(seconds=int(env("JWT_REFRESH_REUSE_GRACE_SECONDS", "60")))
 LOGIN_NONCE_TTL = timedelta(minutes=5)
 
+# SHA-256 fingerprints of the app signing certificate(s), comma-separated, for Android App Links
+# (/.well-known/assetlinks.json): shared https links then open straight in the app.
+ANDROID_APP_CERT_SHA256 = env_list("ANDROID_APP_CERT_SHA256", "")
+
 # Lets the app sign in with just a Telegram ID. Only for local development.
 ALLOW_DEV_LOGIN = env_bool("ALLOW_DEV_LOGIN", False)
 
