@@ -523,3 +523,21 @@ class StudioTests(ApiTestCase):
         resp = self.client_for(self.bob).get("/api/v1/catalog/items/?category=shirt")
         names = [i["name"] for i in resp.json()["results"]]
         self.assertIn("Синяя рубашка", names)
+
+
+class BotNetworkTests(ApiTestCase):
+    def test_network_errors_never_contain_the_token(self):
+        from unittest import mock
+
+        import requests
+
+        from mobile.management.commands.run_bot import Bot, BotNetworkError
+
+        bot = Bot("123456:SECRET-TOKEN")
+        failure = requests.ConnectionError("HTTPSConnectionPool: /bot123456:SECRET-TOKEN/getMe")
+        with mock.patch.object(bot.session, "post", side_effect=failure):
+            with self.assertRaises(BotNetworkError) as ctx:
+                bot.call("getMe")
+        self.assertNotIn("SECRET", str(ctx.exception))
+        # The original exception (with the URL) is not printed in tracebacks.
+        self.assertTrue(ctx.exception.__suppress_context__)

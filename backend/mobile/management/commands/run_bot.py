@@ -28,23 +28,42 @@ DECLINE = "lno:"
 HOUSEKEEPING_EVERY = 3600  # seconds
 
 
+class BotNetworkError(Exception):
+    """Telegram API unreachable. Carries no URL: request URLs contain the bot token."""
+
+
 class Bot:
     def __init__(self, token: str):
         self.base = f"https://api.telegram.org/bot{token}"
         self.session = requests.Session()
 
     def call(self, method: str, **params):
-        resp = self.session.post(f"{self.base}/{method}", json=params, timeout=params.get("timeout", 10) + 10)
-        data = resp.json()
+        try:
+            resp = self.session.post(f"{self.base}/{method}", json=params, timeout=params.get("timeout", 10) + 10)
+            data = resp.json()
+        except (requests.RequestException, ValueError) as exc:
+            # `from None`: the original exception's message includes the URL, i.e. the token.
+            raise BotNetworkError(f"{method}: {exc.__class__.__name__}") from None
         if not data.get("ok"):
             raise RuntimeError(f"{method}: {data.get('description')}")
         return data["result"]
 
+    def call_until_ok(self, method: str, **params):
+        """Retry while Telegram is unreachable (e.g. right after boot or a network hiccup)."""
+        delay = 3
+        while True:
+            try:
+                return self.call(method, **params)
+            except BotNetworkError as exc:
+                log.warning("%s — retrying in %s s", exc, delay)
+                time.sleep(delay)
+                delay = min(delay * 2, 60)
+
     def _safe(self, method: str, **params):
         try:
             return self.call(method, **params)
-        except Exception:  # noqa: BLE001 - a failed reply must not stop the bot
-            log.warning("%s failed", method, exc_info=True)
+        except Exception as exc:  # noqa: BLE001 - a failed reply must not stop the bot
+            log.warning("%s failed: %s", method, exc)
             return None
 
     def send(self, chat_id, text, button=None, buttons=None):
@@ -174,14 +193,14 @@ class Command(BaseCommand):
         if not settings.TG_BOT_TOKEN:
             raise CommandError("TG_BOT_TOKEN is not set")
         bot = Bot(settings.TG_BOT_TOKEN)
-        me = bot.call("getMe")
+        me = bot.call_until_ok("getMe")
         self.stdout.write(self.style.SUCCESS(f"Bot @{me['username']} started"))
         if settings.TG_BOT_USERNAME and settings.TG_BOT_USERNAME.lower() != me["username"].lower():
             self.stderr.write(f"TG_BOT_USERNAME={settings.TG_BOT_USERNAME} differs from @{me['username']}")
         # Long polling does not work while a webhook is set (e.g. left over from an older deployment).
-        if bot.call("getWebhookInfo").get("url"):
+        if bot.call_until_ok("getWebhookInfo").get("url"):
             self.stderr.write("A webhook was set for this bot; removing it to use long polling")
-            bot.call("deleteWebhook")
+            bot.call_until_ok("deleteWebhook")
         offset = None
         next_housekeeping = 0.0
         while True:
@@ -204,7 +223,8 @@ class Command(BaseCommand):
                         handle_update(bot, update)
                     except Exception:  # noqa: BLE001 - one bad update must not stop the bot
                         log.exception("update %s failed", update.get("update_id"))
-            except requests.RequestException:
+            except BotNetworkError as exc:
+                log.warning("%s", exc)
                 time.sleep(3)
             except RuntimeError as exc:
                 log.warning("%s", exc)
